@@ -1427,26 +1427,25 @@ struct
     * We once again use the rewriter to compute the
     * extract.
     *)
-   let compute_rule_ext =
-      fun name (spec:rewrite_args_spec) params goal args result ->
-         let goal = mk_xlist_term (goal :: args) in
+   let compute_rule_ext name (spec:rewrite_args_spec) params goal args result =
+      let goal = mk_xlist_term (goal :: args) in
+      IFDEF VERBOSE_EXN THEN
+         if !debug_refine then
+            eprintf "Refiner.compute_rule_ext: %s: %a + [%s] [%a] -> %a%t" name print_term goal (String.concat ";" (List.map string_of_symbol (Array.to_list spec.spec_ints))) (print_any_list print_term) params print_term result eflush
+      END;
+      let rw = Rewrite.term_rewrite Strict spec (goal :: params) [result] in
+      if !debug_refine then eprintf "\nDone\n%t" eflush;
+      fun addrs' params' goal' args' ->
+         DEFINE compute = List.hd (apply_rewrite rw (addrs', free_vars_terms args') (mk_xlist_term (goal'::args')) params') IN
          IFDEF VERBOSE_EXN THEN
             if !debug_refine then
-               eprintf "Refiner.compute_rule_ext: %s: %a + [%s] [%a] -> %a%t" name print_term goal (String.concat ";" (List.map string_of_symbol (Array.to_list spec.spec_ints))) (print_any_list print_term) params print_term result eflush
-         END;
-         let rw = Rewrite.term_rewrite Strict spec (goal :: params) [result] in
-         if !debug_refine then eprintf "\nDone\n%t" eflush;
-         fun addrs' params' goal' args' ->
-            DEFINE compute = List.hd (apply_rewrite rw (addrs', free_vars_terms args') (mk_xlist_term (goal'::args')) params') IN
-            IFDEF VERBOSE_EXN THEN
-               if !debug_refine then
-                  try compute with exn ->
-                     let arg = mk_xlist_term (goal'::args') in
-                     eprintf "Refiner.compute_rule_ext: rewrite failed: %s: %a + [%s] [%a] -> %a" name print_term goal (String.concat ";" (List.map string_of_symbol (Array.to_list spec.spec_ints))) (print_any_list print_term) params print_term result;
-                     eprintf "appplied to %a [%s] [%a] (combined out of %a [%a])%t" print_term arg (String.concat ";" (List.map string_of_int (Array.to_list addrs'.arg_ints))) (print_any_list print_term) params' print_term goal' (print_any_list print_term) args' eflush;
-                     raise exn
-               else compute
-            ELSE compute END
+               try compute with exn ->
+                  let arg = mk_xlist_term (goal'::args') in
+                  eprintf "Refiner.compute_rule_ext: rewrite failed: %s: %a + [%s] [%a] -> %a" name print_term goal (String.concat ";" (List.map string_of_symbol (Array.to_list spec.spec_ints))) (print_any_list print_term) params print_term result;
+                  eprintf "appplied to %a [%s] [%a] (combined out of %a [%a])%t" print_term arg (String.concat ";" (List.map string_of_int (Array.to_list addrs'.arg_ints))) (print_any_list print_term) params' print_term goal' (print_any_list print_term) args' eflush;
+                  raise exn
+            else compute
+         ELSE compute END
 
    let justify_rule build name _ _ goal subgoals proof =
       let opname = mk_opname name build.build_opname in
@@ -1633,7 +1632,7 @@ struct
       check_rule name addrs params mterm;
       let subgoals, goal = unzip_mimplies mterm in
          List.iter2 check_subgoal_arg subgoals args;
-         let _ = compute_rule_ext name addrs params goal args result in ()
+         let compute_ext = compute_rule_ext name addrs params goal args result in ignore compute_ext
 
    let extract_term refiner opname args =
       let assums, refiner, derivation =
