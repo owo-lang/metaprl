@@ -221,7 +221,7 @@ struct
    (* rev_append here changes proofs but does not break them *)
 end
 
-module JPropositionalQuantifier (JLogic : JLogicSig) =
+module JPropositionalQuantifier (_ : JLogicSig) =
 struct
 
 (* unused
@@ -241,7 +241,7 @@ type trace_entry =
 
 type tracelist = trace_entry list list
 
-module JTUnify (JLogic : JLogicSig)(JQuantifier: JQuantifierSig) =
+module JTUnify (_ : JLogicSig)(JQuantifier: JQuantifierSig) =
 struct
 
 (* unused

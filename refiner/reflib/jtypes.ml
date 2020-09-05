@@ -17,7 +17,7 @@ type pos_kind =
 
 type position = pos_kind * int
 
-module MkJTypes (JLogic : JLogicSig) =
+module MkJTypes (_ : JLogicSig) =
 struct
    type polarity = Zero | One
 

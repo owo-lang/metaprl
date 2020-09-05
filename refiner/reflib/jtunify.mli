@@ -28,7 +28,7 @@ sig
 
 end
 
-module JQuantifier (JLogic : JLogicSig) : JQuantifierSig
+module JQuantifier (_ : JLogicSig) : JQuantifierSig
 
 type trace_entry =
 	 ((position list * position list * position list * position list) *
@@ -38,7 +38,7 @@ type trace_entry =
 
 type tracelist = trace_entry list list
 
-module JTUnifyQ (JLogic : JLogicSig) :
+module JTUnifyQ (_ : JLogicSig) :
 sig
 
 	val do_stringunify :
@@ -61,7 +61,7 @@ sig
 
 end
 
-module JTUnifyProp (JLogic : JLogicSig) :
+module JTUnifyProp (_ : JLogicSig) :
 sig
 
    val do_stringunify :

@@ -39,7 +39,7 @@ module type OID_TYPE =
  end
 
 module type TENTFUNCTOR =
- functor (Id: OID_TYPE) ->
+ functor (_: OID_TYPE) ->
 
  sig
 
