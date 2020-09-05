@@ -163,7 +163,7 @@ value subst mloc env =
   let rec loop =
     fun
     [ <:expr< let $opt:rf$ $list:pel$ in $e$ >> ->
-        let pel = List.map (fun (p, e) -> (p, loop e)) pel in
+        let pel = List.map (fun (p, e, a) -> (p, loop e, a)) pel in
         <:expr< let $opt:rf$ $list:pel$ in $loop e$ >>
     | <:expr< if $e1$ then $e2$ else $e3$ >> ->
         <:expr< if $loop e1$ then $loop e2$ else $loop e3$ >>
