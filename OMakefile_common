@@ -170,10 +170,10 @@ VersionCheck($(OCAMLC_VERSION),     $(OCAMLC))
 VersionCheck($(OCAMLOPT_VERSION),   $(OCAMLOPT))
 VersionCheck($(OCAMLMKTOP_VERSION), $(OCAMLMKTOP))
 section
-    CAML_VERSIONS = 6.17 7.01 7.02 7.03
-    VersionCheck($(CAMLP5_VERSION),     $(CAMLP5), ?opt = $"-v")
-    VersionCheck($(CAMLP5R_VERSION),    $(CAMLP5R), ?opt = $"-v")
-    VersionCheck($(CAMLP5O_VERSION),    $(CAMLP5O), ?opt = $"-v")
+    CAML_VERSIONS = $(CAMLP5_VERSIONS)
+    VersionCheck($(CAMLP5_VERSION),     $(CAMLP5), ?opt = $"-version")
+    VersionCheck($(CAMLP5R_VERSION),    $(CAMLP5R), ?opt = $"-version")
+    VersionCheck($(CAMLP5O_VERSION),    $(CAMLP5O), ?opt = $"-version")
 
 #
 # XXX: This is here to make sure that Camlp5 3.08 acts the same way as 3.09
