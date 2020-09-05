@@ -107,7 +107,7 @@ let free_vars expr =
     | MLast.ExLmd (_, _, _, e)
     | <:expr< ( $e$ : $_$ ) >> ->
          free bvars l e
-    | <:expr< for $v$ = $e1$ $to:_$ $e2$ do { $list:el$ } >> ->
+    | <:expr< for $lid:v$ = $e1$ $to:_$ $e2$ do { $list:el$ } >> ->
          List.fold_left (free (v::bvars)) (free bvars (free bvars l e1) e2) el
     | <:expr< fun [ $list:pwel$ ] >> ->
          free_pwel bvars l pwel
@@ -134,7 +134,7 @@ let free_vars expr =
      | [] ->
           l
    and free_pel bvars l e = function
-      (patt, e)::tl ->
+      (patt, e, _)::tl ->
           free_pel (patt_bvars bvars patt) (free bvars l e) e tl
      | [] ->
           free bvars l e
