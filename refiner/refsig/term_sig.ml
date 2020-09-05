@@ -158,6 +158,7 @@ sig
     * When this file is copied to term_std.mli, the
     * following for type definitions become abstract.
     *)
+   [@@@warning "-34"]
    type level_exp_var
    and level_exp
    and param
