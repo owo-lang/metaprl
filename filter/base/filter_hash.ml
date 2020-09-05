@@ -70,16 +70,23 @@ let hash_type index ctyp =
    (* hash index (hash_max (Pcaml.ctyp_reloc reloc 0 ctyp)) *)
 
 let hash_str_item index item =
-   hash_expr index (MLast.ExPck (_loc, MLast.MeStr (_loc, Ploc.VaVal [item]), None))
+   let it = [item] in
+   hash_expr index <:expr< (module struct $list:it$ end) >>
+   (* hash_expr index (MLast.ExPck (_loc, MLast.MeStr (_loc, Ploc.VaVal [item]), None)) *)
 
 let hash_sig_item index item =
-   hash_patt index (MLast.PaUnp (_loc, Ploc.VaVal "", Some (MLast.MtSig (_loc, Ploc.VaVal [item]))))
+   let s = "" and it = [item] in
+   hash_patt index <:patt< (module $uid:s$ :  sig $list:it$ end) >>
+   (* hash_patt index (MLast.PaUnp (_loc, Ploc.VaVal "", Some (MLast.MtSig (_loc, Ploc.VaVal [item])))) *)
 
 let hash_module_type index mt =
-   hash_patt index (MLast.PaUnp (_loc, Ploc.VaVal "", Some mt))
+   let s = "" in
+   hash_patt index <:patt< (module $uid:s$ :  $mt$) >>
+   (* hash_patt index (MLast.PaUnp (_loc, Ploc.VaVal "", Some mt)) *)
 
 let hash_module_expr index me =
-   hash_expr index (MLast.ExPck (_loc, me, None))
+   hash_expr index <:expr< (module $me$) >>
+   (* hash_expr index (MLast.ExPck (_loc, me, None)) *)
 
 (*
  * -*-
