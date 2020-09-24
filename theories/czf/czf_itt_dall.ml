@@ -50,9 +50,6 @@ extends Czf_itt_all
 extends Czf_itt_set_ind
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 open Top_conversionals
 

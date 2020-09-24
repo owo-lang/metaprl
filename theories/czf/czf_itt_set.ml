@@ -109,8 +109,7 @@ extends Itt_eta
 doc docoff
 extends Czf_itt_comment
 
-open Lm_debug
-open Lm_printf
+(* open Lm_debug *)
 
 open Basic_tactics
 
@@ -118,12 +117,14 @@ open Itt_dfun
 open Itt_struct
 open Itt_w
 
+(* Unused
 let debug_czf_set =
    create_debug (**)
       { debug_name = "czf_set";
         debug_description = "display czf_set operations";
         debug_value = false
       }
+*)
 
 (************************************************************************
  * TERMS                                                                *

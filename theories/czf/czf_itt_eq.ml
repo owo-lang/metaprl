@@ -83,8 +83,6 @@ doc <:doc< @parents >>
 extends Czf_itt_set
 doc docoff
 
-open Itt_equal
-
 open Basic_tactics
 
 open Itt_equal

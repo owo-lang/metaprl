@@ -40,9 +40,6 @@ extends Czf_itt_group
 extends Czf_itt_hom
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

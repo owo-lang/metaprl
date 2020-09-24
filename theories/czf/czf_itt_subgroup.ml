@@ -44,9 +44,6 @@ extends Czf_itt_subset
 extends Czf_itt_isect
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

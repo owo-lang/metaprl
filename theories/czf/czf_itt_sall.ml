@@ -41,9 +41,6 @@ doc <:doc< @parents >>
 extends Czf_itt_set
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Tactic_type.Conversionals
 
 open Dtactic

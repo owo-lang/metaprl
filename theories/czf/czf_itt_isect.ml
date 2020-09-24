@@ -50,9 +50,6 @@ doc <:doc< @parents >>
 extends Czf_itt_union
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 open Itt_logic

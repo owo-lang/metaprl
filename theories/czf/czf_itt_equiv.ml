@@ -78,9 +78,6 @@ extends Czf_itt_pair
 extends Czf_itt_set_bvd
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Basic_tactics
 
 open Itt_dfun

@@ -48,9 +48,6 @@ extends Czf_itt_dall
 extends Czf_itt_dexists
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 open Top_conversionals
 

@@ -44,9 +44,6 @@ extends Czf_itt_abel_group
 extends Czf_itt_coset
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

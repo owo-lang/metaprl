@@ -73,9 +73,6 @@ extends Czf_itt_abel_group
 extends Czf_itt_inv_image
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

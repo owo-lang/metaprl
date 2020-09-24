@@ -11,9 +11,6 @@ extends Itt_bool
 
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Tactic_type.Conversionals
 
 open Dtactic

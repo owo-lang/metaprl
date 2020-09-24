@@ -50,9 +50,6 @@ extends Czf_itt_dexists
 extends Czf_itt_subgroup
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

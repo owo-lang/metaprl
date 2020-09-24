@@ -45,9 +45,6 @@ extends Czf_itt_group_power
 extends Czf_itt_subgroup
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Tactic_type.Conversionals
 
 open Dtactic

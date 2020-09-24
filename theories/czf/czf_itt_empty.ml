@@ -41,9 +41,6 @@ doc <:doc< @parents >>
 extends Czf_itt_member
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

@@ -77,9 +77,6 @@ extends Czf_itt_dexists
 extends Czf_itt_subset
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 open Top_conversionals
 

@@ -59,9 +59,6 @@ extends Czf_itt_dexists
 extends Czf_itt_rel
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 doc <:doc<
    @rules
    @modsubsection{Set induction}

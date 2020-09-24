@@ -50,7 +50,6 @@ extends Czf_itt_dexists
 doc docoff
 
 open Term_sig
-open Refiner.Refiner.TermType
 open Refiner.Refiner.Term
 open Refiner.Refiner.RefineError
 

@@ -44,9 +44,6 @@ extends Czf_itt_cyclic_subgroup
 extends Czf_itt_abel_group
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Tactic_type.Conversionals
 
 open Dtactic

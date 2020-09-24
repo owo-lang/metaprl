@@ -78,9 +78,6 @@ extends Czf_itt_singleton
 extends Czf_itt_union
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

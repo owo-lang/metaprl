@@ -45,9 +45,6 @@ extends Czf_itt_coset
 extends Czf_itt_normal_subgroup
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************

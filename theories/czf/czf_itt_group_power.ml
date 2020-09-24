@@ -50,9 +50,6 @@ extends Czf_itt_group
 extends Itt_int_base
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Tactic_type.Conversionals
 
 open Dtactic

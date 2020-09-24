@@ -32,9 +32,6 @@
 
 extends Czf_itt_and
 
-open Lm_debug
-open Lm_printf
-
 open Dtactic
 
 (************************************************************************
