@@ -163,7 +163,7 @@ value subst mloc env =
   let rec loop =
     fun
     [ <:expr< let $opt:rf$ $list:pel$ in $e$ >> ->
-        let pel = List.map (fun (p, e) -> (p, loop e)) pel in
+        let pel = List.map (fun (p, e, a) -> (p, loop e, a)) pel in
         <:expr< let $opt:rf$ $list:pel$ in $loop e$ >>
     | <:expr< if $e1$ then $e2$ else $e3$ >> ->
         <:expr< if $loop e1$ then $loop e2$ else $loop e3$ >>
@@ -253,7 +253,7 @@ value substt mloc env =
     [ <:ctyp< $t1$ -> $t2$ >> -> <:ctyp< $loop t1$ -> $loop t2$ >>
     | <:ctyp< $t1$ $t2$ >> -> <:ctyp< $loop t1$ $loop t2$ >>
     | <:ctyp< ($list:tl$) >> -> <:ctyp< ($list:List.map loop tl$) >>
-    | <:ctyp< $lid:x$ >> | <:ctyp< $uid:x$ >> as t ->
+    | <:ctyp< $lid:x$ >> as t ->
         try List.assoc x env with [ Not_found -> t ]
     | t -> t ]
 ;
