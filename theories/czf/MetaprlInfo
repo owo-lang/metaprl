@@ -5,7 +5,6 @@ THEORYDESCR = Constructive Set Theory
 THEORY_DEPS[] +=
     itt/core
     itt/extensions/base
-    itt/applications/supinf
 
 # Library files
 MPFILES[] =
