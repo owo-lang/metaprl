@@ -40,12 +40,12 @@ open Lm_printf
 let _ =
    show_loading "Loading Free_vars%t"
 
-
 (*
  * Compute the binding variables.
  *)
 let rec patt_bvars bvars = function
-   <:patt< $p1$ . $p2$ >>
+   <:patt< $longid:_$ . $p$ >> ->
+     patt_bvars bvars p
  | <:patt< ($p1$ as $p2$) >>
  | <:patt< $p1$ $p2$ >>
  | <:patt< $p1$ | $p2$ >>
@@ -119,7 +119,7 @@ let free_vars expr =
     | <:expr< match $e$ with [ $list:pwel$ ] >>
     | <:expr< try $e$ with [ $list:pwel$ ] >> ->
          free_pwel bvars (free bvars l e) pwel
-    | <:expr< new $list:_$ >> ->
+    | <:expr< new $lilongid:_$ >> ->
          bvars
     | <:expr< {< $list:sel$ >} >> ->
          List.fold_left (fun l (_, el) -> free bvars l el) l sel
