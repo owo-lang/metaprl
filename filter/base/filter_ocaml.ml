@@ -121,7 +121,7 @@ struct
             mk_opname s ocaml_op)
 
    let one_subterm s t =
-      if false then
+      if !debug_ocaml then
          begin
             eprintf "one_subterm: %s: begin: %s%t" s (SimplePrint.string_of_term t) eflush;
             let t = one_subterm t in
@@ -210,11 +210,9 @@ struct
    let patt_ifelse_op    = mk_ocaml_op "patt_ifelse"
    let patt_fail_op      = mk_ocaml_op "patt_fail"
 
-   let jc_op             = mk_ocaml_op "joinclause_case"
-   let jcl_op            = mk_ocaml_op "joinclause_list"
-   let joinclause_op     = mk_ocaml_op "joinclause"
-
-   let expr_rpl_string_op = mk_ocaml_op "rpl_string"
+   let lid_acc_op        = mk_ocaml_op "lid_acc"
+   let lid_app_op        = mk_ocaml_op "lid_app"
+   let lid_uid_op        = mk_ocaml_op "lid_uid"
 
    (*
     * Loc has two integer describing character offsets.
@@ -278,7 +276,7 @@ struct
     * Variables are wrapped.
     *)
    let dest_var t =
-      let t = one_subterm "dest_var_t" t in
+      let t = one_subterm "dest_var" t in
          if is_var_term t then
             string_of_symbol (ToTerm.Term.dest_var t)
          else
@@ -324,23 +322,50 @@ struct
    (*
     * Conversion between pattern and expression identifiers.
     *)
+
    let rec expr_of_patt_ident p =
       let _loc = MLast.loc_of_patt p in
+      let rec expr_of_longid lid =
+         let _loc = MLast.loc_of_longid lid in
+            match lid with
+               <:extended_longident< $longid:x$ . $uid:s$ >> ->
+                  <:expr< $expr_of_longid x$ . $uid:s$ >>
+             | <:extended_longident< $longid:x1$ ( $longid:x2$ ) >> ->
+                  <:expr< $expr_of_longid x1$ $expr_of_longid x2$ >>
+             | <:extended_longident< $uid:s$ >> ->
+                  <:expr< $uid:s$ >>
+             | _ ->
+                 Stdpp.raise_with_loc _loc (Failure "Filter_ocaml.expr_of_patt_ident: not a longid")
+      in
          match p with
-            <:patt< $p1$ . $p2$ >> ->
-              <:expr< $expr_of_patt_ident p1$ . $expr_of_patt_ident p2$ >>
-          | <:patt< $uid: uid$ >> ->
-              <:expr< $uid: uid$ >>
-          | <:patt< $lid: lid$ >> ->
-              <:expr< $lid: lid$ >>
+            <:patt< $longid:p1$ . $p2$ >> ->
+               <:expr< $expr_of_longid p1$ . $expr_of_patt_ident p2$ >>
+          | <:patt< $longid:id$ >> ->
+               expr_of_longid id
+          | <:patt< $lid:lid$ >> ->
+               <:expr< $lid:lid$ >>
           | _ ->
-              Stdpp.raise_with_loc _loc (Failure "Filter_ocaml.expr_of_patt_ident: not an identifier")
+               Stdpp.raise_with_loc _loc (Failure "Filter_ocaml.expr_of_patt_ident: not an identifier")
 
    let rec patt_of_expr_ident e =
       let _loc = MLast.loc_of_expr e in
          match e with
           | <:expr< $e1$ . $e2$ >> ->
-               <:patt< $patt_of_expr_ident e1$ . $patt_of_expr_ident e2$ >>
+               let rec longid_of_expr e =
+                  let _loc = MLast.loc_of_expr e in
+                     match e with
+                        <:expr< $e$ . $uid:s$ >> ->
+                           <:extended_longident< $longid:longid_of_expr e$ . $uid:s$ >>
+                      | <:expr< $uid:s$ >> ->
+                           <:extended_longident< $uid:s$ >>
+                      | <:expr< $e1$ $e2$ >> ->
+                           let x1 = longid_of_expr e1 in
+                           let x2 = longid_of_expr e2 in
+                              <:extended_longident< $longid:x1$ ( $longid:x2$ ) >>
+                      | _ ->
+                           Stdpp.raise_with_loc _loc (Failure "Filter_ocaml.patt_of_expr_ident: not an identifer")
+               in
+                  <:patt< $longid:longid_of_expr e1$ . $patt_of_expr_ident e2$ >>
           | <:expr< $uid: uid$ >> ->
                <:patt< $uid: uid$ >>
           | <:expr< $lid: lid$ >> ->
@@ -368,6 +393,10 @@ struct
    (*
     * Destruction uses hashtables.
     *)
+   let dest_longid, add_longid =
+      let table = Hashtbl.create 17 in
+         dest_tbl "longid" table, add_tbl table
+
    let dest_expr, add_expr =
       let table = Hashtbl.create 17 in
          dest_tbl "expr" table, add_tbl table
@@ -460,11 +489,13 @@ struct
          let tl = dest_olist tl in
          let loc, s = dest_loc_string "dest_tdl" s in
          let prm = List.map dest_sbb sl in
-            { MLast.tdNam = Ploc.VaVal (loc, Ploc.VaVal s);
+            { MLast.tdIsDecl = <:vala< true >>;
+              MLast.tdNam = Ploc.VaVal (loc, Ploc.VaVal s);
               MLast.tdPrm = Ploc.VaVal prm;
               MLast.tdPrv = Ploc.VaVal false;
               MLast.tdDef = dest_type t;
-              MLast.tdCon = Ploc.VaVal (List.map dest_tc tl)
+              MLast.tdCon = Ploc.VaVal (List.map dest_tc tl);
+              MLast.tdAttributes = <:vala< [] >>
             }
 
    let dest_expr_opt t = dest_opt dest_expr t
@@ -528,7 +559,8 @@ struct
             ciNam = Ploc.VaVal (dest_string s);
             ciPrm = loc, Ploc.VaVal (List.map (fun (s, b) -> Ploc.VaVal s, b) prm);
             ciVir = Ploc.VaVal (dest_bool b);
-            ciExp = dest_ct t
+            ciExp = dest_ct t;
+            ciAttributes = <:vala< [] >>
           }
 
    let dest_fun_aux =
@@ -577,31 +609,15 @@ struct
       in
          dest
 
-   let dest_joinclause t =
-      let tl = dest_olist t in
-         List.map (fun t ->
-            let loc = dest_loc "dest_joinclause" t in
-            let jcll = one_subterm "dest_joinclause" t in
-            let jcll =
-               List.map (fun t ->
-                  let loc1 = dest_loc "dest_def_str_1" t in
-                  let jcl, e = two_subterms t in
-                  let e = dest_expr e in
-                  let jcl =
-                     List.map (fun t ->
-                        let loc2, s = dest_loc_string "dest_def_str_2" t in
-                        let po = one_subterm "dest_def_str_3" t in
-                        let po, _ = dest_patt_opt po in
-                           loc2, (loc2, Ploc.VaVal s), Ploc.VaVal po) (dest_olist jcll)
-                  in
-                    (loc1, Ploc.VaVal jcl, e)) (dest_olist jcll)
-            in
-               { jcLoc = loc; jcVal = Ploc.VaVal jcll }) tl
-
    let dest_patt_triple t =
       let p1, t = dest_patt (one_subterm "dest_patt_triple" t) in
       let p2, t = dest_patt (one_subterm "dest_patt_triple" t) in
          p1, p2, one_subterm "dest_patt_triple" t
+
+   let dest_lid_triple t =
+      let p1, t = dest_longid (one_subterm "dest_lid_triple" t) in
+      let p2, t = dest_patt (one_subterm "dest_lid_triple" t) in
+         p1, p2, one_subterm "dest_lid_triple" t
 
    let expr_string_op =
       let dest_string_expr t =
@@ -855,14 +871,14 @@ struct
             let _loc = dest_loc "dest_upto_expr" t in
             let e1, e2, v, e3 = dest_dep0_dep0_dep1_any_term t in
             let el = dest_olist e3 in
-               <:expr< for $string_of_symbol v$ = $dest_expr e1$ $to:true$ $dest_expr e2$ do { $list: List.map dest_expr el$ } >>
+               <:expr< for $lid:string_of_symbol v$ = $dest_expr e1$ $to:true$ $dest_expr e2$ do { $list: List.map dest_expr el$ } >>
          in add_expr "for_upto" dest_upto_expr
       and expr_downto_op =
          let dest_downto_expr t =
             let _loc = dest_loc "dest_downto_expr" t in
             let e1, e2, v, e3 = dest_dep0_dep0_dep1_any_term t in
             let el = dest_olist e3 in
-               <:expr< for $string_of_symbol v$ = $dest_expr e1$ $to:false$ $dest_expr e2$ do { $list: List.map dest_expr el$ } >>
+               <:expr< for $lid:string_of_symbol v$ = $dest_expr e1$ $to:false$ $dest_expr e2$ do { $list: List.map dest_expr el$ } >>
          in add_expr "for_downto" dest_downto_expr
       and expr_if_op =
          let dest_if_expr t =
@@ -879,7 +895,7 @@ struct
       and expr_new_op =
          let dest_new_expr t =
             let _loc = dest_loc "dest_new_expr" t in
-               <:expr< new $list:List.map dest_string (dest_olist t)$ >>
+               <:expr< new $lilongid:Asttools.longident_lident_of_string_list _loc (List.map dest_string (dest_olist t))$ >>
          in add_expr "new" dest_new_expr
       and expr_obj_op =
          let dest_obj_expr t =
@@ -955,44 +971,44 @@ struct
             let eo = dest_expr_opt t in
                MLast.ExOlb (loc, p, Ploc.VaVal eo)
          in add_expr "olb" dest_olb_expr
-      and expr_jdf_op =
+   (* and expr_jdf_op =
          let dest_jdf_expr t =
             let loc = dest_loc "dest_jdf_expr" t in
             let e, jc = two_subterms t in
             let jc = dest_joinclause jc in
                MLast.ExJdf (loc, Ploc.VaVal jc, dest_expr e)
-         in add_expr "jdf" dest_jdf_expr
+         in add_expr "jdf" dest_jdf_expr *)
       and expr_lop_op =
          let dest_lop_expr t =
             let _loc = dest_loc "dest_lop_expr" t in
             let me, e = two_subterms t in
-               MLast.ExLop (_loc, dest_me me, dest_expr e)
+               <:expr< let open $dest_me me$ in $dest_expr e$ >>
          in add_expr "lop_expr" dest_lop_expr
-      and expr_par_op =
+   (* and expr_par_op =
          let dest_par_expr t =
             let _loc = dest_loc "dest_par_expr" t in
             let e1, e2 = two_subterms t in
                MLast.ExPar (_loc, dest_expr e1, dest_expr e2)
-         in add_expr "par_expr" dest_par_expr
+         in add_expr "par_expr" dest_par_expr *)
       and expr_pck_op =
          let dest_pck_expr t =
             let _loc = dest_loc "dest_pck_expr" t in
             let me, mto = two_subterms t in
                MLast.ExPck (_loc, dest_me me, dest_opt dest_mt mto)
          in add_expr "pck_expr" dest_pck_expr
-      and expr_rpl_op =
+   (* and expr_rpl_op =
          let dest_rpl_expr t =
             let _loc = dest_loc "dest_rpl_expr" t in
             let eo, ls = two_subterms t in
             let loc2, s = dest_loc_string "dest_rpl_expr" ls in
                MLast.ExRpl (_loc, Ploc.VaVal (dest_opt dest_expr eo), Ploc.VaVal (loc2, Ploc.VaVal s))
-         in add_expr "rpl_expr" dest_rpl_expr
-      and expr_spw_op =
+         in add_expr "rpl_expr" dest_rpl_expr *)
+   (* and expr_spw_op =
          let dest_spw_expr t =
             let _loc = dest_loc "dest_spw_expr" t in
             let e = one_subterm "dest_spw_expr" t in
                MLast.ExSpw (_loc, dest_expr e)
-         in add_expr "spw" dest_spw_expr
+         in add_expr "spw" dest_spw_expr *)
        and expr_xtr_op =
          let dest_xtr_expr t =
             let loc = dest_loc "dest_xtr_expr" t in
@@ -1024,7 +1040,7 @@ struct
                   mk_loc_string expr_char_op loc c
              | (<:expr< $flo:s$ >>) ->
                   mk_loc_string expr_float_op loc s
-             | (<:expr< for $s$ = $e1$ $to:b$ $e2$ do { $list:el$ } >>) ->
+             | (<:expr< for $lid:s$ = $e1$ $to:b$ $e2$ do { $list:el$ } >>) ->
                   let op = if b then expr_upto_op else expr_downto_op in
                   let op_loc = mk_op_loc op loc in
                   let el' = mk_olist_term (List.map (mk_expr (s :: vars)) el) in
@@ -1057,8 +1073,12 @@ struct
                                                            mk_expr vars e]
              | (<:expr< match $e$ with [ $list:pwel$ ] >>) ->
                   mk_match vars loc pwel e
-             | (<:expr< new $list: sl$ >>) ->
-                  mk_simple_term expr_new_op loc [mk_olist_term (List.map (mk_string expr_new_op) sl)]
+             | (<:expr< new $lilongid: obj$ >>) ->
+                  let sl = (match obj with
+                               None, Ploc.VaVal t -> [t]
+                             | _ ->  raise (RefineError ("mk_expr", StringError "lilongid is not supported")))
+                  in (* TODO: add full lilongid support *)
+                     mk_simple_term expr_new_op loc [mk_olist_term (List.map (mk_string expr_new_op) sl)]
              | (<:expr:< object $opt:po$ $list:cfl$ end >>) ->
                   mk_simple_term expr_obj_op loc [mk_patt_opt _loc [] po (mk_cf_list cfl)]
              | (<:expr< {< $list:sel$ >} >>) ->
@@ -1094,55 +1114,13 @@ struct
                   mk_simple_term expr_coerce_class_op loc [mk_expr vars e; mk_opt mk_type ot; mk_type t]
              | (<:expr< $e$ .{ $list:el$ } >>) ->
                   mk_simple_term expr_bigarray_element_op loc [mk_expr vars e; mk_olist_term (List.map (mk_expr vars) el)]
-             | MLast.ExJdf (_, Ploc.VaVal jcl, e) ->
-                  mk_simple_term expr_jdf_op loc [mk_expr vars e; mk_olist_term (List.map (mk_joinclause vars) jcl)]
-             | MLast.ExLop (_, me, e) ->
+             | (<:expr< let open $me$ in $e$ >>) ->
                   mk_simple_term expr_lop_op loc [mk_module_expr vars me; mk_expr vars e]
-             | MLast.ExPar (_, e1, e2) ->
-                  mk_simple_term expr_par_op loc [mk_expr vars e1; mk_expr vars e2]
              | MLast.ExPck (_, me, mto) ->
                   mk_simple_term expr_pck_op loc [mk_module_expr vars me; mk_opt mk_module_type mto]
-             | MLast.ExRpl (_, Ploc.VaVal eo, Ploc.VaVal (loc2, Ploc.VaVal s)) ->
-                  let ls = mk_loc_string expr_rpl_string_op (num_of_loc loc2) s in
-                    mk_simple_term expr_rpl_op loc [mk_opt (mk_expr vars) eo; ls]
-             | MLast.ExSpw (_, e) ->
-                  mk_simple_term expr_spw_op loc [mk_expr vars e]
              | ExXtr (loc, s, eo) ->
                   mk_simple_named_term expr_xtr_op (num_of_loc loc) s [mk_opt (fun e -> (mk_expr vars (dest_vala "ExXtr" e))) eo]
-             | MLast.ExArr (_, Ploc.VaAnt _)
-             | MLast.ExChr (_, Ploc.VaAnt _)
-             | MLast.ExFlo (_, Ploc.VaAnt _)
-             | MLast.ExFor (_, _, _, _, _, Ploc.VaAnt _)
-             | MLast.ExFor (_, _, _, _, Ploc.VaAnt _, _)
-             | MLast.ExFor (_, Ploc.VaAnt _, _, _, _, _)
-             | MLast.ExFun (_, Ploc.VaAnt _)
-             | MLast.ExInt (_, Ploc.VaAnt _, _)
-             | MLast.ExInt (_, Ploc.VaVal _, _)
-             | MLast.ExLet (_, _, Ploc.VaAnt _, _)
-             | MLast.ExLet (_, Ploc.VaAnt _, _, _)
-             | MLast.ExLid (_, Ploc.VaAnt _)
-             | MLast.ExLmd (_, Ploc.VaAnt _, _, _)
-             | MLast.ExMat (_, _, Ploc.VaAnt _)
-             | MLast.ExNew (_, Ploc.VaAnt _)
-             | MLast.ExOvr (_, Ploc.VaAnt _)
-             | MLast.ExRec (_, Ploc.VaAnt _, _)
-             | MLast.ExSeq (_, Ploc.VaAnt _)
-             | MLast.ExSnd (_, _, Ploc.VaAnt _)
-             | MLast.ExStr (_, Ploc.VaAnt _)
-             | MLast.ExTry (_, _, Ploc.VaAnt _)
-             | MLast.ExTup (_, Ploc.VaAnt _)
-             | MLast.ExUid (_, Ploc.VaAnt _)
-             | MLast.ExWhi (_, _, Ploc.VaAnt _)
-             | MLast.ExVrn (_, Ploc.VaAnt _)
-             | MLast.ExLab (_, Ploc.VaAnt _)
-             | MLast.ExObj (_, _, Ploc.VaAnt _)
-             | MLast.ExObj (_, Ploc.VaAnt _, _)
-             | MLast.ExOlb (_, _, Ploc.VaAnt _)
-             | MLast.ExBae (_, _, Ploc.VaAnt _)
-             | MLast.ExJdf (_, Ploc.VaAnt _, _)
-             | MLast.ExRpl (_, Ploc.VaAnt _, _)
-             | MLast.ExRpl (_, _, Ploc.VaAnt _)
-             | MLast.ExRpl (_, _, Ploc.VaVal (_, Ploc.VaAnt _)) | _ ->
+             | _ ->
                   raise (RefineError ("mk_expr", StringError "antiquotations are not supported"))
 
    (*
@@ -1198,18 +1176,18 @@ struct
             let _loc, s, t = dest_loc_string_term "dest_char_patt" t in
                <:patt< $chr:s$ >>, t
          in add_patt "patt_char" dest_char_patt
-      and patt_uid_op =
+      and patt_longid_op =
          let dest_patt_id t =
             if is_var_term t then
                dest_var t
             else
                dest_string_param t
          in
-         let dest_uid_patt t =
-         let _loc = dest_loc "dest_uid_patt" t in
+         let dest_longid_patt t =
+         let _loc = dest_loc "dest_longid_patt" t in
          let p, t = two_subterms t in
             <:patt< $uid:dest_patt_id p$ >>, t
-         in add_patt "patt_uid" dest_uid_patt
+         in add_patt "patt_longid" dest_longid_patt
       and patt_ty_lid_op =
          let dest_patt_id t =
             if is_var_term t then
@@ -1231,8 +1209,8 @@ struct
       and patt_proj_op =
          let dest_proj_patt t =
             let _loc = dest_loc "dest_proj_patt" t in
-            let p1, p2, t = dest_patt_triple t in
-               <:patt< $p1$ . $p2$ >>, t
+            let p1, p2, t = dest_lid_triple t in
+               <:patt< $longid:p1$ . $p2$ >>, t
          in add_patt "patt_proj" dest_proj_patt
       and patt_as_op =
          let dest_as_patt t =
@@ -1344,9 +1322,9 @@ struct
       and patt_typ_op =
          let dest_typ_patt t =
             let _loc = dest_loc "dest_typ_patt" t in
-            let sl, t = two_subterms t in
-            let sl = dest_sl sl in
-               <:patt< # $sl$ >>, t
+            let s, t = two_subterms t in
+            let s = dest_string s in
+               <:patt< # $s$ >>, t
          in add_patt "patt_typ" dest_typ_patt
        and patt_xtr_op =
          let dest_xtr_patt t =
@@ -1359,8 +1337,8 @@ struct
       in fun vars patt tailf ->
          let loc = loc_of_patt patt in
             match patt with
-               (<:patt< $p1$ . $p2$ >>) ->
-                  mk_patt_triple vars loc patt_proj_op patt_proj_arg_op patt_proj_end_op p1 p2 tailf
+               (<:patt< $longid:p1$ . $p2$ >>) ->
+                  mk_longid_triple vars loc patt_proj_op patt_proj_arg_op patt_proj_end_op p1 p2 tailf
              | (<:patt< ( $p1$ as $p2$ ) >>) ->
                   mk_patt_triple vars loc patt_as_op patt_as_arg_op patt_as_end_op p1 p2 tailf
              | (<:patt< _ >>) ->
@@ -1396,8 +1374,6 @@ struct
                   mk_patt_list vars loc patt_tuple_op patt_tuple_arg_op patt_tuple_end_op pl tailf
              | (<:patt< ( $p$ : $t'$ ) >>) ->
                   mk_simple_term patt_cast_op loc [mk_patt vars p tailf; mk_type t']
-             | (<:patt< $uid:s$ >>) ->
-                  mk_var_term patt_uid_op vars loc s (tailf vars)
              | (<:patt< (type $lid:s$) >>) ->
                   mk_var_term patt_ty_lid_op vars loc s (tailf vars)
              | (<:patt< $anti: p$ >>) ->
@@ -1408,8 +1384,8 @@ struct
                   mk_patt_lab vars loc ppol tailf
              | (<:patt< ?{ $p$ $opt:oe$ } >>) ->
                   mk_simple_term patt_olb_op loc [mk_patt vars p tailf; mk_expr_opt vars oe]
-             | (<:patt< # $sl$ >>) ->
-                  mk_simple_term patt_typ_op loc [mk_string_list sl]
+             | (<:patt< # $s$ >>) ->
+                  mk_simple_term patt_typ_op loc [mk_simple_string s]
              | (<:patt< lazy $p$ >>) ->
                   mk_simple_term patt_lazy_op loc [mk_patt vars p tailf]
              | (<:patt< (module $uid:s$) >>) ->
@@ -1426,7 +1402,6 @@ struct
              | PaRec (_, Ploc.VaAnt _)
              | PaStr (_, Ploc.VaAnt _)
              | PaTup (_, Ploc.VaAnt _)
-             | PaUid (_, Ploc.VaAnt _)
              | PaVrn (_, Ploc.VaAnt _)
              | PaOlb (_, _, Ploc.VaAnt _)
              | PaTyp (_, Ploc.VaAnt _)
@@ -1458,6 +1433,11 @@ struct
       let tailf vars = mk_simple_term op3 loc [tailf vars] in
       let tailf vars = mk_simple_term op2 loc [mk_patt vars p2 tailf] in
          mk_simple_term op1 loc [mk_patt vars p1 tailf]
+
+   and mk_longid_triple vars loc op1 op2 op3 p1 p2 tailf =
+      let vars = mk_simple_term op3 loc [tailf vars] in
+      let tailf vars = mk_simple_term op2 loc [mk_patt vars p2 tailf] in
+         mk_simple_term op1 loc [mk_longid vars p1 tailf]
 
    and mk_patt_record =
       let patt_record_proj_op = mk_ocaml_op "patt_record_proj"
@@ -1549,16 +1529,11 @@ struct
             let _loc = dest_loc "dest_lid_type" t in
                <:ctyp< $lid:dest_var t$ >>
          in add_type "type_lid" dest_lid_type
-      and type_uid_op =
-         let dest_uid_type t =
-            let _loc = dest_loc "dest_uid_type" t in
-               <:ctyp< $uid:dest_var t$ >>
-         in add_type "type_uid" dest_uid_type
       and type_proj_op =
          let dest_proj_type t =
             let _loc = dest_loc "dest_proj_type" t in
             let t1, t2 = two_subterms t in
-               <:ctyp< $dest_type t1$ . $dest_type t2$ >>
+               <:ctyp< $longid:dest_type t1$ . $lid:dest_type t2$ >>
          in add_type "type_proj" dest_proj_type
       and type_as_op =
          let dest_as_type t =
@@ -1586,7 +1561,7 @@ struct
       and type_class_id_op =
          let dest_class_id_type t =
             let _loc = dest_loc "dest_class_id_type" t in
-               <:ctyp< # $list:List.map dest_string (dest_olist (one_subterm "dest_class_id_type" t))$ >>
+               <:ctyp< # $lilongid:List.map dest_string (dest_olist (one_subterm "dest_class_id_type" t))$ >>
          in add_type "type_class_id" dest_class_id_type
       and type_param_op =
          let dest_param_type t =
@@ -1699,7 +1674,7 @@ struct
       in fun t ->
          let loc = loc_of_ctyp t in
             match t with
-               (<:ctyp< $t1$ . $t2$ >>) ->
+               (<:ctyp< $longid:t1$ . $lid:t2$ >>) ->
                   mk_simple_term type_proj_op loc [mk_type t1; mk_type t2]
              | (<:ctyp< $t1$ as $t2$ >>) ->
                   mk_simple_term type_as_op loc [mk_type t1; mk_type t2]
@@ -1709,7 +1684,7 @@ struct
                   mk_simple_term type_apply_op loc [mk_type t1; mk_type t2]
              | (<:ctyp< $t1$ -> $t2$ >>) ->
                   mk_simple_term type_fun_op loc [mk_type t1; mk_type t2]
-             | (<:ctyp< # $list:i$ >>) ->
+             | (<:ctyp< # $lilongid:i$ >>) ->
                   mk_simple_term type_class_id_op loc [mk_olist_term (List.map (mk_string type_class_id_op) i)]
              | (<:ctyp< $lid:s$ >>) ->
                   mk_var type_lid_op [] loc s
@@ -1734,8 +1709,6 @@ struct
                   mk_simple_term type_list_op loc [mk_olist_term (List.map mk_stl stll)]
              | (<:ctyp< ( $list:tl$ ) >>) ->
                   mk_simple_term type_prod_op loc [mk_olist_term (List.map mk_type tl)]
-             | (<:ctyp< $uid:s$ >>) ->
-                  mk_var type_uid_op [] loc s
              | MLast.TyVrn (_, Ploc.VaVal sbtll, sloo) ->
                   mk_simple_term type_vrn_op loc [mk_olist_term (List.map mk_rf sbtll);
                                                   mk_opt (mk_opt (mk_vala "TyVrn" mk_string_list)) sloo]
@@ -1820,7 +1793,7 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
          let dest_open_sig t =
             let _loc = dest_loc "dest_open_sig" t in
             let sl = dest_olist (one_subterm "dest_open_sig" t) in
-               <:sig_item< open $List.map dest_string sl$ >>
+               <:sig_item< open $longid:List.map dest_string sl$ $itemattrs:[]$ >>
          in add_sig "sig_open" dest_open_sig
       and sig_type_op =
          let dest_type_sig t =
@@ -1881,7 +1854,7 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
                   mk_simple_named_term sig_module_op loc s [mk_module_type mt]
              | (<:sig_item< module type $s$ = $mt$ >>) ->
                   mk_simple_named_term sig_module_type_op loc s [mk_module_type mt]
-             | (<:sig_item< open $sl$ >>) ->
+             | (<:sig_item< open $longid:sl$ $itemattrs:_$ >>) ->
                   mk_simple_term sig_open_op loc [mk_olist_term (List.map mk_simple_string sl)]
              | (<:sig_item< type $list:tdl$ >>) ->
                   mk_simple_term sig_type_op loc [mk_olist_term (List.map mk_tdl tdl)]
@@ -2088,15 +2061,15 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
              | (<:str_item< type $list:tdl$ >>) ->
                   mk_simple_term str_type_op loc [mk_olist_term (List.map mk_tdl tdl)]
              | (<:str_item< value $opt:b$ $list:pel$ >>) -> mk_str_fix loc b pel
-             | StInc (_, me) ->
+             | (<:str_item< include $me$ >>) ->
                   mk_simple_term str_inc_op loc [mk_module_expr vars me]
              | StDir (_, Ploc.VaVal s, Ploc.VaVal eo) ->
                   mk_simple_named_term str_dir_op loc s [mk_expr_opt vars eo]
              | StExc (_, Ploc.VaVal s, Ploc.VaVal tl, Ploc.VaVal sl) ->
                   mk_simple_named_term str_exc_op loc s [mk_olist_term (List.map mk_type tl);
                                                          mk_string_list sl]
-             | StMod (_, Ploc.VaVal b, Ploc.VaVal smel) ->
-                  mk_simple_term str_mod_op loc [mk_bool b; mk_olist_term (List.map (mk_sme vars) smel)]
+             | (<:str_item< module $flag:b$ $list:lsme$ >>) ->
+                  mk_simple_term str_mod_op loc [mk_bool b; mk_olist_term (List.map (mk_sme vars) lsme)]
              | StUse (_, Ploc.VaVal s, Ploc.VaVal strll) ->
                   mk_simple_named_term str_use_op loc s [mk_olist_term (List.map (mk_strloc vars) strll)]
              | StDef (loc, Ploc.VaVal jcl) ->
@@ -2165,13 +2138,13 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
          let dest_proj_mt t =
             let _loc = dest_loc "dest_proj_mt" t in
             let mt1, mt2 = two_subterms t in
-               <:module_type< $dest_mt mt1$ . $dest_mt mt2$ >>
+               <:module_type< $longid:dest_mt mt1$ . $dest_mt mt2$ >>
          in add_mt "mt_proj" dest_proj_mt
       and mt_apply_op =
          let dest_apply_mt t =
             let _loc = dest_loc "dest_apply_mt" t in
             let mt1, mt2 = two_subterms t in
-               <:module_type< $dest_mt mt1$ $dest_mt mt2$ >>
+               <:module_type< $longid:dest_mt mt1, dest_mt mt2$ >>
          in add_mt "mt_apply" dest_apply_mt
       and mt_functor_op =
          let dest_functor_mt t =
@@ -2212,9 +2185,9 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
      in fun mt ->
          let loc = loc_of_module_type mt in
             match mt with
-               (<:module_type< $mt1$ . $mt2$ >>) ->
+               (<:module_type< $longid:mt1$ . $mt2$ >>) ->
                   mk_simple_term mt_proj_op loc [mk_module_type mt1; mk_module_type mt2]
-             | (<:module_type< $mt1$ $mt2$ >>) ->
+             | (<:module_type< $longid:mt$ >>) ->
                   mk_simple_term mt_apply_op loc [mk_module_type mt1; mk_module_type mt2]
              | (<:module_type< functor ( $s$ : $mt1$ ) -> $mt2$ >>) ->
                   let op_loc = mk_op_loc mt_functor_op loc in
