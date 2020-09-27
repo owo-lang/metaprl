@@ -468,7 +468,7 @@ struct
 
    let dest_sme t =
       let s, me = two_subterms t in
-         Ploc.VaVal (Some (Ploc.VaVal (dest_string s))), dest_me me
+         Ploc.VaVal (Some (Ploc.VaVal (dest_string s))), dest_me me, <:vala< [] >>
 
    let dest_sl t =
       let sl = one_subterm "dest_sl" t in
@@ -1973,20 +1973,20 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
             let oe = dest_expr_opt oe in
                <:str_item< # $lid:s$ $opt:oe$ >>
          in add_str "str_dir" dest_dir_str
-      and str_exc_op =
+(* 8.00 and str_exc_op =
          let dest_exc_str t =
-            let loc, s = dest_loc_string "dest_exc_str" t in
+            let _loc, s = dest_loc_string "dest_exc_str" t in
             let lt, ls = two_subterms t in
             let lt = List.map dest_type (dest_olist lt) in
             let ls = List.map dest_string (dest_olist ls) in
                <:str_item< exception $uid:s$ of $list:lt$ = $list:ls$ >>
-         in add_str "str_exc" dest_exc_str
+         in add_str "str_exc" dest_exc_str *)
       and str_mod_op =
          let dest_mod_str t =
-            let loc = dest_loc "dest_recmod_str" t in
+            let _loc = dest_loc "dest_recmod_str" t in
             let b, smel = two_subterms t in
             let smel = dest_olist smel in
-               StMod (loc, Ploc.VaVal (dest_bool b), Ploc.VaVal (List.map dest_sme smel))
+               <:str_item< module $flag:dest_bool b$ $list:List.map dest_sme smel$ >>
          in add_str "str_mod" dest_mod_str
       and str_use_op =
          let dest_use_str t =
@@ -2000,33 +2000,6 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
             let s, sto = two_subterms t in
                StXtr (loc, dest_string s, dest_opt (fun st -> Ploc.VaVal (dest_str st)) sto)
          in add_str "st_xtr" dest_xtr_st
-      and str_def_op =
-         (* TODO[jyh]: fix this.  I don't understand what a join clause is *)
-         let dest_def_str t =
-            let loc = dest_loc "dest_def_str" t in
-            let jcll = one_subterm "dest_def_str" t in
-            let jcll =
-               List.map (fun t ->
-                  let jcll = one_subterm "dest_def_str" t in
-                  let jcll = dest_olist jcll in
-                  let jcll =
-                     List.map (fun t ->
-                        let loc1 = dest_loc "dest_def_str_1" t in
-                        let jcl, e = two_subterms t in
-                        let e = dest_expr e in
-                        let jcl =
-                           List.map (fun t ->
-                              let loc2, s = dest_loc_string "dest_def_str_2" t in
-                              let po = one_subterm "dest_def_str_3" t in
-                              let po, _ = dest_patt_opt po in
-                                 loc2, (loc2, Ploc.VaVal s), Ploc.VaVal po) (dest_olist jcl)
-                        in
-                          (loc1, Ploc.VaVal jcl, e)) jcll
-                  in
-                     { jcLoc = loc; jcVal = Ploc.VaVal jcll }) (dest_olist jcll)
-             in
-               StDef (loc, Ploc.VaVal jcll)
-         in add_str "str_def" dest_def_str
       in fun vars si ->
          let loc = loc_of_str_item si in
             match si with
@@ -2047,46 +2020,27 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
                   mk_simple_named_term str_module_op loc s [mk_module_expr vars me]
              | (<:str_item< module type $s$ = $mt$ >>) ->
                   mk_simple_named_term str_module_type_op loc s [mk_module_type mt]
-             | (<:str_item< open $sl$ >>) ->
-                  mk_simple_term str_open_op loc [mk_olist_term (List.map mk_simple_string sl)]
+             | (<:str_item< open $me$ >>) ->
+                  mk_simple_term str_open_op loc [mk_module_expr vars me]
              | (<:str_item< type $list:tdl$ >>) ->
                   mk_simple_term str_type_op loc [mk_olist_term (List.map mk_tdl tdl)]
              | (<:str_item< value $opt:b$ $list:pel$ >>) -> mk_str_fix loc b pel
              | (<:str_item< include $me$ >>) ->
                   mk_simple_term str_inc_op loc [mk_module_expr vars me]
-             | StDir (_, Ploc.VaVal s, Ploc.VaVal eo) ->
-                  mk_simple_named_term str_dir_op loc s [mk_expr_opt vars eo]
-             | StExc (_, Ploc.VaVal s, Ploc.VaVal tl, Ploc.VaVal sl) ->
+             | (<:str_item< # $lid:s$ $opt:oe$ >>) ->
+                  mk_simple_named_term str_dir_op loc s [mk_expr_opt vars oe]
+             | StExc (_, _, _) ->
+                  raise (RefineError ("mk_st", StringError "StExc is not supported"))
+                (* TODO: CamlP5 8.00 
                   mk_simple_named_term str_exc_op loc s [mk_olist_term (List.map mk_type tl);
-                                                         mk_string_list sl]
+                                                         mk_string_list sl] *)
              | (<:str_item< module $flag:b$ $list:lsme$ >>) ->
                   mk_simple_term str_mod_op loc [mk_bool b; mk_olist_term (List.map (mk_sme vars) lsme)]
              | StUse (_, Ploc.VaVal s, Ploc.VaVal strll) ->
                   mk_simple_named_term str_use_op loc s [mk_olist_term (List.map (mk_strloc vars) strll)]
-             | StDef (loc, Ploc.VaVal jcl) ->
-                  mk_simple_term str_def_op (num_of_loc loc) [mk_olist_term (List.map (mk_joinclause vars) jcl)]
              | StXtr (loc, s, sto) ->
                   mk_simple_named_term str_xtr_op (num_of_loc loc) s [mk_opt (fun st -> (mk_str_item vars (dest_vala "StXtr" st))) sto]
-             | StCls (_, Ploc.VaAnt _)
-             | StClt (_, Ploc.VaAnt _)
-             | StDcl (_, Ploc.VaAnt _)
-             | StExt (_, _, _, Ploc.VaAnt _)
-             | StExt (_, Ploc.VaAnt _, _, _)
-             | StOpn (_, Ploc.VaAnt _)
-             | StTyp (_, _, Ploc.VaAnt _)
-             | StVal (_, _, Ploc.VaAnt _)
-             | StVal (_, Ploc.VaAnt _, _)
-             | StDir (_, _, Ploc.VaAnt _)
-             | StDir (_, Ploc.VaAnt _, _)
-             | StExc (_, _, _, Ploc.VaAnt _)
-             | StExc (_, _, Ploc.VaAnt _, _)
-             | StExc (_, Ploc.VaAnt _, _, _)
-             | StMty (_, Ploc.VaAnt _, _)
-             | StMod (_, _, Ploc.VaAnt _)
-             | StMod (_, Ploc.VaAnt _, _)
-             | StUse (_, _, Ploc.VaAnt _)
-             | StUse (_, Ploc.VaAnt _, _)
-             | StDef (_, Ploc.VaAnt _ ) | _ ->
+             | _ ->
                   raise (RefineError ("mk_st", StringError "antiquotations are not supported"))
 
    (*
@@ -2098,23 +2052,17 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
             let _loc = dest_loc "dest_lid_mt" t in
                <:module_type< $lid:dest_var t$ >>
          in add_mt "mt_lid" dest_lid_mt
-      and mt_uid_op =
-         let dest_uid_mt t =
-            let _loc = dest_loc "dest_uid_mt" t in
-               <:module_type< $uid:dest_var t$ >>
-         in add_mt "mt_uid" dest_uid_mt
       and mt_proj_op =
          let dest_proj_mt t =
             let _loc = dest_loc "dest_proj_mt" t in
-            let mt1, mt2 = two_subterms t in
-               <:module_type< $longid:dest_mt mt1$ . $dest_mt mt2$ >>
+            let id, mt = two_subterms t in
+               <:module_type< $longid:dest_longid id$ . $dest_string mt$ >>
          in add_mt "mt_proj" dest_proj_mt
-      and mt_apply_op =
+      and mt_longid_op =
          let dest_apply_mt t =
             let _loc = dest_loc "dest_apply_mt" t in
-            let mt1, mt2 = two_subterms t in
-               <:module_type< $longid:dest_mt mt1, dest_mt mt2$ >>
-         in add_mt "mt_apply" dest_apply_mt
+               <:module_type< $longid:dest_longid t$>>
+         in add_mt "mt_longid" dest_apply_mt
       and mt_functor_op =
          let dest_functor_mt t =
             let _loc = dest_loc "dest_functor_mt" t in
@@ -2154,10 +2102,10 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
      in fun mt ->
          let loc = loc_of_module_type mt in
             match mt with
-               (<:module_type< $longid:mt1$ . $mt2$ >>) ->
-                  mk_simple_term mt_proj_op loc [mk_module_type mt1; mk_module_type mt2]
-             | (<:module_type< $longid:mt$ >>) ->
-                  mk_simple_term mt_apply_op loc [mk_module_type mt1; mk_module_type mt2]
+               (<:module_type< $longid:id1$ . $id2$ >>) ->
+                  mk_simple_term mt_proj_op loc [mk_longid [] id1; mk_simple_string id2]
+             | (<:module_type< $longid:id$ >>) ->
+                  mk_simple_term mt_longid_op loc [mk_longid [] id]
              | (<:module_type< functor ( $s$ : $mt1$ ) -> $mt2$ >>) ->
                   let op_loc = mk_op_loc mt_functor_op loc in
                      mk_dep0_dep1_any_term op_loc (Lm_symbol.add s) (mk_module_type mt1) (mk_module_type mt2)
@@ -2167,8 +2115,6 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
                   mk_var mt_quot_op [] loc i
              | (<:module_type< sig $list:sil$ end >>) ->
                   mk_simple_term mt_sig_op loc [mk_olist_term (List.map mk_sig_item sil)]
-             | (<:module_type< $uid:i$ >>) ->
-                  mk_var mt_uid_op [] loc i
              | (<:module_type< $mt$ with $list:wcl$ >>) ->
                   mk_simple_term mt_type_with_op loc
                      [mk_module_type mt; mk_olist_term (List.map mk_wc wcl)]
@@ -2176,12 +2122,7 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
                   mk_simple_term mt_tyo_op (num_of_loc loc) [mk_module_expr [] me]
              | MtXtr (loc, s, mto) ->
                   mk_simple_named_term mt_xtr_op (num_of_loc loc) s [mk_opt (fun mt -> (mk_module_type (dest_vala "MtXtr" mt))) mto]
-             | MtFun (_, Ploc.VaAnt _, _)
-             | MtLid (_, Ploc.VaAnt _)
-             | MtQuo (_, Ploc.VaAnt _)
-             | MtSig (_, Ploc.VaAnt _)
-             | MtUid (_, Ploc.VaAnt _)
-             | MtWit (_, _, Ploc.VaAnt _) | _ ->
+             | _ ->
                    raise (RefineError ("mk_wc", StringError "antiquotations are not supported"))
 
    and mk_wc =
@@ -2191,7 +2132,7 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
             let sl1, sl2, b, t = four_subterms t in
             let sl1' = List.map dest_string (dest_olist sl1) in
             let sl2' = List.map dest_sbb (dest_olist sl2) in
-               WcTyp (loc, Ploc.VaVal sl1', Ploc.VaVal sl2', Ploc.VaVal (dest_bool b), dest_type t)
+               <:with_constr< type $list:sl1'$ $list:sl2'$ = $flag:dest_bool b$ $dest_type t$ >>
          in add_wc "wc_type" dest_type_wc
       and wc_tys_op =
          let dest_tys_wc t =
