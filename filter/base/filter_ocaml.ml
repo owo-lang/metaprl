@@ -456,7 +456,7 @@ struct
 
    let dest_lilongid t =
       let olid, n = two_subterms t in
-         dest_opt (fun x -> <:vala< dest_longid x >>) olid, <:vala< dest_var n >>
+         dest_opt (fun x -> <:vala< dest_longid x >>) olid, <:vala< dest_string n >>
 
    let dest_st t =
       let s, t = two_subterms t in
@@ -464,7 +464,7 @@ struct
 
    let dest_smt t =
       let s, mt = two_subterms t in
-         Ploc.VaVal (Some (Ploc.VaVal (dest_string s))), dest_mt mt
+         Ploc.VaVal (Some (Ploc.VaVal (dest_string s))), dest_mt mt, <:vala< [] >>
 
    let dest_sme t =
       let s, me = two_subterms t in
@@ -897,7 +897,7 @@ struct
       and expr_new_op =
          let dest_new_expr t =
             let _loc = dest_loc "dest_new_expr" t in
-               <:expr< new $lilongid:Asttools.longident_lident_of_string_list _loc (List.map dest_string (dest_olist t))$ >>
+               <:expr< new $lilongid:dest_lilongid t$ >>
          in add_expr "new" dest_new_expr
       and expr_obj_op =
          let dest_obj_expr t =
@@ -1648,13 +1648,13 @@ struct
             let b = dest_bool b in
             let tl = List.map dest_type (dest_olist tl) in
                s, b, tl
-         in let dest_rf loc t =
+         in let dest_rf _loc t =
             let op = opname_of_term t in
                if Opname.eq op row_field_tag_op then
-                  let s, b, tl = dest_sbtl t in
-                     PvTag (loc, Ploc.VaVal s, Ploc.VaVal b, Ploc.VaVal tl)
+                  let s, b, lt = dest_sbtl t in
+                     <:poly_variant< `$s$ of $flag:b$ $list:lt$ >>
                else if Opname.eq op row_field_inh_op then
-                  PvInh (loc, dest_type (one_subterm "dest_rf" t))
+                  <:poly_variant< $dest_type (one_subterm "dest_rf" t)$ >>
                else
                   raise (Invalid_argument "dest_rf")
          in let dest_vrn_type t =
@@ -1681,7 +1681,7 @@ struct
          let loc = loc_of_ctyp t in
             match t with
                (<:ctyp< $longid:t1$ . $lid:t2$ >>) ->
-                  mk_simple_term type_proj_op loc [mk_type t1; mk_type t2]
+                  mk_simple_term type_proj_op loc [mk_longid [] t1; mk_var type_lid_op [] loc t2]
              | (<:ctyp< $t1$ as $t2$ >>) ->
                   mk_simple_term type_as_op loc [mk_type t1; mk_type t2]
              | (<:ctyp< _ >>) ->
@@ -1691,7 +1691,7 @@ struct
              | (<:ctyp< $t1$ -> $t2$ >>) ->
                   mk_simple_term type_fun_op loc [mk_type t1; mk_type t2]
              | (<:ctyp< # $lilongid:i$ >>) ->
-                  mk_simple_term type_class_id_op loc [mk_olist_term (List.map (mk_string type_class_id_op) i)]
+                  mk_simple_term type_class_id_op loc [mk_lilongid [] i]
              | (<:ctyp< $lid:s$ >>) ->
                   mk_var type_lid_op [] loc s
              | (<:ctyp< '$s$ >>) ->
@@ -1779,9 +1779,9 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
          in add_sig "sig_external" dest_external_sig
       and sig_inc_op =
          let dest_inc_sig t =
-            let loc = dest_loc "dest_inc_sig" t in
+            let _loc = dest_loc "dest_inc_sig" t in
             let mt = one_subterm "dest_inc_sig" t in
-               SgInc (loc, dest_mt mt)
+               <:sig_item< include $dest_mt mt$ >>
          in add_sig "sig_inc" dest_inc_sig
       and sig_module_op =
          let dest_module_sig t =
@@ -1798,8 +1798,8 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
       and sig_open_op =
          let dest_open_sig t =
             let _loc = dest_loc "dest_open_sig" t in
-            let sl = dest_olist (one_subterm "dest_open_sig" t) in
-               <:sig_item< open $longid:List.map dest_string sl$ $itemattrs:[]$ >>
+            let id = (one_subterm "dest_open_sig" t) in
+               <:sig_item< open $longid: dest_longid id$ $itemattrs:[]$ >>
          in add_sig "sig_open" dest_open_sig
       and sig_type_op =
          let dest_type_sig t =
@@ -1843,9 +1843,9 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
    in fun si ->
          let loc = loc_of_sig_item si in
             match si with
-               SgCls (_, Ploc.VaVal ctl) ->
+               (<:sig_item< class $list:ctl$ >>) ->
                   mk_simple_term sig_class_sig_op loc (List.map mk_class_type_infos ctl)
-             | SgClt (_, Ploc.VaVal ctl) ->
+             | (<:sig_item< class type $list:ctl$ >>) ->
                   mk_simple_term sig_class_type_op loc (List.map mk_class_type_infos ctl)
              | (<:sig_item< declare $list:sil$ end >>) ->
                   mk_simple_term sig_subsig_op loc (List.map mk_sig_item sil)
@@ -1854,14 +1854,14 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
              | (<:sig_item< external $s$ : $t$ = $list:sl$ >>) ->
                   mk_simple_named_term sig_external_op loc s
                      (mk_type t :: List.map mk_simple_string sl)
-             | SgInc (_, mt) ->
+             | (<:sig_item< include $mt$ >>) ->
                   mk_simple_term sig_inc_op loc [mk_module_type mt]
              | (<:sig_item< module $s$ : $mt$ >>) ->
                   mk_simple_named_term sig_module_op loc s [mk_module_type mt]
              | (<:sig_item< module type $s$ = $mt$ >>) ->
                   mk_simple_named_term sig_module_type_op loc s [mk_module_type mt]
-             | (<:sig_item< open $longid:sl$ $itemattrs:_$ >>) ->
-                  mk_simple_term sig_open_op loc [mk_olist_term (List.map mk_simple_string sl)]
+             | (<:sig_item< open $longid:id$ $itemattrs:_$ >>) ->
+                  mk_simple_term sig_open_op loc [mk_longid [] id]
              | (<:sig_item< type $list:tdl$ >>) ->
                   mk_simple_term sig_type_op loc [mk_olist_term (List.map mk_tdl tdl)]
              | (<:sig_item< value $s$ : $t$ >>) ->
@@ -1874,23 +1874,7 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
                   mk_simple_named_term sig_use_op loc s [mk_olist_term (List.map mk_sigloc sigll)]
              | SgXtr (loc, s, sgo) ->
                   mk_simple_named_term sig_xtr_op (num_of_loc loc) s [mk_opt (fun sg -> (mk_sig_item (dest_vala "SgXtr" sg))) sgo]
-             | SgCls (_, Ploc.VaAnt _)
-             | SgClt (_, Ploc.VaAnt _)
-             | SgDcl (_, Ploc.VaAnt _)
-             | SgExc (_, _, Ploc.VaAnt _)
-             | SgExc (_, Ploc.VaAnt _, _)
-             | SgExt (_, _, _, Ploc.VaAnt _)
-             | SgExt (_, Ploc.VaAnt _, _, _)
-             | SgOpn (_, Ploc.VaAnt _)
-             | SgTyp (_, Ploc.VaAnt _)
-             | SgMty (_, Ploc.VaAnt _, _)
-             | SgMod (_, _, Ploc.VaAnt _)
-             | SgMod (_, Ploc.VaAnt _, _)
-             | SgVal (_, Ploc.VaAnt _, _)
-             | SgDir (_, _, Ploc.VaAnt _)
-             | SgDir (_, Ploc.VaAnt _, _)
-             | SgUse (_, _, Ploc.VaAnt _)
-             | SgUse (_, Ploc.VaAnt _, _) ->
+             | _ ->
                   raise (RefineError ("mk_st", StringError "antiquotations are not supported"))
 
    (*
@@ -1902,10 +1886,11 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
             let loc = dest_loc "dest_class_expr_infos" t in
             let s, sl, b, t = four_subterms t in
                 { ciLoc = loc;
-                  ciNam = Ploc.VaVal (dest_string s);
+                  ciNam = <:vala< dest_string s >>;
                   ciPrm = loc, Ploc.VaVal (List.map dest_sbb (dest_olist sl));
                   ciVir = Ploc.VaVal (dest_bool b);
-                  ciExp = dest_ce t
+                  ciExp = dest_ce t;
+                  ciAttributes = <:vala< [] >>
                 }
          in let dest_class_str_str t =
             let loc = dest_loc "dest_class_str_str" t in
@@ -1965,15 +1950,15 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
       and str_open_op =
          let dest_open_str t =
             let _loc = dest_loc "dest_open_str" t in
-            let sl = dest_olist (one_subterm "dest_open_str" t) in
-               <:str_item< open $List.map dest_string sl$ >>
+            let me = (one_subterm "dest_open_str" t) in
+               <:str_item< open $dest_me me$ $itemattrs:[]$ >>
          in add_str "str_open" dest_open_str
       and str_inc_op =
          let dest_inc_str t =
-            let loc = dest_loc "dest_inc_str" t in
+            let _loc = dest_loc "dest_inc_str" t in
             let me = one_subterm "dest_inc_str" t in
             let me = dest_me me in
-               MLast.StInc (loc, me)
+               <:str_item< include $me$ >>
          in add_str "str_inc" dest_inc_str
       and str_type_op =
          let dest_type_str t =
@@ -1983,18 +1968,18 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
          in add_str "str_type" dest_type_str
       and str_dir_op =
          let dest_dir_str t =
-            let loc, s = dest_loc_string "dest_dir_str" t in
-            let eo = one_subterm "dest_dir_str" t in
-            let eo = dest_expr_opt eo in
-               MLast.StDir (loc, Ploc.VaVal s, Ploc.VaVal eo)
+            let _loc, s = dest_loc_string "dest_dir_str" t in
+            let oe = one_subterm "dest_dir_str" t in
+            let oe = dest_expr_opt oe in
+               <:str_item< # $lid:s$ $opt:oe$ >>
          in add_str "str_dir" dest_dir_str
       and str_exc_op =
          let dest_exc_str t =
             let loc, s = dest_loc_string "dest_exc_str" t in
-            let tl, sl = two_subterms t in
-            let tl = List.map dest_type (dest_olist tl) in
-            let sl = List.map dest_string (dest_olist sl) in
-               MLast.StExc (loc, Ploc.VaVal s, Ploc.VaVal tl, Ploc.VaVal sl)
+            let lt, ls = two_subterms t in
+            let lt = List.map dest_type (dest_olist lt) in
+            let ls = List.map dest_string (dest_olist ls) in
+               <:str_item< exception $uid:s$ of $list:lt$ = $list:ls$ >>
          in add_str "str_exc" dest_exc_str
       and str_mod_op =
          let dest_mod_str t =
@@ -2909,6 +2894,11 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
    and mk_expr_opt vars x = mk_opt (mk_expr vars) x
 
    and mk_type_opt x = mk_opt mk_type x
+
+   and mk_lilongid =
+      let lilongid_op = mk_ocaml_op "lilongid"
+      in fun vars (longid, id) ->
+          mk_simple_term lilongid_op [mk_opt (mk_vala "mk_lilongid" (mk_longid vars)); mk_simple_string id]
 
    and mk_se =
       let se_op = mk_ocaml_op "se"
