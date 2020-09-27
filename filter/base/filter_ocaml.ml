@@ -1413,6 +1413,11 @@ struct
       let tailf vars = mk_simple_term op2 loc [mk_patt vars p2 tailf] in
          mk_simple_term op1 loc [mk_longid vars p1 tailf]
 
+   and mk_longid =
+      let longid_app_op =
+         let dest_app_longid t =
+            let _loc
+
    and mk_patt_record =
       let patt_record_proj_op = mk_ocaml_op "patt_record_proj"
       and patt_record_end_op = mk_ocaml_op "patt_record_end"
@@ -2071,28 +2076,6 @@ MetaPRL does not support this yet in order to remain compatible with OCaml 3.08"
              | StUse (_, Ploc.VaAnt _, _)
              | StDef (_, Ploc.VaAnt _ ) | _ ->
                   raise (RefineError ("mk_st", StringError "antiquotations are not supported"))
-
-
-   and mk_joinclause =
-     fun vars jc ->
-        match jc with
-           { jcLoc = loc; jcVal = Ploc.VaVal jcll } ->
-              let jcll = List.map (function (loc1, Ploc.VaVal jc, e) ->
-                 let jcl =
-                    List.map (function (loc2, (loc3, Ploc.VaVal s), Ploc.VaVal po) ->
-                        let p = mk_patt_opt loc [] po (fun _ -> mk_simple_term jc_op (num_of_loc loc2) []) in
-                          mk_simple_named_term jc_op (num_of_loc loc2) s [p]
-                     | (_, (_, Ploc.VaAnt _), _)
-                     | (_, _, Ploc.VaAnt _) ->
-                          raise (RefineError ("mk_joinclause", StringError "antiquotations are not supported"))) jc
-                 in
-                    mk_simple_term jcl_op (num_of_loc loc1) [mk_olist_term jcl; mk_expr vars e]
-               | (_, Ploc.VaAnt _, _) ->
-                  raise (RefineError ("mk_joinclause", StringError "antiquotations are not supported"))) jcll
-              in
-                  mk_simple_term joinclause_op (num_of_loc loc) [mk_olist_term jcll]
-        | { jcLoc = _; jcVal = Ploc.VaAnt _ } ->
-           raise (RefineError ("mk_joinclause", StringError "antiquotations are not supported"))
 
    (*
     * Module types.
