@@ -454,6 +454,10 @@ struct
       let p, e = two_subterms t in
          patt_of_expr_ident (dest_expr p), dest_expr e
 
+   let dest_lilongid t =
+      let olid, n = two_subterms t in
+         dest_opt (fun x -> <:vala< x >>) (dest_longid olid), <:vala< dest_var n >>
+
    let dest_st t =
       let s, t = two_subterms t in
          dest_string s, dest_type t
@@ -816,10 +820,6 @@ struct
             let _loc = dest_loc "dest_local_module_expr" t in
             let s, me, e = three_subterms t in
                <:expr< let module $uid:dest_string s$ = $dest_me me$ in $dest_expr e$ >>
-            (* ExLmd (loc,
-                      Ploc.VaVal (dest_string s),
-                      dest_me me,
-                      dest_expr e) *)
          in add_expr "local_module" dest_local_module_expr
       and expr_uid_op =
          let dest_uid_expr t =
@@ -1567,7 +1567,7 @@ struct
       and type_class_id_op =
          let dest_class_id_type t =
             let _loc = dest_loc "dest_class_id_type" t in
-               <:ctyp< # $lilongid:List.map dest_string (dest_olist (one_subterm "dest_class_id_type" t))$ >>
+               <:ctyp< # $lilongid:dest_lilongid (one_subterm "dest_class_id_type" t)$ >>
          in add_type "type_class_id" dest_class_id_type
       and type_param_op =
          let dest_param_type t =
