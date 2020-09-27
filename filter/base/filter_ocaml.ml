@@ -304,6 +304,7 @@ struct
 
    let loc_of_expr,
        loc_of_patt,
+       loc_of_longid,
        loc_of_ctyp,
        loc_of_sig_item,
        loc_of_str_item,
@@ -313,6 +314,7 @@ struct
       in
          loc_of_aux loc_of_expr,
          loc_of_aux loc_of_patt,
+         loc_of_aux loc_of_longid,
          loc_of_aux loc_of_ctyp,
          loc_of_aux loc_of_sig_item,
          loc_of_aux loc_of_str_item,
@@ -615,7 +617,7 @@ struct
          p1, p2, one_subterm "dest_patt_triple" t
 
    let dest_lid_triple t =
-      let p1, t = dest_longid (one_subterm "dest_lid_triple" t) in
+      let p1 = dest_longid (one_subterm "dest_lid_triple" t) in
       let p2, t = dest_patt (one_subterm "dest_lid_triple" t) in
          p1, p2, one_subterm "dest_lid_triple" t
 
@@ -1409,14 +1411,39 @@ struct
          mk_simple_term op1 loc [mk_patt vars p1 tailf]
 
    and mk_longid_triple vars loc op1 op2 op3 p1 p2 tailf =
-      let vars = mk_simple_term op3 loc [tailf vars] in
+      let tailf vars = mk_simple_term op3 loc [tailf vars] in
       let tailf vars = mk_simple_term op2 loc [mk_patt vars p2 tailf] in
-         mk_simple_term op1 loc [mk_longid vars p1 tailf]
+         mk_simple_term op1 loc [mk_longid vars p1]
 
    and mk_longid =
       let longid_app_op =
          let dest_app_longid t =
-            let _loc
+            let _loc = dest_loc "dest_app_longid" t in
+            let x1, x2 = two_subterms t in
+               <:extended_longident< $longid:dest_longid x1$ ( $longid:dest_longid x2$ ) >>
+         in add_longid "app" dest_app_longid
+      and longid_acc_op =
+         let dest_acc_longid t =
+            let _loc = dest_loc "dest_acc_longid" t in
+            let x1, x2 = two_subterms t in
+               <:extended_longident< $longid:dest_longid x1$ . $uid:dest_var x2$ >>
+         in add_longid "acc" dest_acc_longid
+      and longid_uid_op =
+         let dest_uid_longid t =
+            let _loc = dest_loc "dest_uid_longid" t in
+               <:extended_longident< $uid:dest_var t$ >>
+         in add_longid "uid" dest_uid_longid
+      in fun vars longid ->
+         let loc = loc_of_longid longid in
+            match longid with
+               (<:extended_longident< $longid:x$ . $uid:s$ >>) ->
+                  mk_simple_term longid_acc_op loc [mk_longid vars x; mk_var longid_uid_op vars loc s]
+             | (<:extended_longident< $longid:x1$ ( $longid:x2$ ) >>) ->
+                  mk_simple_term longid_app_op loc [mk_longid vars x1; mk_longid vars x2]
+             | (<:extended_longident< $uid:s$ >>) ->
+                  mk_var longid_uid_op vars loc s
+             | _ ->
+                  raise (RefineError ("mk_longid", StringError "antiquotations are not supported"))
 
    and mk_patt_record =
       let patt_record_proj_op = mk_ocaml_op "patt_record_proj"
@@ -1512,7 +1539,7 @@ struct
          let dest_proj_type t =
             let _loc = dest_loc "dest_proj_type" t in
             let t1, t2 = two_subterms t in
-               <:ctyp< $longid:dest_type t1$ . $lid:dest_type t2$ >>
+               <:ctyp< $longid:dest_longid t1$ . $lid:dest_var t2$ >>
          in add_type "type_proj" dest_proj_type
       and type_as_op =
          let dest_as_type t =
