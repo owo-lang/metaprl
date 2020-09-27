@@ -456,11 +456,11 @@ struct
 
    let dest_lilongid t =
       let olid, n = two_subterms t in
-         dest_opt (fun x -> <:vala< x >>) (dest_longid olid), <:vala< dest_var n >>
+         dest_opt (fun x -> <:vala< dest_longid x >>) olid, <:vala< dest_var n >>
 
    let dest_st t =
       let s, t = two_subterms t in
-         dest_string s, dest_type t
+         Some (dest_string s), dest_type t, <:vala< [] >>
 
    let dest_smt t =
       let s, mt = two_subterms t in
@@ -620,10 +620,10 @@ struct
       let p2, t = dest_patt (one_subterm "dest_patt_triple" t) in
          p1, p2, one_subterm "dest_patt_triple" t
 
-   let dest_lid_triple t =
-      let p1 = dest_longid (one_subterm "dest_lid_triple" t) in
-      let p2, t = dest_patt (one_subterm "dest_lid_triple" t) in
-         p1, p2, one_subterm "dest_lid_triple" t
+   let dest_longid_triple t =
+      let (p1 : MLast.longid) = dest_longid (one_subterm "dest_longid_triple" t) in
+      let p2, t = dest_patt (one_subterm "dest_longid_triple" t) in
+         p1, p2, one_subterm "dest_longid_triple" t
 
    let expr_string_op =
       let dest_string_expr t =
@@ -1185,7 +1185,7 @@ struct
       and patt_proj_op =
          let dest_proj_patt t =
             let _loc = dest_loc "dest_proj_patt" t in
-            let p1, p2, t = dest_lid_triple t in
+            let (p1 : MLast.longid), p2, t = dest_longid_triple t in
                <:patt< $longid:p1$ . $p2$ >>, t
          in add_patt "patt_proj" dest_proj_patt
       and patt_as_op =
@@ -1596,7 +1596,7 @@ struct
          let dest_sbt t =
             let l, s = dest_loc_string "dest_sbt" t in
             let b, t = two_subterms t in
-               l, s, dest_bool b, dest_type t
+               l, s, dest_bool b, dest_type t, <:vala< [] >>
          in let dest_record_type t =
             let _loc = dest_loc "dest_record_type" t in
             let sbtl = dest_olist (one_subterm "dest_record_type" t) in
@@ -1617,7 +1617,7 @@ struct
             let stll = dest_olist (one_subterm "dest_list_type" t) in
             let stll = List.map (fun t ->
                let l, s, tl = dest_stl t in
-               l, Ploc.VaVal s, Ploc.VaVal tl, None) stll
+               l, Ploc.VaVal s, Ploc.VaVal tl, <:vala< None >>, <:vala< [] >>) stll
             in
                <:ctyp< [ $list: stll$ ] >>
 (* XXX
