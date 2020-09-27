@@ -971,45 +971,19 @@ struct
             let eo = dest_expr_opt t in
                MLast.ExOlb (loc, p, Ploc.VaVal eo)
          in add_expr "olb" dest_olb_expr
-   (* and expr_jdf_op =
-         let dest_jdf_expr t =
-            let loc = dest_loc "dest_jdf_expr" t in
-            let e, jc = two_subterms t in
-            let jc = dest_joinclause jc in
-               MLast.ExJdf (loc, Ploc.VaVal jc, dest_expr e)
-         in add_expr "jdf" dest_jdf_expr *)
       and expr_lop_op =
          let dest_lop_expr t =
             let _loc = dest_loc "dest_lop_expr" t in
             let me, e = two_subterms t in
                <:expr< let open $dest_me me$ in $dest_expr e$ >>
          in add_expr "lop_expr" dest_lop_expr
-   (* and expr_par_op =
-         let dest_par_expr t =
-            let _loc = dest_loc "dest_par_expr" t in
-            let e1, e2 = two_subterms t in
-               MLast.ExPar (_loc, dest_expr e1, dest_expr e2)
-         in add_expr "par_expr" dest_par_expr *)
       and expr_pck_op =
          let dest_pck_expr t =
             let _loc = dest_loc "dest_pck_expr" t in
             let me, mto = two_subterms t in
                MLast.ExPck (_loc, dest_me me, dest_opt dest_mt mto)
          in add_expr "pck_expr" dest_pck_expr
-   (* and expr_rpl_op =
-         let dest_rpl_expr t =
-            let _loc = dest_loc "dest_rpl_expr" t in
-            let eo, ls = two_subterms t in
-            let loc2, s = dest_loc_string "dest_rpl_expr" ls in
-               MLast.ExRpl (_loc, Ploc.VaVal (dest_opt dest_expr eo), Ploc.VaVal (loc2, Ploc.VaVal s))
-         in add_expr "rpl_expr" dest_rpl_expr *)
-   (* and expr_spw_op =
-         let dest_spw_expr t =
-            let _loc = dest_loc "dest_spw_expr" t in
-            let e = one_subterm "dest_spw_expr" t in
-               MLast.ExSpw (_loc, dest_expr e)
-         in add_expr "spw" dest_spw_expr *)
-       and expr_xtr_op =
+      and expr_xtr_op =
          let dest_xtr_expr t =
             let loc = dest_loc "dest_xtr_expr" t in
             let s, eo = two_subterms t in
