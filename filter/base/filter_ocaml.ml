@@ -1407,7 +1407,7 @@ struct
    and mk_longid_triple vars loc op1 op2 op3 p1 p2 tailf = (* FIXME:8.00 What to do? *)
       let tailf vars = mk_simple_term op3 loc [tailf vars] in
       let tailf vars = mk_simple_term op2 loc [mk_patt vars p2 tailf] in
-         mk_simple_term op1 loc [mk_longid vars p1]
+         mk_simple_term op1 loc [mk_longid vars p1; tailf vars]
 
    and mk_longid =
       let longid_app_op =
