@@ -1068,7 +1068,7 @@ let expr_of_pcon _loc = function
           | _ ->
                Stdpp.raise_with_loc _loc (Invalid_argument "\"con\" quotation: string constant parameter must be of string kind")
       in
-         <:expr< Refiner.Refiner.Term.make_param (Term_sig.$uid:shape$ $str:s$) >>
+         <:expr< Refiner.Refiner.Term.make_param (Term_sig . $uid:shape$ $str:s$) >>
  | ConPToken opname, shape ->
       let strings = Opname.dest_opname opname in
       let strings = List.map (fun s -> <:expr< $str: s$ >>) strings in
@@ -1089,7 +1089,7 @@ let expr_of_pcon _loc = function
           | ShapeOperator -> "MOperator"
           | _ -> Stdpp.raise_with_loc _loc (Invalid_argument "\"con\" quotation: unsupported meta-parameter")
       in
-         <:expr< Refiner.Refiner.Term.make_param (Term_sig.$uid:shape$ $str:string_of_symbol s$) >>
+         <:expr< Refiner.Refiner.Term.make_param (Term_sig . $uid:shape$ $str:string_of_symbol s$) >>
  | ConPExpr e, shape ->
       let shape =
          match shape with
@@ -1102,7 +1102,7 @@ let expr_of_pcon _loc = function
           | ShapeShape -> "Shape"
           | ShapeOperator -> "Operator"
       in
-         <:expr< Refiner.Refiner.Term.make_param (Term_sig.$uid:shape$ $e$) >>
+         <:expr< Refiner.Refiner.Term.make_param (Term_sig . $uid:shape$ $e$) >>
  | ConPNum n, ShapeNumber ->
       <:expr< Refiner.Refiner.Term.make_param (Term_sig.Number $add_parsed_binding (BindNum n)$) >>
  | ConPInt e, ShapeNumber ->
