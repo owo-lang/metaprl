@@ -1053,8 +1053,8 @@ struct
                   mk_match vars loc pwel e
              | (<:expr< new $lilongid: obj$ >>) ->
                   mk_simple_term expr_new_op loc [mk_lilongid [] obj]
-             | (<:expr:< object $opt:po$ $list:cfl$ end >>) ->
-                  mk_simple_term expr_obj_op loc [mk_patt_opt _loc [] po (mk_cf_list cfl)]
+             | (<:expr< object $opt:po$ $list:cfl$ end >>) ->
+                  mk_simple_term expr_obj_op loc [mk_patt_opt_loc loc [] po (mk_cf_list cfl)]
              | (<:expr< {< $list:sel$ >} >>) ->
                   mk_simple_term expr_stream_op loc (List.map (mk_se vars) sel)
              | ExRec (_, Ploc.VaVal pel, eo) (* <:expr< { $list:eel$ } >> *) ->
@@ -1078,13 +1078,13 @@ struct
                   mk_var expr_uid_op vars loc s
              | (<:expr< while $e$ do { $list:el$ } >>) ->
                   mk_simple_term expr_while_op loc [mk_expr vars e; mk_olist_term (List.map (mk_expr vars) el)]
-             | MLast.ExVrn (_, Ploc.VaVal s) ->
+             | (<:expr< ` $s$ >>) ->
                   mk_simple_named_term expr_vrn_op loc s []
-             | MLast.ExLab (loc', Ploc.VaVal poel) ->
-                  mk_lab_expr vars loc poel
-             | MLast.ExOlb (loc', p, Ploc.VaVal eo) ->
-                  mk_simple_term expr_olb_op loc [mk_patt vars p (fun vars -> mk_expr_opt vars eo)]
-             | MLast.ExCoe (l, e, ot, t) ->
+             | (<:expr< ~{$list:lpe$} >>) ->
+                  mk_lab_expr vars loc lpe
+             | (<:expr< ?{$p$ $opt:oe$} >>) ->
+                  mk_simple_term expr_olb_op loc [mk_patt vars p (fun vars -> mk_expr_opt vars oe)]
+             | MLast.ExCoe (_, e, ot, t) ->
                   mk_simple_term expr_coerce_class_op loc [mk_expr vars e; mk_opt mk_type ot; mk_type t]
              | (<:expr< $e$ .{ $list:el$ } >>) ->
                   mk_simple_term expr_bigarray_element_op loc [mk_expr vars e; mk_olist_term (List.map (mk_expr vars) el)]
@@ -1092,8 +1092,8 @@ struct
                   mk_simple_term expr_lop_op loc [mk_module_expr vars me; mk_expr vars e]
              | MLast.ExPck (_, me, mto) ->
                   mk_simple_term expr_pck_op loc [mk_module_expr vars me; mk_opt mk_module_type mto]
-             | ExXtr (loc, s, eo) ->
-                  mk_simple_named_term expr_xtr_op (num_of_loc loc) s [mk_opt (fun e -> (mk_expr vars (dest_vala "ExXtr" e))) eo]
+             | ExXtr (_, s, eo) ->
+                  mk_simple_named_term expr_xtr_op loc s [mk_opt (fun e -> (mk_expr vars (dest_vala "ExXtr" e))) eo]
              | _ ->
                   raise (RefineError ("mk_expr", StringError "antiquotations are not supported"))
 
