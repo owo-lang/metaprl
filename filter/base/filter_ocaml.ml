@@ -1350,8 +1350,8 @@ struct
                   Stdpp.raise_with_loc (MLast.loc_of_patt patt) (Failure "Filter_ocaml.mk_patt: encountered PaAnt")
              | (<:patt< `$s$ >>) ->
                   mk_simple_named_term patt_vrn_op loc s [tailf vars]
-             | PaLab (_loc, Ploc.VaVal ppol) ->
-                  mk_patt_lab vars loc ppol tailf
+             | (<:patt< ~{$list:lpp$} >>) ->
+                  mk_patt_lab vars loc lpp tailf
              | (<:patt< ?{ $p$ $opt:oe$ } >>) ->
                   mk_simple_term patt_olb_op loc [mk_patt vars p tailf; mk_expr_opt vars oe]
              | (<:patt< # $s$ >>) ->
