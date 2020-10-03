@@ -1415,18 +1415,18 @@ struct
             let _loc = dest_loc "dest_app_longid" t in
             let x1, x2 = two_subterms t in
                <:extended_longident< $longid:dest_longid x1$ ( $longid:dest_longid x2$ ) >>
-         in add_longid "app" dest_app_longid
+         in add_longid "longid_app" dest_app_longid
       and longid_acc_op =
          let dest_acc_longid t =
             let _loc = dest_loc "dest_acc_longid" t in
             let x1, x2 = two_subterms t in
                <:extended_longident< $longid:dest_longid x1$ . $uid:dest_var x2$ >>
-         in add_longid "acc" dest_acc_longid
+         in add_longid "longid_acc" dest_acc_longid
       and longid_uid_op =
          let dest_uid_longid t =
             let _loc = dest_loc "dest_uid_longid" t in
                <:extended_longident< $uid:dest_var t$ >>
-         in add_longid "uid" dest_uid_longid
+         in add_longid "longid_uid" dest_uid_longid
       in fun vars longid ->
          let loc = loc_of_longid longid in
             match longid with
