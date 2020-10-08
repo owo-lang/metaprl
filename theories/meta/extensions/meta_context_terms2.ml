@@ -30,7 +30,6 @@ extends Meta_context_ind1
 doc docoff
 
 open Basic_tactics
-open Meta_context_terms
 
 doc <:doc<
    There is a corresponding reduction rule on the right.

@@ -42,6 +42,12 @@ declare mapply{'e1; 'e2}
 val mk_mimplies_term : term -> term -> term
 val dest_mimplies_term : term -> term * term
 
+val mk_mlambda_term : var -> term -> term
+val dest_mlambda_term : term -> var * term
+
+val mk_mapply_term : term -> term -> term
+val dest_mapply_term : term -> term * term
+
 (*
  * Tactics.
  *)

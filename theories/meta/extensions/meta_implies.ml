@@ -31,7 +31,6 @@ extends Meta_struct
 
 open Lm_printf
 
-open Simple_print
 open Basic_tactics
 open Refiner.Refiner.Refine
 

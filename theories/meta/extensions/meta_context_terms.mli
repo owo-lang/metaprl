@@ -68,6 +68,12 @@ val dest_hyp_term : term -> var * term * term
 val mk_hlambda_term : var -> term -> term -> term
 val dest_hlambda_term : term -> var * term * term
 
+val mk_hyp_constrain_term : term -> term -> var -> term -> term
+val dest_hyp_constrain_term : term -> term * term * var * term
+
+val mk_concl_constrain_term : var -> var -> term -> term -> term
+val dest_concl_constrain_term : term -> var * var * term * term
+
 (*
  * -*-
  * Local Variables:

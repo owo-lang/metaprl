@@ -36,8 +36,6 @@ extends Meta_util
 
 doc docoff
 
-open Lm_printf
-
 open Refiner.Refiner.Refine
 
 open Basic_tactics

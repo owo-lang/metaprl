@@ -45,7 +45,6 @@ extends Meta_context_terms
 
 doc docoff
 
-open Perv
 open Basic_tactics
 open Meta_context_terms
 

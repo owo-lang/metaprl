@@ -26,10 +26,7 @@
  *)
 extends Base_theory
 
-open Lm_printf
-
 open Basic_tactics
-open Simple_print
 
 doc <:doc<
    The meta-lambda calculus includes typed functions << hlambda{'A; x. 'e['x]} >>

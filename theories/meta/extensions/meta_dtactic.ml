@@ -48,6 +48,8 @@ open Simple_print
 
 open Browser_resource
 
+module TermMan = Refiner.Refiner.TermMan
+
 let debug_meta_dtactic =
    create_debug (**)
       { debug_name = "meta_dtactic";
@@ -90,6 +92,7 @@ let extract_elim_data =
                       | None ->
                            raise (RefineError ("extract_elim_data", StringTermError ("D tactic doesn't know about", t)))))
 
+(* unused
 let in_auto p =
    match Sequent.get_int_arg p "d_auto" with
       Some 0
@@ -97,6 +100,7 @@ let in_auto p =
          true
     | _ ->
          false
+*)
 
 let extract_intro_data =
    let select_intro p in_auto_type (_, sel, options, auto_type, _) =
@@ -380,7 +384,7 @@ let rec meta_dForT i =
    if i <= 0 then
       idT
    else
-      dT 0 thenMT dForT (pred i)
+      dT 0 thenMT meta_dForT (pred i)
 
 (*
  * By default, dT 0 should always make progress.
@@ -402,7 +406,6 @@ let num_equal t p =
 let check_num_equalT n t = funT (fun p ->
    if num_equal t p >= n then raise eq_exn else idT)
 
-(*
 let auto_dT =
    argfunT (fun i p ->
       let t = Sequent.nth_assum p i in
@@ -429,7 +432,7 @@ let resource auto += [ {
    auto_tac = onSomeHypT auto_dT;
    auto_type = AutoComplete;
 }]
- *)
+
 
 (*
  * Add meta_dT 0 to the browser.

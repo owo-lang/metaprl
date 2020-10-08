@@ -50,10 +50,6 @@ extends Meta_context_terms
 
 doc docoff
 
-open Lm_printf
-
-open Perv
-open Simple_print
 open Term_man_sig
 open Basic_tactics
 open Refiner.Refiner.Refine
@@ -104,8 +100,10 @@ type context_var =
  * Canonical term.
  *)
 let it_term = << it >>
+(* unused
 let it_opname = opname_of_term it_term
 let is_it_term = is_no_subterms_term it_opname
+*)
 
 (*
  * Get the first context var in a sequent.
