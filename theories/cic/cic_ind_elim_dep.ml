@@ -2,10 +2,6 @@ extends Cic_ind_type
 extends Cic_ind_elim
 
 open Basic_tactics
-open Dtactic
-open Cic_lambda
-open Cic_ind_type
-open Cic_ind_elim
 
 declare ForAll1TConstr{'terms; 'IndDef; t,c,C.'P['t;'c;'C]}
 declare ForAll1TConstrAux{'terms; 'IndDef; t,c,C.'P['t;'c;'C]}

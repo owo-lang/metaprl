@@ -1,13 +1,12 @@
 extends Cic_ind_type
 extends Cic_ind_elim
-open Basic_tactics
+
 open Dtactic
 
 (*extends Cic_ind_cases
 open Cic_ind_cases*)
 
 extends Cic_ind_elim_dep
-open Cic_ind_elim_dep
 
 define unfold_List: List <-->
 	sequent [IndParams] { B: Set >-

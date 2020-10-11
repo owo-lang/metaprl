@@ -4,7 +4,6 @@ open Basic_tactics
 open Dtactic
 
 extends Cic_ind_elim_dep
-open Cic_ind_elim_dep
 
 (*********************************************************
 *			Propositional Calculus Connectives					*

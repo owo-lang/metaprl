@@ -1,9 +1,9 @@
 extends Cic_lambda
 open Cic_lambda
 
-open Lm_printf
-
 open Basic_tactics
+
+module TermMan = Refiner.Refiner.TermMan
 
 (*********************************************
  *         INDUCTIVE DEFINITIONS PART        *

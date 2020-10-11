@@ -1,9 +1,6 @@
 extends Cic_ind_type
 
 open Basic_tactics
-open Dtactic
-open Cic_lambda
-open Cic_ind_type
 
 (*
  *	ForAll1D{ <H> >- bind{x.'pred['x]} } holds iff
