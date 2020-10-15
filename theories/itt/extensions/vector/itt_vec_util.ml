@@ -24,8 +24,6 @@
  * @email{jyh@cs.caltech.edu}
  * @end[license]
  *)
-open Lm_printf
-
 open Basic_tactics
 open Base_trivial
 

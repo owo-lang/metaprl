@@ -144,7 +144,7 @@ let fcompare_term = << fcompare{'eq; 'x1; 'x2} >>
 let fequalp_term = << fequalp{'eq; 'T} >>
 let fset_term = << fset{'eq; 'T} >>
 
-let fempty_opname = opname_of_term fempty_term
+(* let fempty_opname = opname_of_term fempty_term *)
 let fsingleton_opname = opname_of_term fsingleton_term
 let funion_opname = opname_of_term funion_term
 let fisect_opname = opname_of_term fisect_term
@@ -157,6 +157,7 @@ let fcompare_opname = opname_of_term fcompare_term
 let fequalp_opname = opname_of_term fequalp_term
 let fset_opname = opname_of_term fset_term
 
+(* unused
 let dest_fsingleton = dest_dep0_term fsingleton_opname
 let dest_funion = dest_dep0_dep0_dep0_term funion_opname
 let dest_fisect = dest_dep0_dep0_dep0_term fisect_opname
@@ -165,13 +166,13 @@ let dest_fisempty = dest_dep0_term fisempty_opname
 let dest_fmember = dest_dep0_dep0_dep0_term fmember_opname
 let dest_fsubseteq = dest_dep0_dep0_dep0_term fsubseteq_opname
 let dest_fequal = dest_dep0_dep0_dep0_term fequal_opname
-let dest_fcompare = dest_dep0_dep0_dep0_term fcompare_opname
+let dest_fcompare = dest_dep0_dep0_dep0_term fcompare_opname *)
 let dest_fequalp = dest_dep0_dep0_term fequalp_opname
 let dest_fset = dest_dep0_dep0_term fset_opname
 
 let is_fset_term = is_dep0_dep0_term fset_opname
 
-let mk_fset_term = mk_dep0_dep0_term fset_opname
+(* let mk_fset_term = mk_dep0_dep0_term fset_opname *)
 
 (************************************************************************
  * DISPLAY                                                              *

@@ -43,8 +43,6 @@ extends Meta_context_theory
 extends Itt_struct
 doc docoff
 
-open Basic_tactics
-
 interactive context_thin 'H 'J :
    sequent { <H>; <K> >- 'C } -->
    sequent { <H>; <J<||> >; <K<|H|> > >- 'C<|H;K|> }

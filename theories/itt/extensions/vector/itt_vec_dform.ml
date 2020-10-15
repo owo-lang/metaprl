@@ -27,10 +27,6 @@
 extends Top_tacticals
 extends Base_theory
 
-open Basic_tactics
-
-open Simple_print.SimplePrint
-
 (************************************************************************
  * Terms
  *)
