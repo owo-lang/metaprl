@@ -19,6 +19,7 @@ MPFILES[] =
     fol_all
     fol_exists
     fol_theory
+    fol_ctheory
     fol_itt_type
     fol_itt_false
     fol_itt_true

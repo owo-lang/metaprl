@@ -1,3 +1,6 @@
+THEORYNAME = fir
+THEORYDESCR = Mojave FIR Theory
+
 MLZFILES = mfir_theory
 
 # Library files

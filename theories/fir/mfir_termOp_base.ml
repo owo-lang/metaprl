@@ -35,7 +35,6 @@
 open Term_sig
 open Refiner.Refiner.Term
 open Refiner.Refiner.TermOp
-open Refiner.Refiner.TermType
 open Refiner.Refiner.RefineError
 
 (**************************************************************************
@@ -145,7 +144,7 @@ let mk_3_dep0_1_dep1_term opname t1 t2 t3 str t4 =
 
 let dest_3_dep0_1_dep1_term opname t =
    match dest_term t with
-      { term_terms = [bt1; bt2; bt3; bt4] }
+      { term_terms = [bt1; bt2; bt3; bt4]; _ }
          when (check_basics opname [0;0;0;1] t) ->
          let s4, t4 = string_term_of_dep1_term bt4 in
             dest_simple_bterm bt1,
@@ -287,7 +286,7 @@ let mk_str_3_dep0_1_dep1_term opname str1 t1 t2 t3 str2 t4 =
 
 let dest_str_3_dep0_1_dep1_term opname t =
    match get_params t, dest_term t with
-      [String str1], { term_terms = [bt1; bt2; bt3; bt4] }
+      [String str1], { term_terms = [bt1; bt2; bt3; bt4]; _ }
          when (check_basics opname [0;0;0;1] t) ->
          let str2, t4 = string_term_of_dep1_term bt4 in
             str1,
