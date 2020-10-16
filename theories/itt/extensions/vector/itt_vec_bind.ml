@@ -92,9 +92,9 @@ doc <:doc<
    of the conclusion.
 >>
 prim_rw unfold_mk_vbind : <:xrewrite<
-   "mk_vbind"{| <J> >- C |}
+   "mk_vbind"{| <J> >- 'C |}
    <-->
-   sequent_ind{u, v. mk_bind{x. happly{v; x}}; "TermSequent"{| <J> >- C |}}
+   sequent_ind{u, v. mk_bind{x. happly{'v; 'x}}; "TermSequent"{| <J> >- 'C |}}
 >>
 
 doc <:doc<

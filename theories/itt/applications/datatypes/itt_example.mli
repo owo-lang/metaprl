@@ -32,6 +32,8 @@ topval fold_oven : conv
 topval fold_button : conv
 topval fold_door : conv
 topval fold_action : conv
+topval fold_eq_oven : conv
+topval fold_eq_action : conv
 topval reduce_next : conv
 
 (*

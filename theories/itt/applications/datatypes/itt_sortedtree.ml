@@ -13,9 +13,6 @@ extends Itt_labels
 
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Tactic_type.Tacticals
 open Dtactic
 open Top_conversionals
@@ -26,12 +23,12 @@ let dByRecDefT term unfold n = dByDefT unfold n thenT rwhAll (makeFoldC term unf
 let soft_elim term unfold = term, wrap_elim (dByDefT unfold)
 let soft_intro term unfold = term, wrap_intro (dByDefT unfold 0)
 let softrec_elim term unfold = term, wrap_elim (dByRecDefT term unfold)
-let softrec_intro term unfold = term, wrap_intro (dByRecDefT term unfold 0)
+(* let softrec_intro term unfold = term, wrap_intro (dByRecDefT term unfold 0) *)
 
 let reduceByDefC unfold =   unfold thenC reduceTopC
 let reduceByRecDefC term unfold = reduceByDefC unfold thenC higherC (makeFoldC term unfold)
 
-let soft_reduce term unfold  = term, (reduceByDefC unfold)
+(* let soft_reduce term unfold  = term, (reduceByDefC unfold) *)
 let softrec_reduce term unfold  = term, wrap_reduce (reduceByRecDefC term unfold)
 
 doc terms

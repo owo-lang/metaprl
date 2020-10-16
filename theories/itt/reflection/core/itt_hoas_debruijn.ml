@@ -346,30 +346,30 @@ doc <:doc<
    Some equivalences on binds.
 >>
 interactive_rw reduce_bindn_nth {| reduce |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   m < n -->
-   bind{n; x. nth{x; m}}
+   'n in nat -->
+   'm in nat -->
+   'm < 'n -->
+   bind{'n; x. nth{'x; 'm}}
    <-->
-   var{m; n -@ m -@ 1}
+   var{'m; 'n -@ 'm -@ 1}
 >>
 
 interactive_rw reduce_bindn_nth2 {| reduce |} : <:xrewrite<
-   n1 in nat -->
-   n2 in nat -->
-   m in nat -->
-   m < n1 -->
-   bind{n1; x1. bind{n2; x2. nth{x1; m}}}
+   'n1 in nat -->
+   'n2 in nat -->
+   'm in nat -->
+   'm < 'n1 -->
+   bind{'n1; x1. bind{'n2; x2. nth{'x1; 'm}}}
    <-->
-   var{m; n1 +@ n2 -@ m -@ 1}
+   var{'m; 'n1 +@ 'n2 -@ 'm -@ 1}
 >>
 
 interactive_rw reduce_bind_var {| reduce |} : <:xrewrite<
-   n in nat -->
-   l in nat -->
-   bind{n; var{l; r}}
+   'n in nat -->
+   'l in nat -->
+   bind{'n; var{'l; 'r}}
    <-->
-   var{n +@ l; r}
+   var{'n +@ 'l; 'r}
 >>
 
 doc docoff

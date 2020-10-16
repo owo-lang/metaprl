@@ -54,9 +54,10 @@ open Basic_tactics
 open Itt_struct
 
 let dByDefT  unfold n = rw unfold n thenT dT n
-let dByRecDefT term unfold n = dByDefT unfold n thenT rwhAll (makeFoldC term unfold)
+(* let dByRecDefT term unfold n = dByDefT unfold n thenT rwhAll (makeFoldC term unfold) *)
 
 let soft_elim term unfold = term, wrap_elim (dByDefT unfold)
+(*
 let soft_into term unfold = term, (dByDefT unfold 0)
 let softrec_elim term unfold = term, wrap_elim (dByRecDefT term unfold)
 let softrec_into term unfold = term, (dByRecDefT term unfold 0)
@@ -66,6 +67,7 @@ let reduceByRecDefC term unfold = reduceByDefC unfold thenC higherC (makeFoldC t
 
 let soft_reduce term unfold  = term, (reduceByDefC unfold)
 let softrec_reduce term unfold  = term, (reduceByRecDefC term unfold)
+ *)
 
 doc <:doc<
    @modsection{Order}
@@ -358,8 +360,8 @@ let resource reduce +=
    <<compare{int_order ; number[n:n];number[m:n]; 'less_case; 'equal_case; 'greater_case}>>, wrap_reduce (addrC [Subterm 1] int_order thenC compare)
 
 let preorder_opname = opname_of_term <<preorder[i:l]>>
-let dest_preorder = dest_univ_term preorder_opname
-let mk_preorder_term = mk_univ_term preorder_opname
+(* let dest_preorder = dest_univ_term preorder_opname *)
+(* let mk_preorder_term = mk_univ_term preorder_opname *)
 let type_product_ord_opname = opname_of_term <<type_product_ord{'T;'Ord}>>
 let dest_type_product_ord = dest_dep0_dep0_term type_product_ord_opname
 

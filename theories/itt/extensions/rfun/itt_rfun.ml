@@ -59,8 +59,6 @@ extends Itt_set
 extends Itt_struct
 doc docoff
 
-open Lm_debug
-open Lm_printf
 open Unify_mm
 
 open Basic_tactics
@@ -169,14 +167,12 @@ let dest_fun t =
  * DISPLAY FORMS                                                        *
  ************************************************************************)
 
-(* unused
 prec prec_fun
 prec prec_apply
 prec prec_lambda
 prec prec_lambda < prec_apply
 prec prec_fun < prec_apply
 prec prec_fun < prec_lambda
-*)
 
 declare declaration{'decl : Dform ;'term : Dform } : Dform
 

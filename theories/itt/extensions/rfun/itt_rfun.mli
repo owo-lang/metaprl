@@ -63,11 +63,9 @@ topval fold_ycomb : conv
  * DISPLAY FORMS                                                        *
  ************************************************************************)
 
-(* unused
 prec prec_fun
 prec prec_apply
 prec prec_lambda
- *)
 
 declare declaration{'decl : Dform ;'term : Dform } : Dform
 

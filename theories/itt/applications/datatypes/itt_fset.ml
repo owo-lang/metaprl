@@ -131,29 +131,33 @@ let fold_foflist = makeFoldC << foflist{'l} >> unfold_foflist
  * TERMS                                                                *
  ************************************************************************)
 
+(* unused
 let fempty_term = << fempty >>
 let fsingleton_term = << fsingleton{'x} >>
 let funion_term = << funion{'eq; 's1; 's2} >>
 let fisect_term = << fisect{'eq; 's1; 's2} >>
 let fsub_term = << fsub{'eq; 's1; 's2} >>
-let fisempty_term = << fisempty{'s1} >>
+let fisempty_term = << fisempty{'s1} >> *)
 let fmember_term = << fmember{'eq; 'x; 's1} >>
+(*
 let fsubseteq_term = << fsubseteq{'eq; 's1; 's2} >>
 let fequal_term = << fequal{'eq; 's1; 's2} >>
-let fcompare_term = << fcompare{'eq; 'x1; 'x2} >>
+let fcompare_term = << fcompare{'eq; 'x1; 'x2} >> *)
 let fequalp_term = << fequalp{'eq; 'T} >>
 let fset_term = << fset{'eq; 'T} >>
 
-(* let fempty_opname = opname_of_term fempty_term *)
+(* unused
+let fempty_opname = opname_of_term fempty_term
 let fsingleton_opname = opname_of_term fsingleton_term
 let funion_opname = opname_of_term funion_term
 let fisect_opname = opname_of_term fisect_term
 let fsub_opname = opname_of_term fsub_term
-let fisempty_opname = opname_of_term fisempty_term
+let fisempty_opname = opname_of_term fisempty_term *)
 let fmember_opname = opname_of_term fmember_term
+(*
 let fsubseteq_opname = opname_of_term fsubseteq_term
 let fequal_opname = opname_of_term fequal_term
-let fcompare_opname = opname_of_term fcompare_term
+let fcompare_opname = opname_of_term fcompare_term *)
 let fequalp_opname = opname_of_term fequalp_term
 let fset_opname = opname_of_term fset_term
 
@@ -162,8 +166,9 @@ let dest_fsingleton = dest_dep0_term fsingleton_opname
 let dest_funion = dest_dep0_dep0_dep0_term funion_opname
 let dest_fisect = dest_dep0_dep0_dep0_term fisect_opname
 let dest_fsub = dest_dep0_dep0_dep0_term fsub_opname
-let dest_fisempty = dest_dep0_term fisempty_opname
+let dest_fisempty = dest_dep0_term fisempty_opname *)
 let dest_fmember = dest_dep0_dep0_dep0_term fmember_opname
+(*
 let dest_fsubseteq = dest_dep0_dep0_dep0_term fsubseteq_opname
 let dest_fequal = dest_dep0_dep0_dep0_term fequal_opname
 let dest_fcompare = dest_dep0_dep0_dep0_term fcompare_opname *)

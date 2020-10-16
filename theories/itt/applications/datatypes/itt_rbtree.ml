@@ -17,20 +17,21 @@ extends Itt_labels
 
 doc docoff
 
-open Tactic_type.Tacticals
+(* open Tactic_type.Tacticals *)
 open Dtactic
 open Top_conversionals
 
 open Itt_bintree
 
+(* unsued
 let dByDefT  unfold n = rw unfold n thenT dT n
 let dByRecDefT term unfold n = dByDefT unfold n thenT rwhAll (makeFoldC term unfold)
 
-(* unsued
 let soft_elim term unfold = term, (dByDefT unfold)
 let soft_into term unfold = term, (dByDefT unfold 0)
 let softrec_elim term unfold = term, (dByRecDefT term unfold)
 let softrec_into term unfold = term, (dByRecDefT term unfold 0)
+*)
 
 let reduceByDefC unfold =   unfold thenC reduceTopC
 let reduceByRecDefC term unfold = reduceByDefC unfold thenC higherC (makeFoldC term unfold)

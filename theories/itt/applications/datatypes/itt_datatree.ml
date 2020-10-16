@@ -11,8 +11,6 @@ extends Itt_labels
 
 doc docoff
 
-open Lm_printf
-
 open Dtactic
 open Top_conversionals
 

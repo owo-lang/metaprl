@@ -55,9 +55,6 @@ extends Itt_void
 extends Itt_unit
 doc docoff
 
-open Lm_debug
-open Lm_printf
-
 open Basic_tactics
 
 open Itt_equal

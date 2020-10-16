@@ -276,13 +276,13 @@ interactive_rw reduce_length_vlist_nil {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_length_vlist_left : <:xrewrite<
-   length{vlist{| A; <J> |}}
+   length{vlist{| 'A; <J> |}}
    <-->
    length{vlist{| <J> |}} +@ 1
 >>
 
 interactive_rw reduce_length_vlist_right : <:xrewrite<
-   length{vlist{| <J>; A |}}
+   length{vlist{| <J>; 'A |}}
    <-->
    length{vlist{| <J> |}} +@ 1
 >>
@@ -374,10 +374,10 @@ interactive_rw reduce_vflatten_hd_nil {| reduce |} :
    vflatten{| <J> |}
 
 interactive_rw reduce_vflatten_singleton2 {| reduce |} : <:xrule<
-   A in list -->
-   vflatten{| A |}
+   'A in list -->
+   vflatten{| 'A |}
    <-->
-   A
+   'A
 >>
 
 doc <:doc<
@@ -428,11 +428,11 @@ interactive_rw reduce_vflatten_append 'J :
    vflatten{| <J>; 'l1; 'l2; <K[it]> |}
 
 interactive_rw merge_vflatten_hd2 : <:xrule<
-   x in list -->
-   y in list -->
-   vflatten{| x; y; <J> |}
+   'x in list -->
+   'y in list -->
+   vflatten{| 'x; 'y; <J> |}
    <-->
-   vflatten{| append{x; y}; <J> |}
+   vflatten{| append{'x; 'y}; <J> |}
 >>
 
 doc <:doc<

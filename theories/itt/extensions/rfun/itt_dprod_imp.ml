@@ -36,15 +36,8 @@ extends Itt_dfun_imp
 extends Itt_unit
 extends Itt_union
 
-open Lm_debug
-open Lm_printf
-
-open Tactic_type
-open Var
 open Dtactic
 open Top_conversionals
-
-open Itt_struct
 
 (************************************************************************
  * REWRITES                                                             *

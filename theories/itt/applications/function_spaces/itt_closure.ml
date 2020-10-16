@@ -64,7 +64,6 @@ extends Itt_labels
 doc docoff
 
 open Basic_tactics
-open Itt_struct
 
 doc <:doc<
    @modsection{Operators}
