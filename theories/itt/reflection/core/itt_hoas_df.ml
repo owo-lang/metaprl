@@ -41,8 +41,6 @@ extends Itt_hoas_debruijn
 
 open Basic_tactics
 
-open Lm_printf
-
 open Dform
 
 open Itt_list

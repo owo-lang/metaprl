@@ -54,7 +54,6 @@ extends Itt_sqsimple
 doc docoff
 
 open Basic_tactics
-open Itt_struct
 open Itt_equal
 
 doc <:doc<

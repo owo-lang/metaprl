@@ -90,9 +90,9 @@ interactive_rw reduce_vbind_split 'J :
  * Hyp squashing.
  *)
 interactive_rw squash_lambda_vbind : <:xrewrite<
-   lambda{x. vbind{| <J[x]> >- e |}}
+   lambda{x. vbind{| <J['x]> >- 'e |}}
    <-->
-   lambda{x. vbind{| <J[it]> >- e |}}
+   lambda{x. vbind{| <J[it]> >- 'e |}}
 >>
 
 interactive_rw squash_vbind Perv!bind{x. vbind{| <J['x]> >- 'e |}} : <:xrewrite<

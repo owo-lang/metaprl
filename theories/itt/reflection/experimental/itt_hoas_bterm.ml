@@ -37,7 +37,6 @@ doc <:doc<
 >>
 
 doc <:doc< @parents >>
-extends Itt_hoas_destterm
 extends Itt_image2
 extends Itt_tunion
 extends Itt_subset
@@ -186,8 +185,8 @@ interactive bterm2_wf {| intro [] |} :
    sequent { <H> >- BTerm{'n} Type }
 
 interactive bterm2_forward {| forward []; nth_hyp |} 'H : <:xrule<
-   <H>; x: e in BTerm{d}; <J[x]>; e in BTerm; bdepth{e} = d in nat >- C[x] -->
-   <H>; x: e in BTerm{d}; <J[x]> >- C[x]
+   <H>; x: 'e in BTerm{'d}; <J['x]>; 'e in BTerm; bdepth{'e} = 'd in nat >- C['x] -->
+   <H>; x: 'e in BTerm{'d}; <J['x]> >- C['x]
 >>
 
 interactive bterm2_is_bterm {| nth_hyp |} 'H :
@@ -535,11 +534,11 @@ doc <:doc<
 >>
 let bind_opname = opname_of_term << bind{x. 'e} >>
 let mk_bind_term = mk_dep1_term bind_opname
-let dest_bind_term = dest_dep1_term bind_opname
+(* let dest_bind_term = dest_dep1_term bind_opname *)
 
 let subst_opname = opname_of_term << subst{'e1; 'e2} >>
 let mk_subst_term = mk_dep0_dep0_term subst_opname
-let dest_subst_term = dest_dep0_dep0_term subst_opname
+(* let dest_subst_term = dest_dep0_dep0_term subst_opname *)
 
 let var_x = Lm_symbol.add "x"
 let eta_expand e t =

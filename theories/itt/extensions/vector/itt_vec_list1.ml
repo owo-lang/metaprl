@@ -45,9 +45,7 @@ extends Itt_list3
 
 doc docoff
 
-open Lm_printf
 open Basic_tactics
-open Simple_print
 
 open Base_trivial
 open Itt_equal
