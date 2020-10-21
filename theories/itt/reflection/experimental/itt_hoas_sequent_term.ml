@@ -40,12 +40,8 @@ extends Itt_match
 
 doc docoff
 
-open Lm_printf
-
 open Basic_tactics
-open Base_trivial
 
-open Itt_list2
 open Itt_vec_util
 open Itt_vec_sequent_term
 open Itt_hoas_normalize
@@ -90,7 +86,7 @@ doc <:doc<
    Convert all the hypotheses in a list to their BTerm equivalents.
 >>
 define unfold_hyps_bterms : hyps_bterms{'l} <--> <:xterm<
-   map{t. bterm_of_vterm{t}; l}
+   map{t. bterm_of_vterm{'t}; 'l}
 >>
 
 interactive_rw reduce_hyps_bterms_nil {| reduce |} : <:xrewrite<
@@ -100,16 +96,16 @@ interactive_rw reduce_hyps_bterms_nil {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_hyps_bterms_cons {| reduce |} : <:xrewrite<
-   hyps_bterms{u::v}
+   hyps_bterms{'u::'v}
    <-->
-   bterm_of_vterm{u} :: hyps_bterms{v}
+   bterm_of_vterm{'u} :: hyps_bterms{'v}
 >>
 
 interactive_rw reduce_hyps_bterms_append {| reduce |} : <:xrewrite<
-   l1 in list -->
-   hyps_bterms{append{l1; l2}}
+   'l1 in list -->
+   hyps_bterms{append{'l1; 'l2}}
    <-->
-   append{hyps_bterms{l1}; hyps_bterms{l2}}
+   append{hyps_bterms{'l1}; hyps_bterms{'l2}}
 >>
 
 doc <:doc<
@@ -120,13 +116,13 @@ doc <:doc<
 declare sequent [hyp_term] { Term : Term >- Term } : Term
 
 prim_rw unfold_hyp_term : hyp_term{| <J> >- 'A |} <--> <:xterm<
-   ["vbind"{| <J> >- A |}]
+   ["vbind"{| <J> >- 'A |}]
 >>
 
 declare sequent [hyp_context] { Term : Term >- Term } : Term
 
 prim_rw unfold_hyp_context : hyp_context{| <J> >- 'A |} <--> <:xterm<
-   hyps_bterms{hyps_flatten{"mk_vbind"{| <J> >- mk_core{A} |}}}
+   hyps_bterms{hyps_flatten{"mk_vbind"{| <J> >- mk_core{'A} |}}}
 >>
 
 interactive_rw reduce_hyps_bterms_hyplist_simple {| reduce |} : <:xrewrite<
@@ -152,21 +148,21 @@ doc <:doc<
    representation.
 >>
 interactive_rw reduce_hyps_bterms_mk_vbind {| reduce |} : <:xrewrite<
-   hyps_bterms{["mk_vbind"{| <J> >- mk_core{A} |}]}
+   hyps_bterms{["mk_vbind"{| <J> >- mk_core{'A} |}]}
    <-->
-   "hyp_term"{| <J> >- A |}
+   "hyp_term"{| <J> >- 'A |}
 >>
 
 interactive_rw fold_hyp_term_cons : <:xrewrite<
-   vbind{| <J> >- A |} :: l
+   vbind{| <J> >- 'A |} :: 'l
    <-->
-   append{hyp_term{| <J> >- A |}; l}
+   append{hyp_term{| <J> >- 'A |}; 'l}
 >>
 
 interactive_rw hyp_term_of_hyp_context {| reduce |} : <:xrewrite<
-   hyp_context{| <J> >- hyplist{| x: A |} |}
+   hyp_context{| <J> >- hyplist{| x: 'A |} |}
    <-->
-   hyp_term{| <J> >- A |}
+   hyp_term{| <J> >- 'A |}
 >>
 
 (************************************************************************
@@ -178,29 +174,29 @@ doc <:doc<
 declare sequent [vsequent{'arg}] { Term : Term >- Term } : Term
 
 prim_rw unfold_vsequent : vsequent{'arg}{| <J> >- 'C |} <--> <:xterm<
-   "sequent"{arg; "vflatten"{| <J> |}; "vsubst_dummy"{| <J> >- C |}}
+   "sequent"{'arg; "vflatten"{| <J> |}; "vsubst_dummy"{| <J> >- 'C |}}
 >>
 
 define unfold_vsequent_of_triple : vsequent_of_triple{'e} <--> <:xterm<
-   let arg, hyps, concl = e in
-      vsequent{arg}{| hyps_bterms{hyps} >- bterm_of_vterm{concl} |}
+   let arg, hyps, concl = 'e in
+      vsequent{'arg}{| hyps_bterms{'hyps} >- bterm_of_vterm{'concl} |}
 >>
 
 interactive_rw reduce_vsequent_of_triple {| reduce |} : <:xrewrite<
-   vsequent_of_triple{(a, (b, c))}
+   vsequent_of_triple{('a, ('b, 'c))}
    <-->
-   vsequent{a}{| hyps_bterms{b} >- bterm_of_vterm{c} |}
+   vsequent{'a}{| hyps_bterms{'b} >- bterm_of_vterm{'c} |}
 >>
 
 (*
  * Flattening append.
  *)
 interactive_rw reduce_vsequent_append 'J : <:xrewrite<
-   l1 in list -->
-   l2 in list -->
-   vsequent{arg}{| <J>; append{l1<||>; l2<||>}; <K> >- C |}
+   'l1 in list -->
+   'l2 in list -->
+   vsequent{'arg}{| <J>; append{'l1<||>; 'l2<||>}; <K> >- 'C |}
    <-->
-   vsequent{arg}{| <J>; l1; l2; <K> >- C |}
+   vsequent{'arg}{| <J>; 'l1; 'l2; <K> >- 'C |}
 >>
 
 (************************************************************************
@@ -211,9 +207,9 @@ doc <:doc<
    of the original sequent.
 >>
 prim_rw unfold_bsequent : <:xrewrite<
-   "bsequent"{arg}{| <J> >- C |}
+   "bsequent"{'arg}{| <J> >- 'C |}
    <-->
-   sequent_bterm{vsequent_of_triple{"fsequent"{arg}{| <J> >- C |}}}
+   sequent_bterm{vsequent_of_triple{"fsequent"{'arg}{| <J> >- 'C |}}}
 >>
 
 (************************************************************************
@@ -223,12 +219,12 @@ doc <:doc<
    Well-formedness reasoning.
 >>
 interactive hyp_term_wf {| intro [] |} : <:xrule<
-   <H> >- "hyp_term"{| <J> >- A |} in list
+   <H> >- "hyp_term"{| <J> >- 'A |} in list
 >>
 
 interactive hyps_bterms_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- l in list -->
-   <H> >- hyps_bterms{l} in list
+   "wf" : <H> >- 'l in list -->
+   <H> >- hyps_bterms{'l} in list
 >>
 
 interactive hyp_context_wf {| intro [] |} : <:xrule<
@@ -254,9 +250,9 @@ interactive_rw reduce_hyp_context_nil {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_hyp_context_cons : <:xrewrite<
-   hyp_context{| <J> >- hyplist{| x: A; <K[x]> |} |}
+   hyp_context{| <J> >- hyplist{| x: 'A; <K['x]> |} |}
    <-->
-   vbind{| <J> >- A |} :: hyp_context{| <J>; x: A >- hyplist{| <K[x]> |} |}
+   vbind{| <J> >- 'A |} :: hyp_context{| <J>; x: 'A >- hyplist{| <K['x]> |} |}
 >>
 
 interactive_rw reduce_hyp_context_split 'K : <:xrewrite<
@@ -283,7 +279,7 @@ interactive hyp_context_relax_base {| intro |} : <:xrule<
  * Context squashing.
  *)
 interactive_rw squash_hyp_context Perv!bind{x. hyp_context{| <J['x]> >- 'e |}} : <:xrewrite<
-   hyp_context{| <J[x]> >- 'e |}
+   hyp_context{| <J['x]> >- 'e |}
    <-->
    hyp_context{| <J[it]> >- 'e |}
 >>
@@ -297,14 +293,14 @@ doc <:doc<
    << length{vlist{| <J> |}} >>.
 >>
 interactive_rw reduce_hyps_bterms_length {| reduce |} : <:xrewrite<
-   l in list -->
-   length{hyps_bterms{l}}
+   'l in list -->
+   length{hyps_bterms{'l}}
    <-->
-   length{l}
+   length{'l}
 >>
 
 interactive_rw reduce_hyp_context_length_left {| reduce |} : <:xrewrite<
-   length{hyp_context{| x: A; <J[x]> >- hyplist{| <K[x]> |} |}}
+   length{hyp_context{| x: 'A; <J['x]> >- hyplist{| <K['x]> |} |}}
    <-->
    length{hyp_context{| <J[it]> >- hyplist{| <K[it]> |} |}}
 >>
@@ -322,7 +318,7 @@ interactive_rw reduce_length_hyp_context_nil {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_length_hyp_term {| reduce |} : <:xrewrite<
-   length{hyp_term{| <J> >- e |}}
+   length{hyp_term{| <J> >- 'e |}}
    <-->
    1
 >>
@@ -334,49 +330,49 @@ doc <:doc<
    Well-formedness of sequent terms.
 >>
 interactive vsequent_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- arg in BTerm{0} -->
+   "wf" : <H> >- 'arg in BTerm{0} -->
    "wf" : <H> >- vflatten{| <J> |} in CVar{length{vflatten{| |}}} -->
-   "wf" : <H> >- C in BTerm{length{vflatten{| <J> |}}} -->
-   <H> >- vsequent{arg}{| <J> >- C<|H|> |} in Sequent
+   "wf" : <H> >- 'C in BTerm{length{vflatten{| <J> |}}} -->
+   <H> >- vsequent{'arg}{| <J> >- 'C<|H|> |} in Sequent
 >>
 
 interactive vsequent_equal {| intro [] |} : <:xrule<
-   "wf" : <H> >- arg1 = arg2 in BTerm{0} -->
+   "wf" : <H> >- 'arg1 = 'arg2 in BTerm{0} -->
    "wf" : <H> >- vflatten{| <J1> |} = vflatten{| <J2> |} in CVar{length{vflatten{||}}} -->
-   "wf" : <H> >- C1 = C2 in BTerm{length{vflatten{| <J1> |}}} -->
-   <H> >- vsequent{arg1}{| <J1> >- C1<|H|> |} = vsequent{arg2}{| <J2> >- C2<|H|> |} in Sequent
+   "wf" : <H> >- 'C1 = 'C2 in BTerm{length{vflatten{| <J1> |}}} -->
+   <H> >- vsequent{'arg1}{| <J1> >- 'C1<|H|> |} = vsequent{'arg2}{| <J2> >- 'C2<|H|> |} in Sequent
 >>
 
 interactive vsequent_wf1 {| intro [] |} : <:xrule<
 (*   "wf" : <H> >- vflatten{| <J> |} in CVar{0} -->*)
    "wf" : <H> >- vflatten{| <J> |} in CVarRelax{0} -->
-   "wf" : <H> >- C in Bind{length{vflatten{| <J> |}}} -->
-   <H> >- vsequent{arg}{| <J> >- C<|H|> |} in SequentRelax
+   "wf" : <H> >- 'C in Bind{length{vflatten{| <J> |}}} -->
+   <H> >- vsequent{'arg}{| <J> >- 'C<|H|> |} in SequentRelax
 >>
 
 interactive vsequent_equal1 {| intro [] |} : <:xrule<
-   "wf" : <H> >- arg1 = arg2 in Bind{0} -->
+   "wf" : <H> >- 'arg1 = 'arg2 in Bind{0} -->
    "wf" : <H> >- vflatten{| <J1> |} = vflatten{| <J2> |} in CVarRelax{0} -->
-   "wf" : <H> >- C1 = C2 in Bind{length{vflatten{| <J1> |}}} -->
-   <H> >- vsequent{arg1}{| <J1> >- C1<|H|> |} = vsequent{arg2}{| <J2> >- C2<|H|> |} in SequentRelax
+   "wf" : <H> >- 'C1 = 'C2 in Bind{length{vflatten{| <J1> |}}} -->
+   <H> >- vsequent{'arg1}{| <J1> >- 'C1<|H|> |} = vsequent{'arg2}{| <J2> >- 'C2<|H|> |} in SequentRelax
 >>
 
 interactive vflatten_hyp_concl_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   <H> >- "vflatten"{| |} IN CVar{d}
+   "wf" : <H> >- 'd IN "nat" -->
+   <H> >- "vflatten"{| |} IN CVar{'d}
 >>
 
 interactive vflatten_hyp_left_wf {| intro [] |} : <:xrule<
    "wf" : <H> >- "vlist"{| <K> |} IN list{"list"} -->
-   "wf" : <H> >- A IN CVar{length{"vflatten"{| <K> |}}} -->
-   "wf" : <H> >- "vflatten"{| <J[it]> |} IN CVar{length{"vflatten"{| <K>; x: A |}}} -->
-   <H> >- "vflatten"{| x: A; <J[x]> |} IN CVar{length{"vflatten"{| <K> |}}}
+   "wf" : <H> >- 'A IN CVar{length{"vflatten"{| <K> |}}} -->
+   "wf" : <H> >- "vflatten"{| <J[it]> |} IN CVar{length{"vflatten"{| <K>; x: 'A |}}} -->
+   <H> >- "vflatten"{| x: 'A; <J['x]> |} IN CVar{length{"vflatten"{| <K> |}}}
 >>
 
 interactive hyp_term_cvar_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- n in nat -->
-   <H> >- vbind{| <J> >- e |} in BTerm{n} -->
-   <H> >- hyp_term{| <J> >- e |} in CVar{n}
+   "wf" : <H> >- 'n in nat -->
+   <H> >- vbind{| <J> >- 'e |} in BTerm{'n} -->
+   <H> >- hyp_term{| <J> >- 'e |} in CVar{'n}
 >>
 
 (************************************************************************
@@ -386,45 +382,45 @@ doc <:doc<
    Define the rewrites that turn a @tt[bsequent] into a normalized @tt[vsequent].
 >>
 interactive_rw reduce_bsequent_start : <:xrewrite<
-   bsequent{arg}{| <J> >- C |}
+   bsequent{'arg}{| <J> >- 'C |}
    <-->
-   sequent_bterm{vsequent{arg}{| hyp_context{| >- hyplist{| <J> |} |} >- vbind{| <J> >- C |} |}}
+   sequent_bterm{vsequent{'arg}{| hyp_context{| >- hyplist{| <J> |} |} >- vbind{| <J> >- 'C |} |}}
 >>
 
 interactive_rw reduce_vsequent_nil {| reduce |} : <:xrewrite<
-   vsequent{arg}{| hyp_context{| >- hyplist{||} |}; <J> >- C |}
+   vsequent{'arg}{| hyp_context{| >- hyplist{||} |}; <J> >- 'C |}
    <-->
-   vsequent{arg}{| <J> >- C |}
+   vsequent{'arg}{| <J> >- 'C |}
 >>
 
 interactive_rw reduce_vsequent_split 'J : <:xrewrite<
-   vsequent{arg}{| hyp_context{| >- hyplist{| <J>; <K> |} |}; <L> >- C |}
+   vsequent{'arg}{| hyp_context{| >- hyplist{| <J>; <K> |} |}; <L> >- 'C |}
    <-->
-   vsequent{arg}{| hyp_context{| >- hyplist{| <J> |} |};
+   vsequent{'arg}{| hyp_context{| >- hyplist{| <J> |} |};
                    hyp_context{| <J> >- hyplist{| <K> |} |};
                    <L>
-                   >- C
+                   >- 'C
                 |}
 >>
 
 interactive_rw reduce_vsequent_right : <:xrewrite<
-   vsequent{arg}{| hyp_context{| >- hyplist{| <J>; A |} |}; <L> >- C |}
+   vsequent{'arg}{| hyp_context{| >- hyplist{| <J>; 'A |} |}; <L> >- 'C |}
    <-->
-   vsequent{arg}{| hyp_context{| >- hyplist{| <J> |} |};
-                   hyp_term{| <J> >- A |};
+   vsequent{'arg}{| hyp_context{| >- hyplist{| <J> |} |};
+                   hyp_term{| <J> >- 'A |};
                    <L>
-                   >- C
+                   >- 'C
                 |}
 >>
 
 (*
 interactive_rw reduce_bsequent 'J : <:xrewrite<
-   bsequent{arg}{| <J>; x: A; <K[x]> >- C[x] |}
+   bsequent{'arg}{| <J>; x: 'A; <K['x]> >- C['x] |}
    <-->
-   sequent_bterm{vsequent{arg}{| hyp_context{| >- hyplist{| <J> |} |};
-                                 hyp_term{| <J> >- A |};
-                                 hyp_context{| <J>; x: A >- hyplist{| <K[x]> |} |}
-                                 >- vbind{| <J>; x: A; <K[x]> >- C[x] |}
+   sequent_bterm{vsequent{'arg}{| hyp_context{| >- hyplist{| <J> |} |};
+                                 hyp_term{| <J> >- 'A |};
+                                 hyp_context{| <J>; x: 'A >- hyplist{| <K['x]> |} |}
+                                 >- vbind{| <J>; x: 'A; <K['x]> >- C['x] |}
                               |}}
 >>
  *)
@@ -439,10 +435,10 @@ doc <:doc<
 >>
 interactive vsequent_wf_forward {| forward |} 'H : <:xrule<
    <H>; <K[it]>;
-      arg1 = arg2 in BTerm{0};
+      'arg1 = 'arg2 in BTerm{0};
       vflatten{| <J1> |} = vflatten{| <J2> |} in CVar{length{vflatten{||}}};
-      C1 = C2 in BTerm{length{vflatten{| <J1> |}}} >- D[it] -->
-   <H>; x: vsequent{arg1}{| <J1> >- C1<|H|> |} = vsequent{arg2}{| <J2> >- C2<|H|> |} in Sequent; <K[x]> >- D[x]
+      'C1 = 'C2 in BTerm{length{vflatten{| <J1> |}}} >- D[it] -->
+   <H>; x: vsequent{'arg1}{| <J1> >- 'C1<|H|> |} = vsequent{'arg2}{| <J2> >- 'C2<|H|> |} in Sequent; <K['x]> >- D['x]
 >>
 
 (*
@@ -451,36 +447,36 @@ interactive vsequent_wf_forward {| forward |} 'H : <:xrule<
  * the vsequent hyps.
  *)
 interactive bsequent_wf_forward 'H : <:xrule<
-   <H>; bsequent{arg}{| <J> >- C |} in BSequent; <K>;
-      arg in BTerm{0};
+   <H>; bsequent{'arg}{| <J> >- 'C |} in BSequent; <K>;
+      'arg in BTerm{0};
       hyp_context{| >- hyplist{| <J> |} |} in CVar{0};
-      vbind{| <J> >- C |} in BTerm{length{vlist{| <J> |}}}
-      >- D -->
-   <H>; bsequent{arg}{| <J> >- C |} in BSequent; <K> >- D
+      vbind{| <J> >- 'C |} in BTerm{length{vlist{| <J> |}}}
+      >- 'D -->
+   <H>; bsequent{'arg}{| <J> >- 'C |} in BSequent; <K> >- 'D
 >>
 
 interactive bsequent_wf_forward2 'H : <:xrule<
-   <H>; bsequent{arg}{| <J> >- C |} in BSequent; <K>;
-      vsequent{arg}{| hyp_context{| >- hyplist{| <J> |} |} >- vbind{| <J> >- C |} |} in Sequent
-      >- D -->
-   <H>; bsequent{arg}{| <J> >- C |} in BSequent; <K> >- D
+   <H>; bsequent{'arg}{| <J> >- 'C |} in BSequent; <K>;
+      vsequent{'arg}{| hyp_context{| >- hyplist{| <J> |} |} >- vbind{| <J> >- 'C |} |} in Sequent
+      >- 'D -->
+   <H>; bsequent{'arg}{| <J> >- 'C |} in BSequent; <K> >- 'D
 >>
 
 (*
  * Hyps forward-chaining.
  *)
 interactive vflatten_wf_forward_left {| forward [fwd_reduce_type (-1)] |} 'H : <:xrule<
-   "wf" : <H>; <K[it]> >- n in nat -->
-   "wf" : <H>; <K[it]> >- A in list{BTerm} -->
+   "wf" : <H>; <K[it]> >- 'n in nat -->
+   "wf" : <H>; <K[it]> >- 'A in list{BTerm} -->
    "wf" : <H>; <K[it]> >- vflatten{| <J> |} in list{BTerm} -->
-   <H>; <K[it]>; A in CVar{n}; vflatten{| <J> |} in CVar{n +@ length{A}} >- C[it] -->
-   <H>; x: vflatten{| A; <J> |} in CVar{n}; <K[x]> >- C[x]
+   <H>; <K[it]>; 'A in CVar{'n}; vflatten{| <J> |} in CVar{'n +@ length{'A}} >- C[it] -->
+   <H>; x: vflatten{| 'A; <J> |} in CVar{'n}; <K['x]> >- C['x]
 >>
 
 interactive_rw reduce_vflatten_hyp_term {| reduce |} : <:xrewrite<
-   vflatten{| hyp_term{| <J> >- e |} |}
+   vflatten{| hyp_term{| <J> >- 'e |} |}
    <-->
-   [vbind{| <J> >- e |}]
+   [vbind{| <J> >- 'e |}]
 >>
 doc docoff
 
@@ -581,7 +577,7 @@ let reduce_bsequent =
    thenC addrC [Subterm 1] (tryC reduce_vsequent)
 
 let resource reduce +=
-    [<:xterm< vsequent{arg}{| hyp_context{| <J> >- C |}; <K> >- D |} >>, wrap_reduce reduce_vsequent]
+    [<:xterm< vsequent{'arg}{| hyp_context{| <J> >- 'C |}; <K> >- 'D |} >>, wrap_reduce reduce_vsequent]
 
 (*
  * Perform reduction during forward-chaining.
@@ -606,7 +602,7 @@ let resource forward += [
  * JYH: we don't need this for now because the Itt_hoas_sequent_proof.provable_forwardT
  * calls it manually.
 let resource forward +=
-    [<:xterm< bsequent{arg}{| <J> >- C |} in BSequent >>,
+    [<:xterm< bsequent{'arg}{| <J> >- 'C |} in BSequent >>,
         { forward_loc  = (LOCATION);
           forward_prec = forward_trivial_prec;
           forward_tac  = forward_bsequent_wf
@@ -629,7 +625,7 @@ interactive bsequent_test_intro1 : <:xrule<
 >>
 
 interactive bsequent_test_elim1 'J : <:xrule<
-   <H> >- bsequent{it}{| <J>; x: A; <K[x]> >- 1 +@ 2 |} IN "top"
+   <H> >- bsequent{it}{| <J>; x: 'A; <K['x]> >- 1 +@ 2 |} IN "top"
 >>
 
 (************************************************************************

@@ -46,9 +46,7 @@ extends Itt_hoas_debruijn
 
 doc docoff
 
-open Lm_printf
 open Basic_tactics
-open Simple_print
 open Itt_hoas_vector
 open Itt_hoas_debruijn
 open Itt_hoas_util
@@ -183,8 +181,10 @@ define unfold_lof_append : lof_append{i. 'f['i]; j. 'g['j]; 'i; 'n; 'm} <-->
  *)
 let lof_term = << lof{i. 'f['i]; 'n} >>
 let lof_opname = opname_of_term lof_term
+(* unused
 let is_lof_term = is_dep1_dep0_term lof_opname
 let mk_lof_term = mk_dep1_dep0_term lof_opname
+*)
 let dest_lof_term = dest_dep1_dep0_term lof_opname
 
 let lof_bind_term = << lof_bind{'n; x. 'e['x]} >>
@@ -417,38 +417,38 @@ doc <:doc<
    Some facts about substitutions.
 >>
 interactive_rw reduce_lof_zero : <:xrule<
-   lof{i. f[i]; 0}
+   lof{i. f['i]; 0}
    <-->
    []
 >>
 
 interactive_rw reduce_lof_succ : <:xrule<
-   j in nat -->
-   lof{i. f[i]; j +@ 1}
+   'j in nat -->
+   lof{i. f['i]; 'j +@ 1}
    <-->
-   f[0] :: lof{i. f[i +@ 1]; j}
+   f[0] :: lof{i. f['i +@ 1]; 'j}
 >>
 
 interactive_rw reduce_lof_split : <:xrule<
-   j in nat -->
-   k in nat -->
-   lof{i. f[i]; j +@ k}
+   'j in nat -->
+   'k in nat -->
+   lof{i. f['i]; 'j +@ 'k}
    <-->
-   append{lof{i. f[i]; j}; lof{i. f[i +@ j]; k}}
+   append{lof{i. f['i]; 'j}; lof{i. f['i +@ 'j]; 'k}}
 >>
 
 interactive_rw reduce_lof_nth : <:xrule<
-   l in list -->
-   lof{i. lof_nth{l; i}; length{l}}
+   'l in list -->
+   lof{i. lof_nth{'l; 'i}; length{'l}}
    <-->
-   l
+   'l
 >>
 
 interactive_rw reduce_lof_map_nth Perv!bind{z. 'e['z]} lof_nth{map{x. 'f['x]; 'l}; 'i} : <:xrule<
-   l in list -->
-   lof{i. e[lof_nth{map{x. f[x]; l}; i}]; length{l}}
+   'l in list -->
+   lof{i. e[lof_nth{map{x. f['x]; 'l}; 'i}]; length{'l}}
    <-->
-   lof{i. e[f[lof_nth{l; i}]]; length{l}}
+   lof{i. e[f[lof_nth{'l; 'i}]]; length{'l}}
 >>
 
 let is_lof_map_nth_term t _bv =
@@ -474,13 +474,13 @@ let reduce_lof_map_nthC = termC (fun t ->
             raise (RefineError ("reduce_lof_map_nthC", StringTermError ("no map subterm", t))))
 
 interactive_rw normalize_mk_bterm_subst {| normalize_lof |} : <:xrule<
-   n in nat -->
-   m in nat -->
-   m <= n -->
-   subterms in list -->
-   substl{mk_bterm{n; op; subterms}; lof{i. f[i]; m}}
+   'n in nat -->
+   'm in nat -->
+   'm <= 'n -->
+   'subterms in list -->
+   substl{mk_bterm{'n; 'op; 'subterms}; lof{i. f['i]; 'm}}
    <-->
-   mk_bterm{n -@ m; op; lof{j. substl{lof_nth{subterms; j}; lof{i. f[i]; m}}; length{subterms}}}
+   mk_bterm{'n -@ 'm; 'op; lof{j. substl{lof_nth{'subterms; 'j}; lof{i. f['i]; 'm}}; length{'subterms}}}
 >>
 
 (*
@@ -488,43 +488,43 @@ interactive_rw normalize_mk_bterm_subst {| normalize_lof |} : <:xrule<
  * We should use native list_of_fun for the subterm list.
  *)
 interactive_rw normalize_mk_bterm_subst2 : <:xrule<
-   n in nat -->
-   m in nat -->
-   m <= n -->
-   subterms in list -->
-   substl{mk_bterm{n; op; subterms}; lof{i. f[i]; m}}
+   'n in nat -->
+   'm in nat -->
+   'm <= 'n -->
+   'subterms in list -->
+   substl{mk_bterm{'n; 'op; 'subterms}; lof{i. f['i]; 'm}}
    <-->
-   mk_bterm{n -@ m; op; list_of_fun{j. substl{nth{subterms; j}; lof{i. f[i]; m}}; length{subterms}}}
+   mk_bterm{'n -@ 'm; 'op; list_of_fun{j. substl{nth{'subterms; 'j}; lof{i. f['i]; 'm}}; length{'subterms}}}
 >>
 
 (*
  * Var substitutions.
  *)
 interactive_rw normalize_bind_subst_lof_null {| reduce |} : <:xrule<
-   n in nat -->
-   substl{bind{n; x. e}; lof{i. f[i]; n}}
+   'n in nat -->
+   substl{bind{'n; x. 'e}; lof{i. f['i]; 'n}}
    <-->
-   e
+   'e
 >>
 
 interactive_rw reduce_substl_append_lof : <:xrule<
-   n in nat -->
-   substl{e; append{lof{i. f[i]; n}; l}}
+   'n in nat -->
+   substl{'e; append{lof{i. f['i]; 'n}; 'l}}
    <-->
-   substl{substl{e; lof{i. f[i]; n}}; l}
+   substl{substl{'e; lof{i. f['i]; 'n}}; 'l}
 >>
 
 interactive_rw normalize_var_subst {| normalize_lof |} : <:xrule<
-   l in nat -->
-   r in nat -->
-   n in nat -->
-   n <= l +@ r +@ 1 -->
-   substl{var{l; r}; lof{i. f[i]; n}}
+   'l in nat -->
+   'r in nat -->
+   'n in nat -->
+   'n <= 'l +@ 'r +@ 1 -->
+   substl{var{'l; 'r}; lof{i. f['i]; 'n}}
    <-->
-   if le_bool{n; l} then
-      var{l -@ n; r}
+   if le_bool{'n; 'l} then
+      var{'l -@ 'n; 'r}
    else
-      bind{r -@ n +@ l +@ 1; f[l]}
+      bind{'r -@ 'n +@ 'l +@ 1; f['l]}
 >>
 
 (************************************************************************
@@ -603,9 +603,9 @@ interactive_rw reduce_nth_lof {| reduce; reduce_lof |} :
    'f['j]
 
 interactive_rw reduce_singleton {| normalize_lof; reduce; reduce_lof |} : <:xrewrite<
-   lof_cons{i. f[i]; 0; e}
+   lof_cons{i. f['i]; 0; 'e}
    <-->
-   e
+   'e
 >>
 
 doc docoff
@@ -632,15 +632,15 @@ let resource normalize_lof +=
  * So, when we encounter a naked lof term, we reduce it.
  *)
 interactive_rw reduce_bind_nth {| reduce; reduce_lof |} : <:xrewrite<
-   lof_bind{n; x. lof_nth{l[x]; i[x]}}
+   lof_bind{'n; x. lof_nth{l['x]; i['x]}}
    <-->
-   lof_bind{n; x. nth{l[x]; i[x]}}
+   lof_bind{'n; x. nth{l['x]; i['x]}}
 >>
 
 interactive_rw reduce_bind_nth_prefix {| normalize_lof; reduce; reduce_lof |} : <:xrewrite<
-   lof_bind{n; x. lof_nth_prefix{i. f[i; x]; m[x]; a[x]; b[x]}}
+   lof_bind{'n; x. lof_nth_prefix{i. f['i; 'x]; m['x]; a['x]; b['x]}}
    <-->
-   lof_bind{n; x. f[m[x]; x]}
+   lof_bind{'n; x. f[m['x]; 'x]}
 >>
 
 (************************************************************************
@@ -664,9 +664,9 @@ doc <:doc<
    Nested << nth_prefix{'l; 'n} >> cancel.
 >>
 interactive_rw reduce_nth_prefix_nth_prefix {| reduce_lof |} : <:xrewrite<
-   lof{i. lof_nth_prefix{j. lof_nth_prefix{k. l[k]; j; n2; m2}; i; n1; m1}; n}
+   lof{i. lof_nth_prefix{j. lof_nth_prefix{k. l['k]; 'j; 'n2; 'm2}; 'i; 'n1; 'm1}; 'n}
    <-->
-   lof{i. lof_nth_prefix{j. l[j]; i; n2; m1}; n}
+   lof{i. lof_nth_prefix{j. l['j]; 'i; 'n2; 'm1}; 'n}
 >>
 
 (************************************************************************

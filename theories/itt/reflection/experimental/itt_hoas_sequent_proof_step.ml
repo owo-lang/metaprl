@@ -33,12 +33,7 @@ extends Itt_hoas_proof
 
 doc docoff
 
-open Dform
 open Basic_tactics
-
-open Itt_list
-open Itt_list2
-open Itt_dfun
 
 (************************************************************************
  * SOVar/CVar destructors.
@@ -67,35 +62,35 @@ dform let_cvar_df : let_cvar[name:s]{'d; 'witness; 'i; v. 'e} =
    szone pushm[0] `"let " slot{'v} `"(" slot[name:s] `") : CVar{" slot{'d} `"} = " slot{'witness} `".cvars.[" slot{'i} `"] in" hspace slot{'e} popm ezone
 
 interactive_rw reduce_let_sovar {| reduce |} : <:xrewrite<
-   "let_sovar"[name:s]{d; proof_step_witness{sovars; cvars}; i; v. e[v]}
+   "let_sovar"[name:s]{'d; proof_step_witness{'sovars; 'cvars}; 'i; v. e['v]}
    <-->
-   band{gt_bool{length{sovars}; i};
-   band{beq_int{bdepth{nth{sovars; i}}; d};
-   e[nth{sovars; i}]}}
+   band{gt_bool{length{'sovars}; 'i};
+   band{beq_int{bdepth{nth{'sovars; 'i}}; 'd};
+   e[nth{'sovars; 'i}]}}
 >>
 
 interactive_rw reduce_let_cvar {| reduce |} : <:xrewrite<
-   "let_cvar"[name:s]{d; proof_step_witness{sovars; cvars}; i; v. e[v]}
+   "let_cvar"[name:s]{'d; proof_step_witness{'sovars; 'cvars}; 'i; v. e['v]}
    <-->
-   band{gt_bool{length{cvars}; i};
-   band{bhyp_depths{d; nth{cvars; i}};
-   e[nth{cvars; i}]}}
+   band{gt_bool{length{'cvars}; 'i};
+   band{bhyp_depths{'d; nth{'cvars; 'i}};
+   e[nth{'cvars; 'i}]}}
 >>
 
 interactive let_sovar_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d in nat -->
-   "wf" : <H> >- witness IN ProofStepWitness -->
-   "wf" : <H> >- i in nat -->
-   "wf" : <H>; v: BTerm{d} >- e[v] in bool -->
-   <H> >- "let_sovar"[name:s]{d; witness; i; v. e[v]} in bool
+   "wf" : <H> >- 'd in nat -->
+   "wf" : <H> >- 'witness IN ProofStepWitness -->
+   "wf" : <H> >- 'i in nat -->
+   "wf" : <H>; v: BTerm{'d} >- e['v] in bool -->
+   <H> >- "let_sovar"[name:s]{'d; 'witness; 'i; v. e['v]} in bool
 >>
 
 interactive let_cvar_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d in nat -->
-   "wf" : <H> >- witness IN "ProofStepWitness" -->
-   "wf" : <H> >- i in nat -->
-   "wf" : <H>; v: CVar{d} >- e[v] in bool -->
-   <H> >- "let_cvar"[name:s]{d; witness; i; v. e[v]} in bool
+   "wf" : <H> >- 'd in nat -->
+   "wf" : <H> >- 'witness IN "ProofStepWitness" -->
+   "wf" : <H> >- 'i in nat -->
+   "wf" : <H>; v: CVar{'d} >- e['v] in bool -->
+   <H> >- "let_cvar"[name:s]{'d; 'witness; 'i; v. e['v]} in bool
 >>
 
 interactive let_sovar_elim {| elim [] |} 'H :

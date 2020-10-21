@@ -34,16 +34,12 @@ extends Itt_match
 
 doc docoff
 
-open Lm_printf
-
-open Simple_print
-
 open Basic_tactics
-open Base_trivial
 open Itt_squiggle
 open Itt_struct
-open Itt_dfun
 open Itt_vec_util
+
+module TermMan = Refiner.Refiner.TermMan
 
 declare Invalid_argument
 
@@ -153,39 +149,39 @@ interactive_rw reduce_vsubst_dummy_nil {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_vsubst_dummy_left {| reduce |} : <:xrewrite<
-   "vsubst_dummy"{| x: 'A; <J[x]> >- C[x] |}
+   "vsubst_dummy"{| x: 'A; <J['x]> >- C['x] |}
    <-->
    "vsubst_dummy"{| <J["it"]> >- C["it"] |}
 >>
 
 interactive_rw reduce_vsubst_dummy_right {| reduce |} : <:xrewrite<
-   "vsubst_dummy"{| <J>; x: 'A >- C[x] |}
+   "vsubst_dummy"{| <J>; x: 'A >- C['x] |}
    <-->
    "vsubst_dummy"{| <J> >- C["it"] |}
 >>
 
 interactive_rw reduce_vsubst_dummy_null {| reduce |} : <:xrewrite<
-   "vsubst_dummy"{| <J> >- e<||> |}
+   "vsubst_dummy"{| <J> >- 'e<||> |}
    <-->
-   e
+   'e
 >>
 
 interactive_rw reduce_vsubst_dummy_middle 'J : <:xrewrite<
-   "vsubst_dummy"{| <J>; x: 'A; <K[x]> >- e[x] |}
+   "vsubst_dummy"{| <J>; x: 'A; <K['x]> >- e['x] |}
    <-->
    "vsubst_dummy"{| <J>; <K["it"]> >- e["it"] |}
 >>
 
 interactive_rw reduce_vsubst_dummy_core {| reduce |} : <:xrewrite<
-   "vsubst_dummy"{| <J> >- mk_core{e} |}
+   "vsubst_dummy"{| <J> >- mk_core{'e} |}
    <-->
-   mk_core{"vsubst_dummy"{| <J> >- e |}}
+   mk_core{"vsubst_dummy"{| <J> >- 'e |}}
 >>
 
 interactive_rw reduce_vsubst_dummy_cons {| reduce |} : <:xrewrite<
-   "vsubst_dummy"{| <J> >- e1 :: e2 |}
+   "vsubst_dummy"{| <J> >- 'e1 :: 'e2 |}
    <-->
-   "vsubst_dummy"{| <J> >- e1 |} :: "vsubst_dummy"{| <J> >- e2 |}
+   "vsubst_dummy"{| <J> >- 'e1 |} :: "vsubst_dummy"{| <J> >- 'e2 |}
 >>
 
 (************************************************************************
@@ -197,19 +193,19 @@ doc <:doc<
    << nat >> to avoid wellformedness subgoals.
 >>
 define unfold_mk_lbind : mk_lbind{'n; x. 'e['x]} <--> <:xterm<
-   list_ind{n; lambda{f. f "nil"}; u, v, g. lambda{f. mk_bind{x. g (lambda{l. f (x :: l)})}}} lambda{x. e['x]}
+   list_ind{'n; lambda{f. 'f "nil"}; u, v, g. lambda{f. mk_bind{x. 'g (lambda{l. 'f ('x :: 'l)})}}} lambda{x. e['x]}
 >>
 
 define unfold_bind_substl : bind_substl{'e; 'l} <--> <:xterm<
-   list_ind{l; lambda{e. e}; u, v, g. lambda{e. g bind_subst{e; u}}} e
+   list_ind{'l; lambda{e. 'e}; u, v, g. lambda{e. 'g bind_subst{'e; 'u}}} 'e
 >>
 
 declare sequent [vbind_arity] { Term : Term >- Term } : Term
 
 prim_rw unfold_vbind_arity : <:xrewrite<
-   "vbind_arity"{| <J> >- C |}
+   "vbind_arity"{| <J> >- 'C |}
    <-->
-   sequent_ind{u, v. "it" :: happly{v; "it"}; "TermSequent"{| <J> >- [] |}}
+   sequent_ind{u, v. "it" :: happly{'v; "it"}; "TermSequent"{| <J> >- [] |}}
 >>
 
 doc docoff
@@ -218,7 +214,7 @@ doc docoff
  * Reductions.
  *)
 interactive_rw reduce_vbind_arity_nil {| reduce |} : <:xrewrite<
-   "vbind_arity"{| >- C |}
+   "vbind_arity"{| >- 'C |}
    <-->
    []
 >>
@@ -242,26 +238,26 @@ interactive_rw reduce_vbind_arity_cons {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_mk_lbind_succ {| reduce |} : <:xrewrite<
-   mk_lbind{z::n; l. e[l]}
+   mk_lbind{'z::'n; l. e['l]}
    <-->
-   mk_bind{x. mk_lbind{n; l. e[x:: l]}}
+   mk_bind{x. mk_lbind{'n; l. e['x:: 'l]}}
 >>
 
 interactive_rw reduce_bind_substl_cons {| reduce |} : <:xrewrite<
-   bind_substl{e; u::v}
+   bind_substl{'e; 'u::'v}
    <-->
-   bind_substl{bind_subst{e; u}; v}
+   bind_substl{bind_subst{'e; 'u}; 'v}
 >>
 
 (*
  * Well-formedness rules.
  *)
 interactive vbind_arity_wf {| intro [] |} : <:xrule<
-   <H> >- "vbind_arity"{| <J> >- C |} IN list{"unit"}
+   <H> >- "vbind_arity"{| <J> >- 'C |} IN list{"unit"}
 >>
 
 interactive vsubst_dummy_vbind_arity_wf {| intro [] |} : <:xrule<
-   <H> >- "vsubst_dummy"{| <J> >- "vbind_arity"{| <K> >- C |} |} IN list{"unit"}
+   <H> >- "vsubst_dummy"{| <J> >- "vbind_arity"{| <K> >- 'C |} |} IN list{"unit"}
 >>
 
 doc <:doc<
@@ -270,24 +266,24 @@ doc <:doc<
 >>
 
 interactive_rw vbind_eta_expand : <:xrewrite<
-   "mk_vbind"{| <J> >- C |}
+   "mk_vbind"{| <J> >- 'C |}
    <-->
-   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C |}; l}}
+   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- 'C |}; 'l}}
 >>
 
 doc <:doc<
    Move the binder inward.
 >>
 interactive_rw vbind_subst_push Perv!bind{x. 'C['x]} 'e : <:xrewrite<
-   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C<||>[e] |}; l}}
+   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C<||>['e] |}; 'l}}
    <-->
-   mk_lbind{"vbind_arity"{| <J> |}; l. C[bind_substl{"mk_vbind"{| <J> >- e |}; l}]}
+   mk_lbind{"vbind_arity"{| <J> |}; l. C[bind_substl{"mk_vbind"{| <J> >- 'e |}; 'l}]}
 >>
 
 interactive_rw vbind_subst_push2 Perv!bind{x. 'C['x]} 'e : <:xrewrite<
-   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C[e] |}; l}}
+   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C['e] |}; 'l}}
    <-->
-   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C[bind_substl{"mk_vbind"{| <J> >- e |}; l}] |}; l}}
+   mk_lbind{"vbind_arity"{| <J> |}; l. bind_substl{"mk_vbind"{| <J> >- C[bind_substl{"mk_vbind"{| <J> >- 'e |}; 'l}] |}; 'l}}
 >>
 
 (************************************************************************

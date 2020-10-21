@@ -33,32 +33,27 @@ extends Itt_hoas_relax
 
 doc docoff
 
-open Lm_printf
-
 open Basic_tactics
 
 open Itt_list2
 open Itt_equal
-open Itt_struct
-open Itt_squiggle
 open Itt_vec_list1
 open Itt_hoas_bterm
 open Itt_hoas_vbind
 open Itt_hoas_vector
 open Itt_hoas_debruijn
-open Itt_hoas_bterm_wf
 
 (************************************************************************
  * Length reductions.
  *)
 interactive_rw reduce_length_vlist_single {| reduce |} : <:xrewrite<
-   length{vlist{| A |}}
+   length{vlist{| 'A |}}
    <-->
    1
 >>
 
 interactive_rw reduce_length_vlist_hyp : <:xrewrite<
-   length{vlist{| <J>; x: A |}}
+   length{vlist{| <J>; x: 'A |}}
    <-->
    length{vlist{| <J> |}} +@ 1
 >>
@@ -104,9 +99,9 @@ let resource reduce +=
  * More squashing.
  *)
 interactive_rw squash_hyp_context_bind 'J : <:xrewrite<
-   length{hyp_context{| <J>; x: A; <K[x]> >- hyplist{| <L[x]> |} |}}
+   length{hyp_context{| <J>; x: 'A; <K['x]> >- hyplist{| <L['x]> |} |}}
    <-->
-   length{hyp_context{| <J>; x: A; <K[x]> >- hyplist{| <L[it]> |} |}}
+   length{hyp_context{| <J>; x: 'A; <K['x]> >- hyplist{| <L[it]> |} |}}
 >>
 
 let squash_hyp_context_bind_aux t =
@@ -142,41 +137,41 @@ let resource reduce +=
  * Vbinds.
  *)
 interactive_rw length_hyplist_succ {| reduce |} : <:xrule<
-   length{hyp_context{| <J> >- hyplist{| x: A; <K[x]> |} |}}
+   length{hyp_context{| <J> >- hyplist{| x: 'A; <K['x]> |} |}}
    <-->
    length{hyp_context{| <J> >- hyplist{| <K[it]> |} |}} +@ 1
 >>
 
 interactive_rw length_hyplist_right {| reduce |} : <:xrule<
-   length{hyp_context{| <J> >- hyplist{| <K>; x: A |} |}}
+   length{hyp_context{| <J> >- hyplist{| <K>; x: 'A |} |}}
    <-->
    length{hyp_context{| <J> >- hyplist{| <K> |} |}} +@ 1
 >>
 
 interactive_rw length_hypcontext_right {| reduce |} : <:xrule<
-   length{hyp_context{| <J>; x: A >- hyplist{| <K[x]> |} |}}
+   length{hyp_context{| <J>; x: 'A >- hyplist{| <K['x]> |} |}}
    <-->
    length{hyp_context{| <J> >- hyplist{| <K[it]> |} |}}
 >>
 
 interactive_rw vbind_of_bind_trivial : <:xrule<
-   bind{length{vlist{| <J> |}}; x. e}
+   bind{length{vlist{| <J> |}}; x. 'e}
    <-->
-   vbind{| <J> >- e |}
+   vbind{| <J> >- 'e |}
 >>
 
 interactive_rw reduce_bindn_vbind_up : <:xrewrite<
-   bind{length{vlist{| <J> |}} +@ 1; x. e[x]}
+   bind{length{vlist{| <J> |}} +@ 1; x. e['x]}
    <-->
-   bind{x. bind{length{vlist{| <J> |}}; y. e[x :: y]}}
+   bind{x. bind{length{vlist{| <J> |}}; y. e['x :: 'y]}}
 >>
 
 interactive_rw length_hyplist_assoc : <:xrewrite<
-   j in nat -->
-   k in nat -->
-   (length{hyp_context{| <J> >- hyplist{| <K> |} |}} +@ j) +@ k
+   'j in nat -->
+   'k in nat -->
+   (length{hyp_context{| <J> >- hyplist{| <K> |} |}} +@ 'j) +@ 'k
    <-->
-   length{hyp_context{| <J> >- hyplist{| <K> |} |}} +@ (j +@ k)
+   length{hyp_context{| <J> >- hyplist{| <K> |} |}} +@ ('j +@ 'k)
 >>
 
 interactive_rw length_vlist_zero : <:xrewrite<
@@ -192,20 +187,21 @@ interactive_rw length_hyp_context_zero : <:xrewrite<
 >>
 
 interactive_rw split_vbind_trivial 'J : <:xrewrite<
-   vbind{| <J>; <K> >- e<|J|> |}
+   vbind{| <J>; <K> >- 'e<|J|> |}
    <-->
-   vbind{| <J> >- bind{length{hyp_context{| <J> >- hyplist{| <K> |} |}}; x. e} |}
+   vbind{| <J> >- bind{length{hyp_context{| <J> >- hyplist{| <K> |} |}}; x. 'e} |}
 >>
 
 interactive_rw reduce_vbind_var 'J : <:xrule<
-   vbind{| <J>; x: A; <K[x]> >- 'x |}
+   vbind{| <J>; x: 'A; <K['x]> >- 'x |}
    <-->
-   var{length{vlist{| <J> |}}; length{hyp_context{| <J>; x: 'A >- hyplist{| <K[x]> |} |}}}
+   var{length{vlist{| <J> |}}; length{hyp_context{| <J>; x: 'A >- hyplist{| <K['x]> |} |}}}
 >>
 
 let reduce_vbind_var_aux t =
    let { sequent_hyps = hyps;
-         sequent_concl = concl
+         sequent_concl = concl;
+         _
        } = explode_sequent t
    in
    let v = dest_var concl in
@@ -237,58 +233,58 @@ let resource reduce +=
  * Step cases.
  *)
 interactive_rw vbind_eta_expand1 : <:xrewrite<
-   vbind{| <J> >- bind{z. e} |}
+   vbind{| <J> >- bind{z. 'e} |}
    <-->
-   bind{length{vlist{| <J> |}}; x. bind{z. substl{vbind{| <J> >- e |}; x}}}
+   bind{length{vlist{| <J> |}}; x. bind{z. substl{vbind{| <J> >- 'e |}; 'x}}}
 >>
 
 interactive_rw bindn_bind1_prefix : <:xrewrite<
-   n in nat -->
-   bind{n; x. bind{y. substl{e; x}}}
+   'n in nat -->
+   bind{'n; x. bind{y. substl{'e; 'x}}}
    <-->
-   bind{n +@ 1; x. substl{e; nth_prefix{x; n}}}
+   bind{'n +@ 1; x. substl{'e; nth_prefix{'x; 'n}}}
 >>
 
 interactive_rw vbind_eta_expand2 : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- bind{n<||>; z. e} |}
+   'n in nat -->
+   vbind{| <J> >- bind{n<||>; z. 'e} |}
    <-->
-   bind{length{vlist{| <J> |}}; x. bind{n; z. substl{vbind{| <J> >- e |}; x}}}
+   bind{length{vlist{| <J> |}}; x. bind{'n; z. substl{vbind{| <J> >- 'e |}; 'x}}}
 >>
 
 interactive vbind_bind1_wf {| intro |} : <:xrewrite<
-   "wf" : <H> >- vbind{| <J> >- e |} in BTerm -->
-   <H> >- vbind{| <J> >- bind{x. e} |} in BTerm
+   "wf" : <H> >- vbind{| <J> >- 'e |} in BTerm -->
+   <H> >- vbind{| <J> >- bind{x. 'e} |} in BTerm
 >>
 
 interactive vbind_split_wf 'J : <:xrewrite<
-   "wf" : <H> >- vbind{| <J> >- e |} in BTerm -->
-   <H> >- vbind{| <J>; <K> >- e<|J,H|> |} in BTerm
+   "wf" : <H> >- vbind{| <J> >- 'e |} in BTerm -->
+   <H> >- vbind{| <J>; <K> >- 'e<|J,H|> |} in BTerm
 >>
 
 (*
  * Depth versions.
  *)
 interactive vbind_bind1_wf2 {| intro |} : <:xrewrite<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- vbind{| <J> >- e |} in BTerm{n -@ 1} -->
-   <H> >- vbind{| <J> >- bind{x. e} |} in BTerm{n}
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- vbind{| <J> >- 'e |} in BTerm{'n -@ 1} -->
+   <H> >- vbind{| <J> >- bind{x. 'e} |} in BTerm{'n}
 >>
 
 interactive vbind_split_wf2 'J : <:xrewrite<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- vbind{| <J> >- e |} in BTerm{n -@ length{hyp_context{| <J> >- hyplist{| <K> |} |}}} -->
-   <H> >- vbind{| <J>; <K> >- e<|J,H|> |} in BTerm{n}
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- vbind{| <J> >- 'e |} in BTerm{'n -@ length{hyp_context{| <J> >- hyplist{| <K> |} |}}} -->
+   <H> >- vbind{| <J>; <K> >- 'e<|J,H|> |} in BTerm{'n}
 >>
 
 (*
  * Depths.
  *)
 interactive_rw reduce_bdepth_vbind_split 'J : <:xrewrite<
-   vbind{| <J> >- e |} in BTerm -->
-   bdepth{vbind{| <J>; <K> >- e<|J|> |}}
+   vbind{| <J> >- 'e |} in BTerm -->
+   bdepth{vbind{| <J>; <K> >- 'e<|J|> |}}
    <-->
-   bdepth{vbind{| <J> >- e |}} +@ length{hyp_context{| <J> >- hyplist{| <K> |} |}}
+   bdepth{vbind{| <J> >- 'e |}} +@ length{hyp_context{| <J> >- hyplist{| <K> |} |}}
 >>
 
 (*
@@ -296,7 +292,8 @@ interactive_rw reduce_bdepth_vbind_split 'J : <:xrewrite<
  *)
 let unused_tail t =
    let { sequent_hyps = hyps;
-         sequent_concl = concl
+         sequent_concl = concl;
+         _
        } = explode_sequent t
    in
 
@@ -334,8 +331,8 @@ let vbind_split_tac p =
 let vbind_splitT = funT vbind_split_tac
 
 let resource intro +=
-   [<:xterm< vbind{| <J> >- e |} in BTerm >>, wrap_intro vbind_splitT;
-    <:xterm< vbind{| <J> >- e |} in BTerm{n} >>, wrap_intro vbind_splitT]
+   [<:xterm< vbind{| <J> >- 'e |} in BTerm >>, wrap_intro vbind_splitT;
+    <:xterm< vbind{| <J> >- 'e |} in BTerm{'n} >>, wrap_intro vbind_splitT]
 
 (*
  * Depth rewrite.
@@ -348,36 +345,36 @@ let reduce_depth_vbind_split_conv t =
 let reduce_depth_vbind_splitC = termC reduce_depth_vbind_split_conv
 
 let resource reduce +=
-   [<:xterm< bdepth{vbind{| <J> >- e |}} >>, wrap_reduce reduce_depth_vbind_splitC]
+   [<:xterm< bdepth{vbind{| <J> >- 'e |}} >>, wrap_reduce reduce_depth_vbind_splitC]
 
 (************************************************************************
  * More splitting.
  *)
 interactive_rw bind_merge_prefix : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. bind{m; y. substl{e; x}}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. bind{'m; y. substl{'e; 'x}}}
    <-->
-   bind{n +@ m; x. substl{e; nth_prefix{x; n}}}
+   bind{'n +@ 'm; x. substl{'e; nth_prefix{'x; 'n}}}
 >>
 
 interactive_rw vbind_split_bindn 'J : <:xrewrite<
-   vbind{| <J>; <K> >- e<|J|> |}
+   vbind{| <J>; <K> >- 'e<|J|> |}
    <-->
-   vbind{| <J> >- bind{length{hyp_context{| <J> >- hyplist{| <K> |} |}}; y. e} |}
+   vbind{| <J> >- bind{length{hyp_context{| <J> >- hyplist{| <K> |} |}}; y. 'e} |}
 >>
 
 interactive_rw vbind_split_prefix 'J : <:xrewrite<
-   vbind{| <J>; <K> >- e<|J|> |}
+   vbind{| <J>; <K> >- 'e<|J|> |}
    <-->
-   bind{length{vlist{| <J>; <K> |}}; x. substl{vbind{| <J> >- e |}; nth_prefix{x; length{vlist{| <J> |}}}}}
+   bind{length{vlist{| <J>; <K> |}}; x. substl{vbind{| <J> >- 'e |}; nth_prefix{'x; length{vlist{| <J> |}}}}}
 >>
 
 interactive vbind_bindn_equal 'J : <:xrewrite<
-   "wf" : <H> >- m = length{vlist{| <J> |}} in nat -->
-   "wf" : <H> >- n = length{vlist{| <J>; <K> |}} in nat -->
-   "wf" : <H> >- vbind{| <J>; <K> >- e |} in BTerm -->
-   <H> >- vbind{| <J>; <K> >- e<|J,H|> |} = bind{n; x. substl{vbind{| <J> >- e |}; nth_prefix{x; m}}} in BTerm
+   "wf" : <H> >- 'm = length{vlist{| <J> |}} in nat -->
+   "wf" : <H> >- 'n = length{vlist{| <J>; <K> |}} in nat -->
+   "wf" : <H> >- vbind{| <J>; <K> >- 'e |} in BTerm -->
+   <H> >- vbind{| <J>; <K> >- 'e<|J,H|> |} = bind{'n; x. substl{vbind{| <J> >- 'e |}; nth_prefix{'x; 'm}}} in BTerm
 >>
 
 let vbind_bindn_equal_tac p =
@@ -397,29 +394,29 @@ let vbind_bindn_equal_tac p =
 let vbind_bindn_equalT = funT vbind_bindn_equal_tac
 
 let resource intro +=
-   [<:xterm< vbind{| <J> >- e1 |} = bind{n; x. substl{vbind{| <K> >- e |}; nth_prefix{x; m}}} in BTerm >>, wrap_intro vbind_bindn_equalT;
-    <:xterm< bind{n; x. substl{vbind{| <K> >- e |}; nth_prefix{x; m}}} = vbind{| <J> >- e1 |} in BTerm >>, wrap_intro vbind_bindn_equalT]
+   [<:xterm< vbind{| <J> >- 'e1 |} = bind{'n; x. substl{vbind{| <K> >- 'e |}; nth_prefix{'x; 'm}}} in BTerm >>, wrap_intro vbind_bindn_equalT;
+    <:xterm< bind{'n; x. substl{vbind{| <K> >- 'e |}; nth_prefix{'x; 'm}}} = vbind{| <J> >- 'e1 |} in BTerm >>, wrap_intro vbind_bindn_equalT]
 
 (************************************************************************
  * Var properties.
  *)
 interactive bind_trivial_wf {| intro |} : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- e in BTerm{n -@ 1} -->
-   <H> >- bind{x. e} in BTerm{n}
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'e in BTerm{'n -@ 1} -->
+   <H> >- bind{x. 'e} in BTerm{'n}
 >>
 
 interactive vbind_var_wf {| intro |} : <:xrule<
-   "wf" : <H> >- n = length{vlist{| <J> |}} +@ 1 in nat -->
-   <H> >- vbind{| <J>; x: A >- x |} in BTerm{n}
+   "wf" : <H> >- 'n = length{vlist{| <J> |}} +@ 1 in nat -->
+   <H> >- vbind{| <J>; x: 'A >- 'x |} in BTerm{'n}
 >>
 
 interactive vbind_var_wf2 {| intro |} : <:xrule<
-   <H> >- vbind{| <J>; x: A >- x |} in BTerm
+   <H> >- vbind{| <J>; x: 'A >- 'x |} in BTerm
 >>
 
 interactive_rw reduce_depth_vbind_var {| reduce |} : <:xrewrite<
-   bdepth{vbind{| <J>; x: A >- x |}}
+   bdepth{vbind{| <J>; x: 'A >- 'x |}}
    <-->
    length{vlist{| <J> |}} +@ 1
 >>
@@ -428,17 +425,17 @@ interactive_rw reduce_depth_vbind_var {| reduce |} : <:xrewrite<
  * Relaxed goals.
  *)
 interactive hyp_depths_forward1 {| forward [ForwardPrec forward_trivial_prec] |} 'H : <:xrule<
-   "wf" : <H>; x: hyp_depths{n; l}; <J[x]> >- n in nat -->
-   "wf" : <H>; x: hyp_depths{n; l}; <J[x]> >- l in list{BTerm} -->
-   <H>; x: hyp_depths{n; l}; <J[x]>; l in list{Bind{n}} >- C[x] -->
-   <H>; x: hyp_depths{n; l}; <J[x]> >- C[x]
+   "wf" : <H>; x: hyp_depths{'n; 'l}; <J['x]> >- 'n in nat -->
+   "wf" : <H>; x: hyp_depths{'n; 'l}; <J['x]> >- 'l in list{BTerm} -->
+   <H>; x: hyp_depths{'n; 'l}; <J['x]>; 'l in list{Bind{'n}} >- C['x] -->
+   <H>; x: hyp_depths{'n; 'l}; <J['x]> >- C['x]
 >>
 
 (************************************************************************
  * More depth lemmas.
  *)
 let resource forward_subst +=
-   [<:xterm< bdepth{vbind{| <J> >- e1 |}} = length{e2} in nat >>, ()]
+   [<:xterm< bdepth{vbind{| <J> >- 'e1 |}} = length{'e2} in nat >>, ()]
 
 (*
  * -*-

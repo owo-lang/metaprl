@@ -42,12 +42,12 @@ extends Meta_context_theory
 
 doc docoff
 
-open Lm_printf
 open Basic_tactics
-open Base_trivial
 open Itt_squiggle
 open Itt_struct
 open Itt_vec_util
+
+module TermMan = Refiner.Refiner.TermMan
 
 doc <:doc<
    @terms
@@ -96,7 +96,7 @@ interactive_rw squash_lambda_vbind : <:xrewrite<
 >>
 
 interactive_rw squash_vbind Perv!bind{x. vbind{| <J['x]> >- 'e |}} : <:xrewrite<
-   vbind{| <J[x]> >- 'e |}
+   vbind{| <J['x]> >- 'e |}
    <-->
    vbind{| <J[it]> >- 'e |}
 >>

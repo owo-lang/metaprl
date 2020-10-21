@@ -40,13 +40,13 @@ interactive base_theory_wf {| intro |} : <:xrule<
 >>
 
 interactive elim_start_base_theory {| elim |} 'H : <:xrule<
-   <H>; x: SimpleStep{premises; goal; witness; "itt_hoas_base_theory"}; <J[x]> >- C[x] -->
-   <H>; x: SimpleStep{premises; goal; witness; "base_theory"}; <J[x]> >- C[x]
+   <H>; x: SimpleStep{'premises; 'goal; 'witness; "itt_hoas_base_theory"}; <J['x]> >- C['x] -->
+   <H>; x: SimpleStep{'premises; 'goal; 'witness; "base_theory"}; <J['x]> >- C['x]
 >>
 
 interactive elim_base_theory {| elim |} 'H : <:xrule<
-   <H>; x: ProvableSequent{"itt_hoas_base_theory"; e}; <J[x]> >- C[x] -->
-   <H>; x: ProvableSequent{"base_theory"; e}; <J[x]> >- C[x]
+   <H>; x: ProvableSequent{"itt_hoas_base_theory"; 'e}; <J['x]> >- C['x] -->
+   <H>; x: ProvableSequent{"base_theory"; 'e}; <J['x]> >- C['x]
 >>
 
 (*

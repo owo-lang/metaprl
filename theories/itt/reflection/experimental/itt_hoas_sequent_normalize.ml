@@ -31,62 +31,57 @@ extends Itt_hoas_lof_vec
 
 doc docoff
 
-open Lm_printf
-
 open Basic_tactics
 
 open Itt_list2
-
 open Itt_vec_util
 
 open Itt_hoas_lof
-open Itt_hoas_lof_vec
-open Itt_hoas_normalize
 
 (************************************************************************
  * Map a bind over a list.
  *)
 define unfold_bind_length : bind_length{'e} <--> <:xterm<
-   (fix f e -> weak_dest_terms{e; f subst{e; it}; l. length{l}}) e
+   (fix f e -> weak_dest_terms{'e; 'f subst{'e; it}; l. length{'l}}) 'e
 >>
 
 define unfold_bind_nth : bind_nth{'e; 'i} <--> <:xterm<
-   (fix f e -> weak_dest_terms{e; bind{x. f subst{e; x}}; l. nth{l; i}}) e
+   (fix f e -> weak_dest_terms{'e; bind{x. 'f subst{'e; 'x}}; l. nth{'l; 'i}}) 'e
 >>
 
 define unfold_bind_flatten : bind_flatten{'e} <--> <:xterm<
-   list_of_fun{i. bind_nth{e; i}; bind_length{e}}
+   list_of_fun{i. bind_nth{'e; 'i}; bind_length{'e}}
 >>
 
 declare sequent [vbind_map] { Term : Term >- Term } : Term
 
 prim_rw unfold_vbind_map : vbind_map{| <J> >- 'e |} <--> <:xterm<
-   bind_flatten{vbind{| <J> >- mk_terms{e} |}}
+   bind_flatten{vbind{| <J> >- mk_terms{'e} |}}
 >>
 
 (************************************************************************
  * sequent_bterm normalization.
  *)
 interactive_rw reduce_vbind_sequent_bterm_core_nil : <:xrewrite<
-   vbind{| <J> >- sequent_bterm{d<||>; []; concl} |}
+   vbind{| <J> >- sequent_bterm{'d<||>; []; 'concl} |}
    <-->
-   vbind{| <J> >- $'[d]seq_concl{concl} |}
+   vbind{| <J> >- $'['d]seq_concl{'concl} |}
 >>
 
 interactive_rw reduce_vbind_sequent_bterm_core_cons : <:xrewrite<
-   d in nat -->
-   vbind{| <J> >- sequent_bterm{d<||>; h :: hyps; concl} |}
+   'd in nat -->
+   vbind{| <J> >- sequent_bterm{'d<||>; 'h :: 'hyps; 'concl} |}
    <-->
-   mk_bterm{d +@ length{vlist{| <J> |}}; $seq_hyp{h; x. r};
-      [vbind{| <J> >- h |}; vbind{| <J> >- sequent_bterm{d +@ 1; hyps; concl} |}]}
+   mk_bterm{'d +@ length{vlist{| <J> |}}; $seq_hyp{'h; x. 'r};
+      [vbind{| <J> >- 'h |}; vbind{| <J> >- sequent_bterm{'d +@ 1; 'hyps; 'concl} |}]}
 >>
 
 interactive_rw reduce_vbind_sequent_bterm : <:xrewrite<
-   d in nat -->
-   vbind{| <J> >- sequent_bterm{d<||>; "sequent"{arg; hyps; concl}} |}
+   'd in nat -->
+   vbind{| <J> >- sequent_bterm{'d<||>; "sequent"{'arg; 'hyps; 'concl}} |}
    <-->
-   mk_bterm{d +@ length{vlist{| <J> |}}; $seq_arg{arg; s};
-      [vbind{| <J> >- arg |}; vbind{| <J> >- sequent_bterm{d; hyps; concl} |}]}
+   mk_bterm{'d +@ length{vlist{| <J> |}}; $seq_arg{'arg; 's};
+      [vbind{| <J> >- 'arg |}; vbind{| <J> >- sequent_bterm{'d; 'hyps; 'concl} |}]}
 >>
 
 (************************************************************************
@@ -98,53 +93,53 @@ interactive_rw reduce_vbind_sequent_bterm : <:xrewrite<
 declare sequent [lof_vsequent{'arg}] { Term : Term >- Term } : Term
 
 prim_rw unfold_lof_vsequent : <:xrewrite<
-   lof_vsequent{arg}{| <J> >- e |}
+   lof_vsequent{'arg}{| <J> >- 'e |}
    <-->
-   vsequent{arg}{| <J> >- e |}
+   vsequent{'arg}{| <J> >- 'e |}
 >>
 
 interactive_rw pre_normalize_vsequent {| pre_normalize_lof |} : <:xrewrite<
-   vsequent{arg}{| <J> >- concl |}
+   vsequent{'arg}{| <J> >- 'concl |}
    <-->
-   lof_vsequent{arg}{| lof{i. lof_nil; 0}; <J> >- concl |}
+   lof_vsequent{'arg}{| lof{i. lof_nil; 0}; <J> >- 'concl |}
 >>
 
 interactive_rw hyp_term_lof : <:xrewrite<
-   hyp_term{| <K> >- h |}
+   hyp_term{| <K> >- 'h |}
    <-->
-   lof{i. lof_nth{hyp_term{| <K> >- h |}; i}; 1}
+   lof{i. lof_nth{hyp_term{| <K> >- 'h |}; 'i}; 1}
 >>
 
 interactive_rw vsequent_hyp_term_lof : <:xrewrite<
-   n in nat -->
-   lof_vsequent{arg}{| lof{i. f[i]; n}; hyp_term{| <K> >- h |}; <J> >- concl |}
+   'n in nat -->
+   lof_vsequent{'arg}{| lof{i. f['i]; 'n}; hyp_term{| <K> >- 'h |}; <J> >- 'concl |}
    <-->
-   lof_vsequent{arg}{| lof{i.
-      lof_append{i. f[i];
-                 i. lof_nth{hyp_term{| <K> >- h |}; i};
-                 i;
-                 n;
+   lof_vsequent{'arg}{| lof{i.
+      lof_append{i. f['i];
+                 i. lof_nth{hyp_term{| <K> >- 'h |}; 'i};
+                 'i;
+                 'n;
                  1};
-      n +@ 1}; <J> >- concl |}
+      'n +@ 1}; <J> >- 'concl |}
 >>
 
 interactive_rw hyp_context_lof : <:xrewrite<
    hyp_context{| <J> >- hyplist{| <K> |} |}
    <-->
-   lof{i. lof_nth{hyp_context{| <J> >- hyplist{| <K> |} |}; i}; length{hyp_context{| <J> >- hyplist{| <K> |} |}}}
+   lof{i. lof_nth{hyp_context{| <J> >- hyplist{| <K> |} |}; 'i}; length{hyp_context{| <J> >- hyplist{| <K> |} |}}}
 >>
 
 interactive_rw vsequent_hyp_context_lof : <:xrewrite<
-   n in nat -->
-   lof_vsequent{arg}{| lof{i. f[i]; n}; hyp_context{| <K> >- hyplist{| <L> |} |}; <J> >- concl |}
+   'n in nat -->
+   lof_vsequent{'arg}{| lof{i. f['i]; 'n}; hyp_context{| <K> >- hyplist{| <L> |} |}; <J> >- 'concl |}
    <-->
-   lof_vsequent{arg}{| lof{i.
-      lof_append{i. f[i];
-                 i. lof_nth{hyp_context{| <K> >- hyplist{| <L> |} |}; i};
-                 i;
-                 n;
+   lof_vsequent{'arg}{| lof{i.
+      lof_append{i. f['i];
+                 i. lof_nth{hyp_context{| <K> >- hyplist{| <L> |} |}; 'i};
+                 'i;
+                 'n;
                  length{hyp_context{| <K> >- hyplist{| <L> |} |}}};
-      n +@ length{hyp_context{| <K> >- hyplist{| <L> |} |}}}; <J> >- concl |}
+      'n +@ length{hyp_context{| <K> >- hyplist{| <L> |} |}}}; <J> >- 'concl |}
 >>
 
 (************************************************************************
@@ -153,25 +148,25 @@ interactive_rw vsequent_hyp_context_lof : <:xrewrite<
 declare sequent [squash_vbind] { Term : Term >- Term } : Term
 
 prim_rw unfold_squash_vbind : <:xrewrite<
-   squash_vbind{| <J> >- e |}
+   squash_vbind{| <J> >- 'e |}
    <-->
-   sequent_ind{u, v. happly{v; it}; TermSequent{| <J> >- e |}}
+   sequent_ind{u, v. happly{'v; it}; TermSequent{| <J> >- 'e |}}
 >>
 
 interactive_rw reduce_squash_vbind_nil {| reduce |} : <:xrewrite<
-   squash_vbind{| >- e |}
+   squash_vbind{| >- 'e |}
    <-->
-   e
+   'e
 >>
 
 interactive_rw reduce_squash_vbind_left {| reduce |} : <:xrewrite<
-   squash_vbind{| x: A; <J[x]> >- e[x] |}
+   squash_vbind{| x: 'A; <J['x]> >- e['x] |}
    <-->
    squash_vbind{| <J[it]> >- e[it] |}
 >>
 
 interactive_rw reduce_squash_vbind_right {| reduce |} : <:xrewrite<
-   squash_vbind{| <J>; x: A >- e[x] |}
+   squash_vbind{| <J>; x: 'A >- e['x] |}
    <-->
    squash_vbind{| <J> >- e[it] |}
 >>
@@ -183,9 +178,9 @@ interactive_rw reduce_length_hyp_context {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw squash_squash_vbind Perv!bind{x. squash_vbind{| <J['x]> >- 'e |}} : <:xrewrite<
-   squash_vbind{| <J[t]> >- e |}
+   squash_vbind{| <J['t]> >- 'e |}
    <-->
-   squash_vbind{| <J[it]> >- e |}
+   squash_vbind{| <J[it]> >- 'e |}
 >>
 
 interactive squash_vbind_hyplist_wf {| intro |} : <:xrule<
@@ -195,7 +190,7 @@ interactive squash_vbind_hyplist_wf {| intro |} : <:xrule<
 let squash_squash_vbindC = termC (fun t -> squash_squash_vbind (squash_rewrite_arg t))
 
 let resource reduce +=
-   [<:xterm< squash_vbind{| <J> >- e |} >>, wrap_reduce squash_squash_vbindC]
+   [<:xterm< squash_vbind{| <J> >- 'e |} >>, wrap_reduce squash_squash_vbindC]
 
 
 interactive_rw reduce_length_squash_hyplist_zero {| reduce |} : <:xrewrite<
@@ -205,7 +200,7 @@ interactive_rw reduce_length_squash_hyplist_zero {| reduce |} : <:xrewrite<
 >>
 
 interactive_rw reduce_length_squash_hyplist_succ {| reduce |} : <:xrewrite<
-   length{squash_vbind{| <J> >- hyplist{| <K>; A |} |}}
+   length{squash_vbind{| <J> >- hyplist{| <K>; 'A |} |}}
    <-->
    length{squash_vbind{| <J> >- hyplist{| <K> |} |}} +@ 1
 >>
@@ -230,7 +225,8 @@ let is_squash_vbind_term t =
 
 let vbind_length_hyp_context_conv t =
    let { sequent_hyps = hyps;
-         sequent_concl = concl
+         sequent_concl = concl;
+         _
        } = explode_sequent t
    in
 
@@ -280,11 +276,11 @@ let vbind_length_hyp_contextC = termC vbind_length_hyp_context_conv
  * vbind pushing.
  *)
 interactive_rw vbind_vsequent_lof {| normalize_lof |} : <:xrewrite<
-   d in nat -->
-   n in nat -->
-   lof_vbind{| <J> >- sequent_bterm{d<||>; lof_vsequent{arg}{| lof{i. f[i]; n<||>} >- concl |}} |}
+   'd in nat -->
+   'n in nat -->
+   lof_vbind{| <J> >- sequent_bterm{'d<||>; lof_vsequent{'arg}{| lof{i. f['i]; 'n<||>} >- 'concl |}} |}
    <-->
-   sequent_bterm{d +@ length{vlist{| <J> |}}; lof_vsequent{lof_vbind{| <J> >- arg |}}{| lof{i. lof_vbind{| <J> >- f[i] |}; n} >- lof_vbind{| <J> >- concl |} |}}
+   sequent_bterm{'d +@ length{vlist{| <J> |}}; lof_vsequent{lof_vbind{| <J> >- 'arg |}}{| lof{i. lof_vbind{| <J> >- f['i] |}; 'n} >- lof_vbind{| <J> >- 'concl |} |}}
 >>
 
 (*
@@ -298,7 +294,7 @@ let reduce_vsequentC =
    progressC (repeatC reduce_vsequent_conv)
 
 let resource reduce_lof +=
-   [<:xterm< lof_vbind{| <J> >- lof_vsequent{arg}{| <K> >- concl |} |} >>, reduce_vsequentC]
+   [<:xterm< lof_vbind{| <J> >- lof_vsequent{'arg}{| <K> >- 'concl |} |} >>, reduce_vsequentC]
 
 (*
  * -*-

@@ -43,12 +43,9 @@ extends Itt_hoas_bterm
 
 doc docoff
 
-open Lm_printf
 open Basic_tactics
-open Itt_hoas_base
 open Itt_hoas_lof
 open Itt_hoas_lof_vec
-open Itt_hoas_vbind
 open Itt_hoas_vector
 open Itt_hoas_util
 open Itt_hoas_debruijn
@@ -83,13 +80,14 @@ let resource (term * conv, conv) pre_normalize_simple =
 let preNormalizeSimpleTopC_env e =
    get_resource_arg (env_arg e) get_pre_normalize_simple_resource
 
-let preNormalizeSimpleTopC = funC preNormalizeSimpleTopC_env
+(* let preNormalizeSimpleTopC = funC preNormalizeSimpleTopC_env *)
 
 let preNormalizeSimpleC =
    funC (fun e -> sweepUpC (preNormalizeSimpleTopC_env e))
 
+(* unused
 let preNormalizeSimpleT =
-   rwAll preNormalizeSimpleC
+   rwAll preNormalizeSimpleC *)
 
 (*
  * Simple normalizer.
@@ -102,13 +100,14 @@ let resource (term * conv, conv) normalize_simple =
 let normalizeSimpleTopC_env e =
    get_resource_arg (env_arg e) get_normalize_simple_resource
 
-let normalizeSimpleTopC = funC normalizeSimpleTopC_env
+(* let normalizeSimpleTopC = funC normalizeSimpleTopC_env *)
 
 let normalizeSimpleC =
    funC (fun e -> sweepDnC (repeatC (normalizeSimpleTopC_env e)))
 
+(* unused
 let normalizeSimpleT =
-   rwAll normalizeSimpleC
+   rwAll normalizeSimpleC *)
 
 doc <:doc<
    @misspelled{Pre}-normalization.  This eliminates the non-canonical forms.
@@ -123,135 +122,135 @@ doc <:doc<
    The following or for pushing @tt[bindn] through @tt[mk_bterm].
 >>
 interactive_rw bindn_of_mk_bterm0 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. mk_bterm{m; op; []}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. mk_bterm{'m; 'op; []}}
    <-->
-   mk_bterm{m +@ n; op; []}
+   mk_bterm{'m +@ 'n; 'op; []}
 >>
 
 interactive_rw bindn_of_mk_bterm1 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. mk_bterm{m; op; [e1[x]]}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. mk_bterm{'m; 'op; [e1['x]]}}
    <-->
-   mk_bterm{m +@ n; op; [bind{n; x. e1[x]}]}
+   mk_bterm{'m +@ 'n; 'op; [bind{'n; x. e1['x]}]}
 >>
 
 interactive_rw bindn_of_mk_bterm2 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. mk_bterm{m; op; [e1[x]; e2[x]]}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. mk_bterm{'m; 'op; [e1['x]; e2['x]]}}
    <-->
-   mk_bterm{m +@ n; op; [bind{n; x. e1[x]}; bind{n; x. e2[x]}]}
+   mk_bterm{'m +@ 'n; 'op; [bind{'n; x. e1['x]}; bind{'n; x. e2['x]}]}
 >>
 
 interactive_rw bindn_of_mk_bterm3 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. mk_bterm{m; op; [e1[x]; e2[x]; e3[x]]}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. mk_bterm{'m; 'op; [e1['x]; e2['x]; e3['x]]}}
    <-->
-   mk_bterm{m +@ n; op; [bind{n; x. e1[x]}; bind{n; x. e2[x]}; bind{n; x. e3[x]}]}
+   mk_bterm{'m +@ 'n; 'op; [bind{'n; x. e1['x]}; bind{'n; x. e2['x]}; bind{'n; x. e3['x]}]}
 >>
 
 interactive_rw bindn_of_mk_bterm4 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. mk_bterm{m; op; [e1[x]; e2[x]; e3[x]; e4[x]]}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. mk_bterm{'m; 'op; [e1['x]; e2['x]; e3['x]; e4['x]]}}
    <-->
-   mk_bterm{m +@ n; op; [bind{n; x. e1[x]}; bind{n; x. e2[x]}; bind{n; x. e3[x]}; bind{n; x. e4[x]}]}
+   mk_bterm{'m +@ 'n; 'op; [bind{'n; x. e1['x]}; bind{'n; x. e2['x]}; bind{'n; x. e3['x]}; bind{'n; x. e4['x]}]}
 >>
 
 interactive_rw bindn_of_mk_bterm5 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m in nat -->
-   bind{n; x. mk_bterm{m; op; [e1[x]; e2[x]; e3[x]; e4[x]; e5[x]]}}
+   'n in nat -->
+   'm in nat -->
+   bind{'n; x. mk_bterm{'m; 'op; [e1['x]; e2['x]; e3['x]; e4['x]; e5['x]]}}
    <-->
-   mk_bterm{m +@ n; op; [bind{n; x. e1[x]}; bind{n; x. e2[x]}; bind{n; x. e3[x]}; bind{n; x. e4[x]}; bind{n; x. e5[x]}]}
+   mk_bterm{'m +@ 'n; 'op; [bind{'n; x. e1['x]}; bind{'n; x. e2['x]}; bind{'n; x. e3['x]}; bind{'n; x. e4['x]}; bind{'n; x. e5['x]}]}
 >>
 
 doc <:doc<
    A similar set of theorems for << vbind{| <J> >- 'e |} >>.
 >>
 interactive_rw vbind_of_mk_bterm0 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- mk_bterm{n<||>; op<||>; []} |}
+   'n in nat -->
+   vbind{| <J> >- mk_bterm{n<||>; 'op<||>; []} |}
    <-->
-   mk_bterm{n +@ length{vlist{| <J> |}}; op; []}
+   mk_bterm{'n +@ length{vlist{| <J> |}}; 'op; []}
 >>
 
 interactive_rw vbind_of_mk_bterm1 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- mk_bterm{n<||>; op<||>; [e1]} |}
+   'n in nat -->
+   vbind{| <J> >- mk_bterm{n<||>; 'op<||>; ['e1]} |}
    <-->
-   mk_bterm{n +@ length{vlist{| <J> |}}; op; [vbind{| <J> >- e1 |}]}
+   mk_bterm{'n +@ length{vlist{| <J> |}}; 'op; [vbind{| <J> >- 'e1 |}]}
 >>
 
 interactive_rw vbind_of_mk_bterm2 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- mk_bterm{n<||>; op<||>; [e1; e2]} |}
+   'n in nat -->
+   vbind{| <J> >- mk_bterm{n<||>; 'op<||>; ['e1; 'e2]} |}
    <-->
-   mk_bterm{n +@ length{vlist{| <J> |}}; op; [vbind{| <J> >- e1 |}; vbind{| <J> >- e2 |}]}
+   mk_bterm{'n +@ length{vlist{| <J> |}}; 'op; [vbind{| <J> >- 'e1 |}; vbind{| <J> >- 'e2 |}]}
 >>
 
 interactive_rw vbind_of_mk_bterm3 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- mk_bterm{n<||>; op<||>; [e1; e2; e3]} |}
+   'n in nat -->
+   vbind{| <J> >- mk_bterm{'n<||>; 'op<||>; ['e1; 'e2; 'e3]} |}
    <-->
-   mk_bterm{n +@ length{vlist{| <J> |}}; op; [vbind{| <J> >- e1 |}; vbind{| <J> >- e2 |}; vbind{| <J> >- e3 |}]}
+   mk_bterm{'n +@ length{vlist{| <J> |}}; 'op; [vbind{| <J> >- 'e1 |}; vbind{| <J> >- 'e2 |}; vbind{| <J> >- 'e3 |}]}
 >>
 
 interactive_rw vbind_of_mk_bterm4 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- mk_bterm{n<||>; op<||>; [e1; e2; e3; e4]} |}
+   'n in nat -->
+   vbind{| <J> >- mk_bterm{'n<||>; 'op<||>; ['e1; 'e2; 'e3; 'e4]} |}
    <-->
-   mk_bterm{n +@ length{vlist{| <J> |}}; op; [vbind{| <J> >- e1 |};
-                                              vbind{| <J> >- e2 |};
-                                              vbind{| <J> >- e3 |};
-                                              vbind{| <J> >- e4 |}]}
+   mk_bterm{'n +@ length{vlist{| <J> |}}; 'op; [vbind{| <J> >- 'e1 |};
+                                              vbind{| <J> >- 'e2 |};
+                                              vbind{| <J> >- 'e3 |};
+                                              vbind{| <J> >- 'e4 |}]}
 >>
 
 interactive_rw vbind_of_mk_bterm5 {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   vbind{| <J> >- mk_bterm{n<||>; op<||>; [e1; e2; e3; e4; e5]} |}
+   'n in nat -->
+   vbind{| <J> >- mk_bterm{'n<||>; 'op<||>; ['e1; 'e2; 'e3; 'e4; 'e5]} |}
    <-->
-   mk_bterm{n +@ length{vlist{| <J> |}}; op; [vbind{| <J> >- e1 |};
-                                              vbind{| <J> >- e2 |};
-                                              vbind{| <J> >- e3 |};
-                                              vbind{| <J> >- e4 |};
-                                              vbind{| <J> >- e5 |}]}
+   mk_bterm{'n +@ length{vlist{| <J> |}}; 'op; [vbind{| <J> >- 'e1 |};
+                                              vbind{| <J> >- 'e2 |};
+                                              vbind{| <J> >- 'e3 |};
+                                              vbind{| <J> >- 'e4 |};
+                                              vbind{| <J> >- 'e5 |}]}
 >>
 
 doc <:doc<
    Optimizations.
 >>
 interactive_rw substl_merge1 {| normalize_simple |} : <:xrewrite<
-   m in nat -->
-   bind{m +@ 1; x. substl{substl{e; nth_prefix{x; m}}; [hd{nth_suffix{x; m}}]}}
+   'm in nat -->
+   bind{'m +@ 1; x. substl{substl{'e; nth_prefix{'x; 'm}}; [hd{nth_suffix{'x; 'm}}]}}
    <-->
-   bind{m +@ 1; x. substl{e; x}}
+   bind{'m +@ 1; x. substl{'e; 'x}}
 >>
 
 interactive_rw hd_nth_suffix_nth_prefix {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   s in nat -->
-   p in nat -->
-   p <= n -->
-   s < p -->
-   bind{n; x. hd{nth_suffix{nth_prefix{x; p}; s}}}
+   'n in nat -->
+   's in nat -->
+   'p in nat -->
+   'p <= 'n -->
+   's < 'p -->
+   bind{'n; x. hd{nth_suffix{nth_prefix{'x; 'p}; 's}}}
    <-->
-   bind{n; x. nth{x; s}}
+   bind{'n; x. nth{'x; 's}}
 >>
 
 interactive_rw bind_nth_prefix_nth_prefix {| normalize_simple |} : <:xrewrite<
-   n in nat -->
-   m1 in nat -->
-   m2 in nat -->
-   m1 <= n -->
-   m2 <= m1 -->
-   bind{n; x. substl{v; nth_prefix{nth_prefix{x; m1}; m2}}}
+   'n in nat -->
+   'm1 in nat -->
+   'm2 in nat -->
+   'm1 <= 'n -->
+   'm2 <= 'm1 -->
+   bind{'n; x. substl{'v; nth_prefix{nth_prefix{'x; 'm1}; 'm2}}}
    <-->
-   bind{n; x. substl{v; nth_prefix{x; m2}}}
+   bind{'n; x. substl{'v; nth_prefix{'x; 'm2}}}
 >>
 
 doc <:doc<
@@ -261,9 +260,9 @@ let resource normalize_simple +=
    [<< bind{'n; x. bind{'m; y. 'e['x; 'y]}} >>, coalesce_bindn_bindn]
 
 interactive_rw coalesce_vbind_bind1 {| normalize_simple |} : <:xrewrite<
-   vbind{| <J> >- bind{1; x. e[x]} |}
+   vbind{| <J> >- bind{1; x. e['x]} |}
    <-->
-   vbind{| <J>; x: it >- e[ [x] ] |}
+   vbind{| <J>; x: it >- e[ ['x] ] |}
 >>
 
 (************************************************************************

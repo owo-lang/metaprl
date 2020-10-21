@@ -48,19 +48,14 @@ extends Itt_hoas_relax
 
 doc docoff
 
-open Lm_printf
-
-open Term_match_table
 open Basic_tactics
 
 open Itt_equal
 open Itt_struct
 open Itt_logic
 open Itt_int_arith
-open Itt_omega
 open Itt_hoas_normalize
 open Itt_hoas_debruijn
-open Itt_hoas_vector
 open Itt_hoas_relax
 open Itt_hoas_bterm
 open Itt_hoas_lof
@@ -137,25 +132,25 @@ doc <:doc<
 interactive subterms_forward_lemma 'n 'op : <:xrule<
    <H> >- 'n in nat -->
    <H> >- 'op in "Operator" -->
-   <H> >- btl in list{Bind{n}} -->
-   <H> >- mk_bterm{n; op; btl} in BTerm -->
-   <H> >- btl in list{BTerm}
+   <H> >- 'btl in list{Bind{'n}} -->
+   <H> >- mk_bterm{'n; 'op; 'btl} in BTerm -->
+   <H> >- 'btl in list{BTerm}
 >>
 
 interactive mk_bterm_subterms_forward 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d in nat -->
-   "wf" : <H>; <J[it]> >- op in Operator -->
-   "wf" : <H>; <J[it]> >- subterms in list{Bind{d}} -->
-   <H>; <J[it]>; subterms in list{BTerm} >- C[it] -->
-   <H>; x: mk_bterm{d; op; subterms} in BTerm; <J[x]> >- C[x]
+   "wf" : <H>; <J[it]> >- 'd in nat -->
+   "wf" : <H>; <J[it]> >- 'op in Operator -->
+   "wf" : <H>; <J[it]> >- 'subterms in list{Bind{'d}} -->
+   <H>; <J[it]>; 'subterms in list{BTerm} >- C[it] -->
+   <H>; x: mk_bterm{'d; 'op; 'subterms} in BTerm; <J['x]> >- C['x]
 >>
 
 interactive mk_bterm_wf_forward 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d in nat -->
-   "wf" : <H>; <J[it]> >- op in Operator -->
-   "wf" : <H>; <J[it]> >- subterms in list{Bind{d}} -->
-   <H>; <J[it]>; compatible_shapes{d; shape{op}; subterms} >- C[it] -->
-   <H>; x: mk_bterm{d; op; subterms} in BTerm; <J[x]> >- C[x]
+   "wf" : <H>; <J[it]> >- 'd in nat -->
+   "wf" : <H>; <J[it]> >- 'op in Operator -->
+   "wf" : <H>; <J[it]> >- 'subterms in list{Bind{'d}} -->
+   <H>; <J[it]>; compatible_shapes{'d; shape{'op}; 'subterms} >- C[it] -->
+   <H>; x: mk_bterm{'d; 'op; 'subterms} in BTerm; <J['x]> >- C['x]
 >>
 
 doc <:doc<
@@ -163,123 +158,123 @@ doc <:doc<
    just for efficiency.
 >>
 interactive mk_bterm_wf_forward2 {| forward [ForwardPrec forward_trivial_prec] |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d in nat -->
-   "wf" : <H>; <J[it]> >- op in Operator -->
-   "wf" : <H>; <J[it]> >- subterms in list{Bind{d}} -->
+   "wf" : <H>; <J[it]> >- 'd in nat -->
+   "wf" : <H>; <J[it]> >- 'op in Operator -->
+   "wf" : <H>; <J[it]> >- 'subterms in list{Bind{'d}} -->
    <H>; <J[it]>;
-      subterms in list{BTerm};
-      compatible_shapes{d; shape{op}; subterms}
+      'subterms in list{BTerm};
+      compatible_shapes{'d; shape{'op}; 'subterms}
       >- C[it] -->
-   <H>; x: mk_bterm{d; op; subterms} in BTerm; <J[x]> >- C[x]
+   <H>; x: mk_bterm{'d; 'op; 'subterms} in BTerm; <J['x]> >- C['x]
 >>
 
 interactive mk_bterm_wf_forward3 {| forward [ForwardPrec forward_trivial_prec] |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d in nat -->
-   "wf" : <H>; <J[it]> >- op in Operator -->
-   "wf" : <H>; <J[it]> >- subterms in list{Bind{d}} -->
+   "wf" : <H>; <J[it]> >- 'd in nat -->
+   "wf" : <H>; <J[it]> >- 'op in Operator -->
+   "wf" : <H>; <J[it]> >- 'subterms in list{Bind{'d}} -->
    <H>; <J[it]>;
-      d = n in nat;
-      subterms in list{BTerm};
-      compatible_shapes{d; shape{op}; subterms}
+      'd = 'n in nat;
+      'subterms in list{BTerm};
+      compatible_shapes{'d; shape{'op}; 'subterms}
       >- C[it] -->
-   <H>; x: mk_bterm{d; op; subterms} in BTerm{n}; <J[x]> >- C[x]
+   <H>; x: mk_bterm{'d; 'op; 'subterms} in BTerm{'n}; <J['x]> >- C['x]
 >>
 
 interactive mk_bterm_wf_forward4 {| forward |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d1 in nat -->
-   "wf" : <H>; <J[it]> >- d2 in nat -->
-   "wf" : <H>; <J[it]> >- o1 in Operator -->
-   "wf" : <H>; <J[it]> >- o2 in Operator -->
-   "wf" : <H>; <J[it]> >- s1 in list{Bind{d1}} -->
-   "wf" : <H>; <J[it]> >- s2 in list{Bind{d2}} -->
+   "wf" : <H>; <J[it]> >- 'd1 in nat -->
+   "wf" : <H>; <J[it]> >- 'd2 in nat -->
+   "wf" : <H>; <J[it]> >- 'o1 in Operator -->
+   "wf" : <H>; <J[it]> >- 'o2 in Operator -->
+   "wf" : <H>; <J[it]> >- 's1 in list{Bind{'d1}} -->
+   "wf" : <H>; <J[it]> >- 's2 in list{Bind{'d2}} -->
    <H>; <J[it]>;
-      d1 = d2 in nat;
-      o1 = o2 in Operator;
-      s1 = s2 in list{BTerm};
-      compatible_shapes{d1; shape{o1}; s1};
-      compatible_shapes{d2; shape{o2}; s2}
+      'd1 = 'd2 in nat;
+      'o1 = 'o2 in Operator;
+      's1 = 's2 in list{BTerm};
+      compatible_shapes{'d1; shape{'o1}; 's1};
+      compatible_shapes{'d2; shape{'o2}; 's2}
       >- C[it] -->
-   <H>; x: mk_bterm{'d1; 'o1; 's1} = mk_bterm{'d2; 'o2; 's2} in BTerm; <J[x]> >- C[x]
+   <H>; x: mk_bterm{'d1; 'o1; 's1} = mk_bterm{'d2; 'o2; 's2} in BTerm; <J['x]> >- C['x]
 >>
 
 interactive mk_bterm_wf_forward5 {| forward |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d1 in nat -->
-   "wf" : <H>; <J[it]> >- d2 in nat -->
-   "wf" : <H>; <J[it]> >- o1 in Operator -->
-   "wf" : <H>; <J[it]> >- o2 in Operator -->
-   "wf" : <H>; <J[it]> >- s1 in list{Bind{d1}} -->
-   "wf" : <H>; <J[it]> >- s2 in list{Bind{d2}} -->
+   "wf" : <H>; <J[it]> >- 'd1 in nat -->
+   "wf" : <H>; <J[it]> >- 'd2 in nat -->
+   "wf" : <H>; <J[it]> >- 'o1 in Operator -->
+   "wf" : <H>; <J[it]> >- 'o2 in Operator -->
+   "wf" : <H>; <J[it]> >- 's1 in list{Bind{'d1}} -->
+   "wf" : <H>; <J[it]> >- 's2 in list{Bind{'d2}} -->
    <H>; <J[it]>;
-      d1 = n in nat;
-      d1 = d2 in nat;
-      o1 = o2 in Operator;
-      s1 = s2 in list{BTerm};
-      compatible_shapes{d1; shape{o1}; s1};
-      compatible_shapes{d2; shape{o2}; s2}
+      'd1 = 'n in nat;
+      'd1 = 'd2 in nat;
+      'o1 = 'o2 in Operator;
+      's1 = 's2 in list{BTerm};
+      compatible_shapes{'d1; shape{'o1}; 's1};
+      compatible_shapes{'d2; shape{'o2}; 's2}
       >- C[it] -->
-   <H>; x: mk_bterm{'d1; 'o1; 's1} = mk_bterm{'d2; 'o2; 's2} in BTerm{n}; <J[x]> >- C[x]
+   <H>; x: mk_bterm{'d1; 'o1; 's1} = mk_bterm{'d2; 'o2; 's2} in BTerm{'n}; <J['x]> >- C['x]
 >>
 
 doc <:doc<
    Basic rules for forward chaining.
 >>
 interactive cons_wf_forward {| forward |} 'H : <:xrule<
-   <H>; <J[it]>; h1 = h2 in t; l1 = l2 in list{t} >- C[it] -->
-   <H>; x: cons{h1; l1} = cons{h2; l2} in list{t}; <J[x]> >- C[x]
+   <H>; <J[it]>; 'h1 = 'h2 in 't; 'l1 = 'l2 in list{'t} >- C[it] -->
+   <H>; x: cons{'h1; 'l1} = cons{'h2; 'l2} in list{'t}; <J['x]> >- C['x]
  >>
 
 interactive and_forward {| forward [ForwardPost thinT] |} 'H : <:xrule<
-   <H>; x: A && B; <J[x]>; A; B >- C[x] -->
-   <H>; x: A && B; <J[x]> >- C[x]
+   <H>; x: 'A && 'B; <J['x]>; 'A; 'B >- C['x] -->
+   <H>; x: 'A && 'B; <J['x]> >- C['x]
 >>
 
 interactive var_bterm2_wf {| intro |} : <:xrule<
-   "wf" : <H> >- l in nat -->
-   "wf" : <H> >- r in nat -->
-   "aux" : <H> >- n = l +@ (r +@ 1) in nat -->
-   <H> >- var{l; r} in BTerm{n}
+   "wf" : <H> >- 'l in nat -->
+   "wf" : <H> >- 'r in nat -->
+   "aux" : <H> >- 'n = 'l +@ ('r +@ 1) in nat -->
+   <H> >- var{'l; 'r} in BTerm{'n}
 >>
 
 interactive var_bterm2_wf2 {| intro |} : <:xrule<
-   "wf" : <H> >- l1 = l2 in nat -->
-   "wf" : <H> >- r1 = r2 in nat -->
-   "aux" : <H> >- n = l1 +@ (r1 +@ 1) in nat -->
-   <H> >- var{l1; r1} = var{l2; r2} in BTerm{n}
+   "wf" : <H> >- 'l1 = 'l2 in nat -->
+   "wf" : <H> >- 'r1 = 'r2 in nat -->
+   "aux" : <H> >- 'n = 'l1 +@ ('r1 +@ 1) in nat -->
+   <H> >- var{'l1; 'r1} = var{'l2; 'r2} in BTerm{'n}
 >>
 
 interactive var_bterm2_wf3 {| intro |} : <:xrule<
-   "wf" : <H> >- l1 = l2 in nat -->
-   "wf" : <H> >- r1 = r2 in nat -->
-   <H> >- var{l1; r1} = var{l2; r2} in BTerm
+   "wf" : <H> >- 'l1 = 'l2 in nat -->
+   "wf" : <H> >- 'r1 = 'r2 in nat -->
+   <H> >- var{'l1; 'r1} = var{'l2; 'r2} in BTerm
 >>
 
 interactive compatible_shapes_forward1 {| forward |} 'H : <:xrule<
-   "wf" : <H>; x: compatible_shapes{n; shape; subterms}; <J[x]> >- n in nat -->
-   "wf" : <H>; x: compatible_shapes{n; shape; subterms}; <J[x]> >- shape in list{nat} -->
-   "wf" : <H>; x: compatible_shapes{n; shape; subterms}; <J[x]> >- subterms in list{BTerm} -->
-   <H>; x: compatible_shapes{n; shape; subterms}; <J[x]>;
-      length{shape} = length{subterms} in nat;
-      all i: Index{subterms}. bdepth{nth{subterms; i}} = nth{shape; i} +@ n in nat
-      >- C[x] -->
-   <H>; x: compatible_shapes{n; shape; subterms}; <J[x]> >- C[x]
+   "wf" : <H>; x: compatible_shapes{'n; 'shape; 'subterms}; <J['x]> >- 'n in nat -->
+   "wf" : <H>; x: compatible_shapes{'n; 'shape; 'subterms}; <J['x]> >- 'shape in list{nat} -->
+   "wf" : <H>; x: compatible_shapes{'n; 'shape; 'subterms}; <J['x]> >- 'subterms in list{BTerm} -->
+   <H>; x: compatible_shapes{'n; 'shape; 'subterms}; <J['x]>;
+      length{'shape} = length{'subterms} in nat;
+      all i: Index{'subterms}. bdepth{nth{'subterms; 'i}} = nth{'shape; 'i} +@ 'n in nat
+      >- C['x] -->
+   <H>; x: compatible_shapes{'n; 'shape; 'subterms}; <J['x]> >- C['x]
 >>
 
 interactive compatible_shapes1 : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- shape in list{nat} -->
-   "wf" : <H> >- subterms in list{BTerm} -->
-   "aux" : <H> >- length{subterms} = length{shape} in nat -->
-   "wf" : <H>; i: Index{subterms} >- bdepth{nth{subterms; i}} = nth{shape; i} +@ n in nat -->
-   <H> >- compatible_shapes{n; shape; subterms}
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'shape in list{nat} -->
+   "wf" : <H> >- 'subterms in list{BTerm} -->
+   "aux" : <H> >- length{'subterms} = length{'shape} in nat -->
+   "wf" : <H>; i: Index{'subterms} >- bdepth{nth{'subterms; 'i}} = nth{'shape; 'i} +@ 'n in nat -->
+   <H> >- compatible_shapes{'n; 'shape; 'subterms}
 >>
 
 interactive operator_forward {| forward |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- op_1 in Operator -->
-   "wf" : <H>; <J[it]> >- op_2 in Operator -->
+   "wf" : <H>; <J[it]> >- 'op_1 in Operator -->
+   "wf" : <H>; <J[it]> >- 'op_2 in Operator -->
    <H>; <J[it]>;
-      "assert"{is_same_op{op_1;op_2}}
+      "assert"{is_same_op{'op_1; 'op_2}}
       >- C[it] -->
-   <H>; x: op_1 = op_2 in Operator; <J[x]> >- C[x]
+   <H>; x: 'op_1 = 'op_2 in Operator; <J['x]> >- C['x]
 >>
 
 (************************************************************************
@@ -293,8 +288,8 @@ interactive operator_forward {| forward |} 'H : <:xrule<
  *
  * t in BTerm[m] -->                                                 (1)
  * k <= m -->
- * all i:[0..k-1]. bind{n; x.ts[i; x]} in BTerms{n} -->              (2)
- * bind{n; x. t @ lof{k; i. t[i; x]} in BTerms {m -@ k +@ n}
+ * all i:[0..k-1]. bind{'n; x.ts[i; x]} in BTerms{n} -->              (2)
+ * bind{'n; x. t @ lof{k; i. t[i; x]} in BTerms {m -@ k +@ n}
  *
  * We would need to make sure that the LOF algebra (or some modification of it)
  * can ensure that (2) will always be auto-provable.
@@ -306,42 +301,42 @@ interactive operator_forward {| forward |} 'H : <:xrule<
  * big deal either way.
  *)
 interactive bind_subst_nth_prefix_wf_aux : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- m in nat -->
-   "aux" : <H> >- m <= n -->
-   "wf" : <H> >- e in BTerm -->
-   "aux" : <H> >- bdepth{e} >= m -->
-   <H> >- bind{n; x. substl{e; nth_prefix{x; m}}} in BTerm{bdepth{e} -@ m +@ n}
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'm in nat -->
+   "aux" : <H> >- 'm <= 'n -->
+   "wf" : <H> >- 'e in BTerm -->
+   "aux" : <H> >- bdepth{'e} >= 'm -->
+   <H> >- bind{'n; x. substl{'e; nth_prefix{'x; 'm}}} in BTerm{bdepth{'e} -@ 'm +@ 'n}
 >>
 
 interactive bind_subst_nth_prefix_wf {| intro |} : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- m in nat -->
-   "aux" : <H> >- m <= n -->
-   "wf" : <H> >- e in BTerm -->
-   "aux" : <H> >- bdepth{e} >= m -->
-   <H> >- bind{n; x. substl{e; nth_prefix{x; m}}} in BTerm
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'm in nat -->
+   "aux" : <H> >- 'm <= 'n -->
+   "wf" : <H> >- 'e in BTerm -->
+   "aux" : <H> >- bdepth{'e} >= 'm -->
+   <H> >- bind{'n; x. substl{'e; nth_prefix{'x; 'm}}} in BTerm
 >>
 
 interactive bind_subst_nth_prefix_wf2 {| intro |} : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- m in nat -->
-   "aux" : <H> >- m <= n -->
-   "wf" : <H> >- e in BTerm -->
-   "aux" : <H> >- bdepth{e} >= m -->
-   "aux" : <H> >- d = bdepth{e} -@ m +@ n in nat -->
-   <H> >- bind{n; x. substl{e; nth_prefix{x; m}}} in BTerm{d}
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'm in nat -->
+   "aux" : <H> >- 'm <= 'n -->
+   "wf" : <H> >- 'e in BTerm -->
+   "aux" : <H> >- bdepth{'e} >= 'm -->
+   "aux" : <H> >- 'd = bdepth{'e} -@ 'm +@ 'n in nat -->
+   <H> >- bind{'n; x. substl{'e; nth_prefix{'x; 'm}}} in BTerm{'d}
 >>
 
 interactive_rw reduce_bdepth_bind_subst_nth_prefix {| reduce |} : <:xrule<
-   n in nat -->
-   m in nat -->
-   m <= n -->
-   e in BTerm -->
-   bdepth{e} >= m -->
-   bdepth{bind{n; x. substl{e; nth_prefix{x; m}}}}
+   'n in nat -->
+   'm in nat -->
+   'm <= 'n -->
+   'e in BTerm -->
+   bdepth{'e} >= 'm -->
+   bdepth{bind{'n; x. substl{'e; nth_prefix{'x; 'm}}}}
    <-->
-   bdepth{e} -@ m +@ n
+   bdepth{'e} -@ 'm +@ 'n
 >>
 
 (************************************************************************
@@ -436,10 +431,10 @@ let proofRuleWFT =
  * Depth wf.
  *)
 interactive_rw reduce_bind_of_bterm2 BTerm{'d} : <:xrewrite<
-   e IN BTerm{d} -->
-   bdepth{e}
+   'e IN BTerm{'d} -->
+   bdepth{'e}
    <-->
-   d
+   'd
 >>
 
 let reduce_depth_of_exp e =

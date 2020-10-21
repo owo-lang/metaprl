@@ -35,11 +35,8 @@ extends Itt_list3
 
 doc docoff
 
-open Lm_printf
 open Basic_tactics
-open Simple_print
 open Itt_struct
-open Itt_squiggle
 open Itt_vec_bind
 open Itt_logic
 open Itt_equal
@@ -567,7 +564,8 @@ let hoist_hyps_length_tac p =
          addr1 :: addrs ->
             let t_vbind = term_subterm t addr1 in
             let { sequent_hyps = hyps;
-                  sequent_concl = c
+                  sequent_concl = c;
+                  _
                 } = explode_sequent t_vbind
             in
                (match find_subterm c (fun t _ -> is_hyps_length_term t) with
@@ -634,7 +632,8 @@ let rec split_hyplist_conv hyps i t =
 
 let reduce_hyplist_conv t =
    let { sequent_args = arg;
-         sequent_hyps = hyps
+         sequent_hyps = hyps;
+         _
        } = explode_sequent t
    in
       if is_hyplist_arg_term arg then

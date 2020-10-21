@@ -35,9 +35,6 @@ doc docoff
 
 open Basic_tactics
 
-open Itt_list
-open Itt_list2
-open Itt_dfun
 open Itt_sqsimple
 open Itt_struct
 
@@ -162,14 +159,14 @@ interactive proof_step_wf {| intro [] |} : <:xrule<
 >>
 
 interactive proof_step_wf2 {| intro [] |} : <:xrule<
-   "wf" : <H> >- premises in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   <H> >- proof_step{premises; goal} IN ProofStep
+   "wf" : <H> >- 'premises in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   <H> >- proof_step{'premises; 'goal} IN ProofStep
 >>
 
 interactive proof_step_elim {| elim [ThinFirst thinT] |} 'H : <:xrule<
-   "wf" : <H>; premises: list{BTerm}; goal: BTerm; <J[proof_step{premises; goal}]> >- C[proof_step{premises; goal}] -->
-   <H>; s: ProofStep; <J[s]> >- C[s]
+   "wf" : <H>; premises: list{BTerm}; goal: BTerm; <J[proof_step{'premises; 'goal}]> >- C[proof_step{'premises; 'goal}] -->
+   <H>; s: ProofStep; <J['s]> >- C['s]
 >>
 
 interactive proof_step_sqsimple {| intro []; sqsimple |} : <:xrule<
@@ -184,14 +181,14 @@ interactive proof_step_witness_wf {| intro [] |} : <:xrule<
 >>
 
 interactive proof_step_witness_wf2 {| intro [] |} : <:xrule<
-   "wf" : <H> >- sovars in list{BTerm} -->
-   "wf" : <H> >- cvars in list{list{BTerm}} -->
-   <H> >- proof_step_witness{sovars; cvars} in ProofStepWitness
+   "wf" : <H> >- 'sovars in list{BTerm} -->
+   "wf" : <H> >- 'cvars in list{list{BTerm}} -->
+   <H> >- proof_step_witness{'sovars; 'cvars} in ProofStepWitness
 >>
 
 interactive proof_step_witness_elim {| elim [ThinFirst thinT] |} 'H : <:xrule<
-   <H>; sovars: list{"BTerm"}; cvars: list{list{"BTerm"}}; <J[proof_step_witness{sovars; cvars}]> >- C[proof_step_witness{sovars; cvars}] -->
-   <H>; x: "ProofStepWitness"; <J[x]> >- C[x]
+   <H>; sovars: list{"BTerm"}; cvars: list{list{"BTerm"}}; <J[proof_step_witness{'sovars; 'cvars}]> >- C[proof_step_witness{'sovars; 'cvars}] -->
+   <H>; x: "ProofStepWitness"; <J['x]> >- C['x]
 >>
 
 (*
@@ -209,124 +206,124 @@ interactive logic_wf {| intro [] |} : <:xrule<
  * A ValidStep requires a derivation and a goal.
  *)
 interactive derivation_premises_wf1 : <:xrule<
-   "wf" : <H> >- t IN ty_premises * "top" * "top" -->
-   <H> >- derivation_premises{t} IN ty_premises
+   "wf" : <H> >- 't IN 'ty_premises * "top" * "top" -->
+   <H> >- derivation_premises{'t} IN 'ty_premises
 >>
 
 interactive derivation_goal_wf1 : <:xrule<
-   "wf" : <H> >- t IN "top" * BTerm * "top" -->
-   <H> >- derivation_goal{t} IN BTerm
+   "wf" : <H> >- 't IN "top" * BTerm * "top" -->
+   <H> >- derivation_goal{'t} IN BTerm
 >>
 
 (*
  * Misc wf rules
  *)
 interactive proof_check_wf {| intro |} : <:xrule<
-   "wf" : <H> >- r in ProofRule -->
-   "wf" : <H> >- assums in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- witness in ProofStepWitness -->
-   <H> >- proof_check{r; assums; goal; witness} in bool
+   "wf" : <H> >- 'r in ProofRule -->
+   "wf" : <H> >- 'assums in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'witness in ProofStepWitness -->
+   <H> >- proof_check{'r; 'assums; 'goal; 'witness} in bool
 >>
 
 interactive proof_check_wf2 {| intro |} : <:xrule<
-   "wf" : <H> >- r in ProofRule -->
-   "wf" : <H> >- assums in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- witness in ProofStepWitness -->
-   <H> >- ProofCheck{r; assums; goal; witness} Type
+   "wf" : <H> >- 'r in ProofRule -->
+   "wf" : <H> >- 'assums in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'witness in ProofStepWitness -->
+   <H> >- proof_check{'r; 'assums; 'goal; 'witness} Type
 >>
 
 interactive proof_rule_start_wf {| intro [] |} : <:xrule<
-   "wf" : <H>; s: ProofStep; w: ProofStepWitness >- e[s; w] in "bool" -->
-   <H> >- lambda{step. spread{step; s, w. e[s; w]}} in ProofRule
+   "wf" : <H>; s: ProofStep; w: ProofStepWitness >- e['s; 'w] in "bool" -->
+   <H> >- lambda{step. spread{'step; s, w. e['s; 'w]}} in ProofRule
 >>
 
 interactive simple_step_wf {| intro [intro_typeinf << 'goal >>] |} : <:xrule<
-   "wf" : <H> >- premises in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- witness in ProofStepWitness -->
-   "wf" : <H> >- logic in Logic -->
-   <H> >- SimpleStep{premises; goal; witness; logic} Type
+   "wf" : <H> >- 'premises in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'witness in ProofStepWitness -->
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- SimpleStep{'premises; 'goal; 'witness; 'logic} Type
 >>
 
 interactive valid_step_wf {| intro [intro_typeinf << 'goal >>] |} : <:xrule<
-   "wf" : <H> >- premises IN list{"top" * BTerm * "top"} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- witness in "ProofStepWitness" -->
-   "wf" : <H> >- logic IN Logic -->
-   <H> >- ValidStep{premises; goal; witness; logic} Type
+   "wf" : <H> >- 'premises IN list{"top" * BTerm * "top"} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'witness in "ProofStepWitness" -->
+   "wf" : <H> >- 'logic IN Logic -->
+   <H> >- ValidStep{'premises; 'goal; 'witness; 'logic} Type
 >>
 
 (*
  * The step discards some of the information.
  *)
 interactive_rw reduce_derivation_indexed_base {| reduce |} : <:xrewrite<
-   Derivation{0; logic}
+   Derivation{0; 'logic}
    <-->
    "void"
 >>
 
 interactive_rw reduce_derivation_indexed_step {| reduce |} : <:xrewrite<
-   n IN "nat" -->
-   Derivation{n +@ 1; logic}
+   'n IN "nat" -->
+   Derivation{'n +@ 1; 'logic}
    <-->
-   Prod premises: list{Derivation{n; logic}}
+   Prod premises: list{Derivation{'n; 'logic}}
    * Prod goal: BTerm
    * Prod witness: "ProofStepWitness"
-   * ValidStep{premises; goal; witness; logic}
+   * ValidStep{'premises; 'goal; 'witness; 'logic}
 >>
 
 interactive derivation_indexed_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- logic in Logic -->
-   <H> >- Derivation{n; logic} Type
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- Derivation{'n; 'logic} Type
 >>
 
 interactive derivation_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   <H> >- "Derivation"{logic} Type
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- "Derivation"{'logic} Type
 >>
 
 (*
  * Derivations contain valid steps.
  *)
 interactive valid_step_wf2 {| intro [intro_typeinf << 'premises >>] |} list{Derivation{'n; 'logic}} : <:xrule<
-   "wf" : <H> >- n IN "nat" -->
-   "wf" : <H> >- premises IN list{Derivation{n; logic}} -->
-   "wf" : <H> >- goal IN BTerm -->
-   "wf" : <H> >- witness IN "ProofStepWitness" -->
-   "wf" : <H> >- logic IN Logic -->
-   <H> >- ValidStep{premises; goal; witness; logic} Type
+   "wf" : <H> >- 'n IN "nat" -->
+   "wf" : <H> >- 'premises IN list{Derivation{'n; 'logic}} -->
+   "wf" : <H> >- 'goal IN BTerm -->
+   "wf" : <H> >- 'witness IN "ProofStepWitness" -->
+   "wf" : <H> >- 'logic IN Logic -->
+   <H> >- ValidStep{'premises; 'goal; 'witness; 'logic} Type
 >>
 
 (*
  * The type of derivations is monotone.
  *)
 interactive derivation_indexed_monotone 'i : <:xrule<
-   "wf" : <H> >- logic IN Logic -->
-   "wf" : <H> >- i IN "nat" -->
-   "wf" : <H> >- j IN "nat" -->
-   "aux" : <H> >- i <= j -->
-   <H> >- e IN Derivation{i; logic} -->
-   <H> >- e IN Derivation{j; logic}
+   "wf" : <H> >- 'logic IN Logic -->
+   "wf" : <H> >- 'i IN "nat" -->
+   "wf" : <H> >- 'j IN "nat" -->
+   "aux" : <H> >- 'i <= 'j -->
+   <H> >- 'e IN Derivation{'i; 'logic} -->
+   <H> >- 'e IN Derivation{'j; 'logic}
 >>
 
 interactive derivation_indexed_list_monotone 'i : <:xrule<
-   "wf" : <H> >- logic IN Logic -->
-   "wf" : <H> >- i IN "nat" -->
-   "wf" : <H> >- j IN "nat" -->
-   "aux" : <H> >- i <= j -->
-   <H> >- e IN list{Derivation{i; logic}} -->
-   <H> >- e IN list{Derivation{j; logic}}
+   "wf" : <H> >- 'logic IN Logic -->
+   "wf" : <H> >- 'i IN "nat" -->
+   "wf" : <H> >- 'j IN "nat" -->
+   "aux" : <H> >- 'i <= 'j -->
+   <H> >- 'e IN list{Derivation{'i; 'logic}} -->
+   <H> >- 'e IN list{Derivation{'j; 'logic}}
 >>
 
 (*
  * Elimination rule for ProofCheck.
  *)
 interactive proofCheck_elim {| elim [] |} 'H : <:xrule<
-   <H>; x: ProofCheck{r; premises; goal; witness}; <J[x]>; "assert"{'r (proof_step{'premises; 'goal}, 'witness)}; r in ProofRule; premises in list{BTerm}; goal in BTerm; witness in ProofStepWitness >- C[x] -->
-   <H>; x: ProofCheck{r; premises; goal; witness}; <J[x]> >- C[x]
+   <H>; x: ProofCheck{'r; 'premises; 'goal; 'witness}; <J['x]>; "assert"{'r (proof_step{'premises; 'goal}, 'witness)}; 'r in ProofRule; 'premises in list{BTerm}; 'goal in BTerm; 'witness in ProofStepWitness >- C['x] -->
+   <H>; x: ProofCheck{'r; 'premises; 'goal; 'witness}; <J['x]> >- C['x]
 >>
 
 (*
@@ -334,69 +331,69 @@ interactive proofCheck_elim {| elim [] |} 'H : <:xrule<
  *)
 define unfold_derivation_depth : derivation_depth{'d} <--> <:xterm<
    (fix depth d ->
-       list_max{map{premise. depth premise; derivation_premises{d}}} +@ 1) d
+       list_max{map{premise. 'depth 'premise; derivation_premises{'d}}} +@ 1) 'd
 >>
 
 let fold_derivation_depth = makeFoldC << derivation_depth{'d} >> unfold_derivation_depth
 
 interactive_rw reduce_derivation_depth {| reduce |} : <:xrewrite<
-    derivation_depth{(premises, goal, witness, p)}
+    derivation_depth{('premises, 'goal, 'witness, 'p)}
     <-->
-    list_max{map{premise. derivation_depth{premise}; premises}} +@ 1
+    list_max{map{premise. derivation_depth{'premise}; 'premises}} +@ 1
 >>
 
 interactive derivation_depth_wf1 {| intro [intro_typeinf << 'd >>] |} Derivation{'n; 'ty_logic} : <:xrule<
-   "wf" : <H> >- n IN "nat" -->
-   "wf" : <H> >- ty_logic IN Logic -->
-   "wf" : <H> >- d IN Derivation{n; ty_logic} -->
-   <H> >- derivation_depth{d} IN "nat"
+   "wf" : <H> >- 'n IN "nat" -->
+   "wf" : <H> >- 'ty_logic IN Logic -->
+   "wf" : <H> >- 'd IN Derivation{'n; 'ty_logic} -->
+   <H> >- derivation_depth{'d} IN "nat"
 >>
 
 interactive derivation_depth_wf {| intro [intro_typeinf << 'd >>] |} Derivation{'ty_logic} : <:xrule<
-   "wf" : <H> >- ty_logic IN Logic -->
-   "wf" : <H> >- d IN Derivation{ty_logic} -->
-   <H> >- derivation_depth{d} IN "nat"
+   "wf" : <H> >- 'ty_logic IN Logic -->
+   "wf" : <H> >- 'd IN Derivation{'ty_logic} -->
+   <H> >- derivation_depth{'d} IN "nat"
 >>
 
 interactive derivation_depth_elim {| elim [ThinFirst thinT] |} 'H : <:xrule<
-   "wf" : <H>; e: Derivation{logic}; <J[e]> >- logic IN Logic -->
-   <H>; e: Derivation{logic}; <J[e]>; e IN Derivation{derivation_depth{e}; logic} >- C[e] -->
-   <H>; e: Derivation{logic}; <J[e]> >- C[e]
+   "wf" : <H>; e: Derivation{'logic}; <J['e]> >- 'logic IN Logic -->
+   <H>; e: Derivation{'logic}; <J['e]>; 'e IN Derivation{derivation_depth{'e}; 'logic} >- C['e] -->
+   <H>; e: Derivation{'logic}; <J['e]> >- C['e]
 >>
 
 interactive derivation_depth_bound {| intro [intro_typeinf << 'e >>] |} Derivation{'n; 'logic} : <:xrule<
-   "wf" : <H> >- n IN "nat" -->
-   "wf" : <H> >- logic IN Logic -->
-   "wf" : <H> >- e IN Derivation{n; logic} -->
-   <H> >- derivation_depth{e} <= n
+   "wf" : <H> >- 'n IN "nat" -->
+   "wf" : <H> >- 'logic IN Logic -->
+   "wf" : <H> >- 'e IN Derivation{'n; 'logic} -->
+   <H> >- derivation_depth{'e} <= 'n
 >>
 
 interactive derivation_depth_elim2 'H : <:xrule<
-   "wf" : <H>; e: Derivation{n; logic}; <J[e]> >- n IN "nat" -->
-   "wf" : <H>; e: Derivation{n; logic}; <J[e]> >- logic IN Logic -->
-   <H>; e: Derivation{logic}; <J[e]> >- C[e] -->
-   <H>; e: Derivation{n; logic}; <J[e]> >- C[e]
+   "wf" : <H>; e: Derivation{'n; 'logic}; <J['e]> >- 'n IN "nat" -->
+   "wf" : <H>; e: Derivation{'n; 'logic}; <J['e]> >- 'logic IN Logic -->
+   <H>; e: Derivation{'logic}; <J['e]> >- C['e] -->
+   <H>; e: Derivation{'n; 'logic}; <J['e]> >- C['e]
 >>
 
 interactive derivation_depth_list_elim2 'H : <:xrule<
-   "wf" : <H>; e: list{Derivation{n; logic}}; <J[e]> >- n IN "nat" -->
-   "wf" : <H>; e: list{Derivation{n; logic}}; <J[e]> >- logic IN Logic -->
-   <H>; e: list{Derivation{logic}}; <J[e]> >- C[e] -->
-   <H>; e: list{Derivation{n; logic}}; <J[e]> >- C[e]
+   "wf" : <H>; e: list{Derivation{'n; 'logic}}; <J['e]> >- 'n IN "nat" -->
+   "wf" : <H>; e: list{Derivation{'n; 'logic}}; <J['e]> >- 'logic IN Logic -->
+   <H>; e: list{Derivation{'logic}}; <J['e]> >- C['e] -->
+   <H>; e: list{Derivation{'n; 'logic}}; <J['e]> >- C['e]
 >>
 
 doc <:doc<
    This is the general proof induction principle.
 >>
 interactive derivation_elim {| elim [ThinFirst thinT] |} 'H : <:xrule<
-   "wf" : <H>; e: Derivation{logic}; <J[e]> >- logic IN Logic -->
-   <H>; e: Derivation{logic}; <J[e]>;
-       premises: list{Derivation{logic}};
+   "wf" : <H>; e: Derivation{'logic}; <J['e]> >- 'logic IN Logic -->
+   <H>; e: Derivation{'logic}; <J['e]>;
+       premises: list{Derivation{'logic}};
        goal: BTerm;
        witness: "ProofStepWitness";
-       all_list{premises; premise. P[premise]};
-       p: ValidStep{premises; goal; witness; logic} >- P[derivation_step{premises; goal; witness; p}] -->
-   <H>; e: Derivation{logic}; <J[e]> >- P[e]
+       all_list{'premises; premise. P['premise]};
+       p: ValidStep{'premises; 'goal; 'witness; 'logic} >- P[derivation_step{'premises; 'goal; 'witness; 'p}] -->
+   <H>; e: Derivation{'logic}; <J['e]> >- P['e]
 >>
 
 doc docoff
@@ -408,22 +405,22 @@ let resource elim +=
  * Restate some of the well-formedness goals.
  *)
 interactive derivation_goal_wf2 {| intro [intro_typeinf << 'e >>] |} Derivation{'logic} : <:xrule<
-   "wf" : <H> >- logic IN "Logic" -->
-   "wf" : <H> >- e IN Derivation{logic} -->
-   <H> >- derivation_goal{e} in BTerm
+   "wf" : <H> >- 'logic IN "Logic" -->
+   "wf" : <H> >- 'e IN Derivation{'logic} -->
+   <H> >- derivation_goal{'e} in BTerm
 >>
 
 interactive valid_step_wf3 {| intro [intro_typeinf << 'premises >>] |} list{Derivation{'logic}} : <:xrule<
-   "wf" : <H> >- premises in list{Derivation{logic}} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- witness in ProofStepWitness -->
-   "wf" : <H> >- logic in Logic -->
-   <H> >- ValidStep{premises; goal; witness; logic} Type
+   "wf" : <H> >- 'premises in list{Derivation{'logic}} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'witness in ProofStepWitness -->
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- ValidStep{'premises; 'goal; 'witness; 'logic} Type
 >>
 
 interactive simple_step_elim {| elim |} 'H : <:xrule<
    <H>; exists_list{'logic; r. ProofCheck{'r; 'premises; 'goal; 'witness}}; 'logic in Logic; <J[it]> >- C[it] -->
-   <H>; x: SimpleStep{premises; goal; witness; logic}; <J[x]> >- C[x]
+   <H>; x: SimpleStep{'premises; 'goal; 'witness; 'logic}; <J['x]> >- C['x]
 >>
 
 doc <:doc<
@@ -436,21 +433,21 @@ define unfold_Provable : Provable{'logic; 't} <-->
 doc docoff
 
 interactive wf_Provable {| intro [] |} : <:xrule<
-    "wf" : <H> >- logic IN Logic -->
-    "wf" : <H> >- t IN BTerm -->
-    <H> >- Provable{logic; t} Type
+    "wf" : <H> >- 'logic IN Logic -->
+    "wf" : <H> >- 't IN BTerm -->
+    <H> >- Provable{'logic; 't} Type
 >>
 
 doc <:doc<
    Introduction forms.
 >>
 interactive derivation_step_intro {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- premises in list{Derivation{logic}} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- witness in ProofStepWitness -->
-   "wf" : <H> >- p in ValidStep{premises; goal; witness; logic} -->
-   <H> >- derivation_step{premises; goal; witness; p} in Derivation{logic}
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'premises in list{Derivation{'logic}} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'witness in ProofStepWitness -->
+   "wf" : <H> >- 'p in ValidStep{'premises; 'goal; 'witness; 'logic} -->
+   <H> >- derivation_step{'premises; 'goal; 'witness; 'p} in Derivation{'logic}
 >>
 
 doc <:doc<
@@ -458,12 +455,12 @@ doc <:doc<
    by a rule in the logic.
 >>
 interactive provable_intro 'premises : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- premises in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   "aux" : <H> >- all_list{premises; premise. Provable{logic; premise}} -->
-   <H> >- exists witness: ProofStepWitness. SimpleStep{premises; goal; witness; logic} -->
-   <H> >- Provable{logic; goal}
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'premises in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "aux" : <H> >- all_list{'premises; premise. Provable{'logic; 'premise}} -->
+   <H> >- exists witness: ProofStepWitness. SimpleStep{'premises; 'goal; 'witness; 'logic} -->
+   <H> >- Provable{'logic; 'goal}
 >>
 
 (************************************************************************
@@ -473,33 +470,33 @@ doc <:doc<
    Define alpha-equality on proof steps.
 >>
 define unfold_beq_proof_step : beq_proof_step{'step1; 'step2} <--> <:xterm<
-   let premises1, goal1 = step1 in
-   let premises2, goal2 = step2 in
-      beq_bterm_list{premises1; premises2} &&b beq_bterm{goal1; goal2}
+   let premises1, goal1 = 'step1 in
+   let premises2, goal2 = 'step2 in
+      beq_bterm_list{'premises1; 'premises2} &&b beq_bterm{'goal1; 'goal2}
 >>
 
 interactive_rw reduce_beq_proof_step {| reduce |} : <:xrewrite<
-   beq_proof_step{proof_step{premises1; goal1}; proof_step{premises2; goal2}}
+   beq_proof_step{proof_step{'premises1; 'goal1}; proof_step{'premises2; 'goal2}}
    <-->
-   beq_bterm_list{premises1; premises2} &&b beq_bterm{goal1; goal2}
+   beq_bterm_list{'premises1; 'premises2} &&b beq_bterm{'goal1; 'goal2}
 >>
 
 interactive beq_proof_step_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- step1 in ProofStep -->
-   "wf" : <H> >- step2 IN ProofStep -->
-   <H> >- beq_proof_step{step1; step2} in bool
+   "wf" : <H> >- 'step1 in ProofStep -->
+   "wf" : <H> >- 'step2 IN ProofStep -->
+   <H> >- beq_proof_step{'step1; 'step2} in bool
 >>
 
 interactive beq_proof_step_intro {| intro [] |} : <:xrule<
-   <H> >- s1 = s2 in ProofStep -->
-   <H> >- "assert"{beq_proof_step{s1; s2}}
+   <H> >- 's1 = 's2 in ProofStep -->
+   <H> >- "assert"{beq_proof_step{'s1; 's2}}
 >>
 
 interactive beq_proof_step_elim {| elim [] |} 'H : <:xrule<
-   "wf" : <H>; u: "assert"{beq_proof_step{s1; s2}}; <J[u]> >- s1 in ProofStep -->
-   "wf" : <H>; u: "assert"{beq_proof_step{s1; s2}}; <J[u]> >- s2 in ProofStep -->
-   <H>; u: s1 = s2 in ProofStep; <J[u]> >- C[u] -->
-   <H>; u: "assert"{beq_proof_step{s1; s2}}; <J[u]> >- C[u]
+   "wf" : <H>; u: "assert"{beq_proof_step{'s1; 's2}}; <J['u]> >- 's1 in ProofStep -->
+   "wf" : <H>; u: "assert"{beq_proof_step{'s1; 's2}}; <J['u]> >- 's2 in ProofStep -->
+   <H>; u: 's1 = 's2 in ProofStep; <J['u]> >- C['u] -->
+   <H>; u: "assert"{beq_proof_step{'s1; 's2}}; <J['u]> >- C['u]
 >>
 
 (************************************************************************
@@ -515,11 +512,11 @@ define unfold_union_logic : union_logic{'logic1; 'logic2} <-->
    append{'logic1; 'logic2}
 
 define unfold_MemLogic : MemLogic{'step; 'logic} <--> <:xterm<
-   mem{step; logic; ProofRule}
+   mem{'step; 'logic; ProofRule}
 >>
 
 define unfold_SubLogic : SubLogic{'logic1; 'logic2} <--> <:xterm<
-   "subset"{logic1; logic2; ProofRule}
+   "subset"{'logic1; 'logic2; ProofRule}
 >>
 
 interactive nil_logic_wf {| intro [] |} : <:xrule<
@@ -527,63 +524,63 @@ interactive nil_logic_wf {| intro [] |} : <:xrule<
 >>
 
 interactive rules_logic_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- rules in list{ProofRule} -->
-   "wf" : <H> >- logic in Logic -->
-   <H> >- rules_logic{rules; logic} in Logic
+   "wf" : <H> >- 'rules in list{ProofRule} -->
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- rules_logic{'rules; 'logic} in Logic
 >>
 
 interactive union_logic_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- union_logic{logic1; logic2} in Logic
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- union_logic{'logic1; 'logic2} in Logic
 >>
 
 interactive mem_logic_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- step in ProofRule -->
-   "wf" : <H> >- logic in Logic -->
-   <H> >- MemLogic{step; logic} Type
+   "wf" : <H> >- 'step in ProofRule -->
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- MemLogic{'step; 'logic} Type
 >>
 
 interactive sub_logic_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- SubLogic{logic1; logic2} Type
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- SubLogic{'logic1; 'logic2} Type
 >>
 
 (*
  * Membership in a logic.
  *)
 interactive mem_logic_trans 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   "wf" : <H> >- step in ProofRule -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- MemLogic{step; logic1} -->
-   <H> >- MemLogic{step; logic2}
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   "wf" : <H> >- 'step in ProofRule -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- MemLogic{'step; 'logic1} -->
+   <H> >- MemLogic{'step; 'logic2}
 >>
 
 interactive mem_rules_logic {| intro [] |} : <:xrule<
-   "wf" : <H> >- step in ProofRule -->
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- steps in list{ProofRule} -->
-   "wf" : <H> >- mem{step; steps; ProofRule} -->
-   <H> >- MemLogic{step; rules_logic{steps; logic}}
+   "wf" : <H> >- 'step in ProofRule -->
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'steps in list{ProofRule} -->
+   "wf" : <H> >- mem{'step; 'steps; ProofRule} -->
+   <H> >- MemLogic{'step; rules_logic{'steps; 'logic}}
 >>
 
 interactive mem_union_logic1 {| intro [SelectOption 1] |} : <:xrule<
-   "wf" : <H> >- step in ProofRule -->
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- MemLogic{step; logic1} -->
-   <H> >- MemLogic{step; union_logic{logic1; logic2}}
+   "wf" : <H> >- 'step in ProofRule -->
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- MemLogic{'step; 'logic1} -->
+   <H> >- MemLogic{'step; union_logic{'logic1; 'logic2}}
 >>
 
 interactive mem_union_logic2 {| intro [SelectOption 2] |} : <:xrule<
-   "wf" : <H> >- step in ProofRule -->
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- MemLogic{step; logic2} -->
-   <H> >- MemLogic{step; union_logic{logic1; logic2}}
+   "wf" : <H> >- 'step in ProofRule -->
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- MemLogic{'step; 'logic2} -->
+   <H> >- MemLogic{'step; union_logic{'logic1; 'logic2}}
 >>
 
 (*
@@ -591,26 +588,26 @@ interactive mem_union_logic2 {| intro [SelectOption 2] |} : <:xrule<
  *)
 
 interactive sub_logic_ref {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- logic in Logic -->
-   <H> >- SubLogic{logic; logic}
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'logic in Logic -->
+   <H> >- SubLogic{'logic; 'logic}
 >>
 
 
 interactive derivation_sub 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 IN Logic -->
-   "wf" : <H> >- logic2 IN Logic -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- e IN Derivation{logic1} -->
-   <H> >- e IN Derivation{logic2}
+   "wf" : <H> >- 'logic1 IN Logic -->
+   "wf" : <H> >- 'logic2 IN Logic -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- 'e IN Derivation{'logic1} -->
+   <H> >- 'e IN Derivation{'logic2}
 >>
 
 interactive provable_sub 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- Provable{logic1; seq} -->
-   <H> >- Provable{logic2; seq}
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- Provable{'logic1; 'seq} -->
+   <H> >- Provable{'logic2; 'seq}
 >>
 
 doc docoff

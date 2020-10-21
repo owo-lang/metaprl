@@ -39,11 +39,8 @@ extends Itt_sqsimple
 
 doc docoff
 
-open Dform
 open Basic_tactics
 
-open Itt_list
-open Itt_list2
 open Itt_dfun
 open Itt_equal
 open Itt_sqsimple
@@ -68,8 +65,8 @@ define unfold_sequent_concl : sequent_concl{'s} <-->
    snd{snd{'s}}
 
 define unfold_dest_sequent : dest_sequent{'s; arg, hyps, concl. 'e['arg; 'hyps; 'concl]} <--> <:xterm<
-   let a, h, c = s in
-      e[a; h; c]
+   let a, h, c = 's in
+      e['a; 'h; 'c]
 >>
 
 doc <:doc<
@@ -135,95 +132,95 @@ let fold_sequent = makeFoldC << "sequent"{'arg; 'hyps; 'goal} >> unfold_sequent
  * hyp_depths rules.
  *)
 interactive_rw reduce_hyp_depths_nil {| reduce |} : <:xrewrite<
-   hyp_depths{d; "nil"}
+   hyp_depths{'d; "nil"}
    <-->
    "true"
 >>
 
 interactive_rw reduce_hyp_depths_cons {| reduce |} : <:xrewrite<
-   hyp_depths{d; u::v}
+   hyp_depths{'d; 'u::'v}
    <-->
-   bdepth{u} = d in "nat" && hyp_depths{d +@ 1; v}
+   bdepth{'u} = 'd in "nat" && hyp_depths{'d +@ 1; 'v}
 >>
 
 interactive hyp_depths_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- l IN list{"BTerm"} -->
-   <H> >- hyp_depths{d; l} Type
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'l IN list{"BTerm"} -->
+   <H> >- hyp_depths{'d; 'l} Type
 >>
 
 (*
  * bhyp_depths (Boolean version).
  *)
 interactive_rw reduce_bhyp_depths_nil {| reduce |} : <:xrewrite<
-   bhyp_depths{d; "nil"}
+   bhyp_depths{'d; "nil"}
    <-->
    "btrue"
 >>
 
 interactive_rw reduce_bhyp_depths_cons {| reduce |} : <:xrewrite<
-   bhyp_depths{d; u::v}
+   bhyp_depths{'d; 'u::'v}
    <-->
-   beq_int{bdepth{u}; d} &&b bhyp_depths{d +@ 1; v}
+   beq_int{bdepth{'u}; 'd} &&b bhyp_depths{'d +@ 1; 'v}
 >>
 
 interactive bhyp_depths_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- l IN list{"BTerm"} -->
-   <H> >- bhyp_depths{d; l} IN "bool"
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'l IN list{"BTerm"} -->
+   <H> >- bhyp_depths{'d; 'l} IN "bool"
 >>
 
 interactive bhyp_depths_intro {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- l IN list{"BTerm"} -->
-   <H> >- hyp_depths{d; l} -->
-   <H> >- "assert"{bhyp_depths{d; l}}
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'l IN list{"BTerm"} -->
+   <H> >- hyp_depths{'d; 'l} -->
+   <H> >- "assert"{bhyp_depths{'d; 'l}}
 >>
 
 interactive bhyp_depths_elim {| elim [] |} 'H : <:xrule<
-   "wf" : <H>; u: "assert"{bhyp_depths{d; l}}; <J[u]> >- d IN "nat" -->
-   "wf" : <H>; u: "assert"{bhyp_depths{d; l}}; <J[u]> >- l IN list{"BTerm"} -->
-   <H>; hyp_depths{d; l}; <J["it"]> >- C["it"] -->
-   <H>; u: "assert"{bhyp_depths{d; l}}; <J[u]> >- C[u]
+   "wf" : <H>; u: "assert"{bhyp_depths{'d; 'l}}; <J['u]> >- 'd IN "nat" -->
+   "wf" : <H>; u: "assert"{bhyp_depths{'d; 'l}}; <J['u]> >- 'l IN list{"BTerm"} -->
+   <H>; hyp_depths{'d; 'l}; <J["it"]> >- C["it"] -->
+   <H>; u: "assert"{bhyp_depths{'d; 'l}}; <J['u]> >- C['u]
 >>
 
 interactive bhyp_depths_forward {| forward |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d in nat -->
-   "wf" : <H>; <J[it]> >- l in list{BTerm} -->
-   <H>; <J[it]>; hyp_depths{d; l} >- C[it] -->
-   <H>; x: "assert"{bhyp_depths{d; l}}; <J[x]> >- C[x]
+   "wf" : <H>; <J[it]> >- 'd in nat -->
+   "wf" : <H>; <J[it]> >- 'l in list{BTerm} -->
+   <H>; <J[it]>; hyp_depths{'d; 'l} >- C[it] -->
+   <H>; x: "assert"{bhyp_depths{'d; 'l}}; <J['x]> >- C['x]
 >>
 
 (*
  * is_sequent is well-formed if applied to a sequent triple.
  *)
 interactive is_sequent_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- s IN "BTerm" * list{"BTerm"} * "BTerm" -->
-   <H> >- is_sequent{s} Type
+   "wf" : <H> >- 's IN "BTerm" * list{"BTerm"} * "BTerm" -->
+   <H> >- is_sequent{'s} Type
 >>
 
 interactive is_sequent_depth_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- s IN "BTerm" * list{"BTerm"} * "BTerm" -->
-   <H> >- is_sequent{d; s} Type
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 's IN "BTerm" * list{"BTerm"} * "BTerm" -->
+   <H> >- is_sequent{'d; 's} Type
 >>
 
 (*
  * This is similar, but we have an explicit sequent triple.
  *)
 interactive is_sequent_wf2 {| intro [] |} : <:xrule<
-   "wf" : <H> >- arg IN "BTerm" -->
-   "wf" : <H> >- hyps IN list{"BTerm"} -->
-   "wf" : <H> >- concl IN "BTerm" -->
-   <H> >- is_sequent{"sequent"{arg; hyps; concl}} Type
+   "wf" : <H> >- 'arg IN "BTerm" -->
+   "wf" : <H> >- 'hyps IN list{"BTerm"} -->
+   "wf" : <H> >- 'concl IN "BTerm" -->
+   <H> >- is_sequent{"sequent"{'arg; 'hyps; 'concl}} Type
 >>
 
 interactive is_sequent_depth_wf2 {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- arg IN "BTerm" -->
-   "wf" : <H> >- hyps IN list{"BTerm"} -->
-   "wf" : <H> >- concl IN "BTerm" -->
-   <H> >- is_sequent{d; "sequent"{arg; hyps; concl}} Type
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'arg IN "BTerm" -->
+   "wf" : <H> >- 'hyps IN list{"BTerm"} -->
+   "wf" : <H> >- 'concl IN "BTerm" -->
+   <H> >- is_sequent{'d; "sequent"{'arg; 'hyps; 'concl}} Type
 >>
 
 (*
@@ -243,112 +240,112 @@ interactive sequent_sqsimple {| intro []; sqsimple |} : <:xrule<
  * and depths match up.
  *)
 interactive sequent_term_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- arg IN "BTerm" -->
-   "wf" : <H> >- hyps IN list{"BTerm"} -->
-   "wf" : <H> >- concl IN "BTerm" -->
-   "wf" : <H> >- bdepth{arg} = 0 in "nat" -->
-   "wf" : <H> >- hyp_depths{0; hyps} -->
-   "wf" : <H> >- bdepth{concl} = length{hyps} in "nat" -->
-   <H> >- "sequent"{arg; hyps; concl} IN "Sequent"
+   "wf" : <H> >- 'arg IN "BTerm" -->
+   "wf" : <H> >- 'hyps IN list{"BTerm"} -->
+   "wf" : <H> >- 'concl IN "BTerm" -->
+   "wf" : <H> >- bdepth{'arg} = 0 in "nat" -->
+   "wf" : <H> >- hyp_depths{0; 'hyps} -->
+   "wf" : <H> >- bdepth{'concl} = length{'hyps} in "nat" -->
+   <H> >- "sequent"{'arg; 'hyps; 'concl} IN "Sequent"
 >>
 
 interactive sequent_term_equal {| intro [] |} : <:xrule<
-   "wf" : <H> >- arg1 = arg2 in BTerm -->
-   "wf" : <H> >- hyps1 = hyps2 in list{BTerm} -->
-   "wf" : <H> >- concl1 = concl2 in BTerm -->
-   "wf" : <H> >- bdepth{arg1} = 0 in nat -->
-   "wf" : <H> >- hyp_depths{0; hyps1} -->
-   "wf" : <H> >- bdepth{concl1} = length{hyps1} in nat -->
-   <H> >- "sequent"{arg1; hyps1; concl1} = "sequent"{arg2; hyps2; concl2} in Sequent
+   "wf" : <H> >- 'arg1 = 'arg2 in BTerm -->
+   "wf" : <H> >- 'hyps1 = 'hyps2 in list{BTerm} -->
+   "wf" : <H> >- 'concl1 = 'concl2 in BTerm -->
+   "wf" : <H> >- bdepth{'arg1} = 0 in nat -->
+   "wf" : <H> >- hyp_depths{0; 'hyps1} -->
+   "wf" : <H> >- bdepth{'concl1} = length{'hyps1} in nat -->
+   <H> >- "sequent"{'arg1; 'hyps1; 'concl1} = "sequent"{'arg2; 'hyps2; 'concl2} in Sequent
 >>
 
 (*
  * Elimination, to the three parts.
  *)
 interactive sequent_elim {| elim [] |} 'H : <:xrule<
-   <H>; arg: "BTerm"; hyps: list{"BTerm"}; goal: "BTerm"; squash{is_sequent{"sequent"{arg; hyps; goal}}};
-      <J["sequent"{arg; hyps; goal}]> >- C["sequent"{arg; hyps; goal}] -->
-   <H>; s: "Sequent"; <J[s]> >- C[s]
+   <H>; arg: "BTerm"; hyps: list{"BTerm"}; goal: "BTerm"; squash{is_sequent{"sequent"{'arg; 'hyps; 'goal}}};
+      <J["sequent"{'arg; 'hyps; 'goal}]> >- C["sequent"{'arg; 'hyps; 'goal}] -->
+   <H>; s: "Sequent"; <J['s]> >- C['s]
 >>
 
 interactive sequent_elim2 {| elim [] |} 'H : <:xrule<
-   <H>; arg: "BTerm"; hyps: list{"BTerm"}; goal: "BTerm"; squash{is_sequent{d;"sequent"{arg; hyps; goal}}};
-      <J["sequent"{arg; hyps; goal}]> >- C["sequent"{arg; hyps; goal}] -->
-   <H>; s: "Sequent"{d}; <J[s]> >- C[s]
+   <H>; arg: "BTerm"; hyps: list{"BTerm"}; goal: "BTerm"; squash{is_sequent{'d;"sequent"{'arg; 'hyps; 'goal}}};
+      <J["sequent"{'arg; 'hyps; 'goal}]> >- C["sequent"{'arg; 'hyps; 'goal}] -->
+   <H>; s: "Sequent"{'d}; <J['s]> >- C['s]
 >>
 
 (*
  * An CVar is well-formed over subtypes of BTerm.
  *)
 interactive cvar_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   <H> >- CVar{d} Type
+   "wf" : <H> >- 'd IN "nat" -->
+   <H> >- CVar{'d} Type
 >>
 
 interactive cvar_sqsimple {| intro []; sqsimple |} : <:xrule<
-   "wf" : <H> >- d in nat -->
-   <H> >- sqsimple{CVar{d}}
+   "wf" : <H> >- 'd in nat -->
+   <H> >- sqsimple{CVar{'d}}
 >>
 
 (*
  * Sequent projections.
  *)
 interactive_rw reduce_sequent_arg {| reduce |} : <:xrewrite<
-   sequent_arg{"sequent"{arg; hyps; concl}}
+   sequent_arg{"sequent"{'arg; 'hyps; 'concl}}
    <-->
-   arg
+   'arg
 >>
 
 interactive_rw reduce_sequent_hyps {| reduce |} : <:xrewrite<
-   sequent_hyps{"sequent"{arg; hyps; concl}}
+   sequent_hyps{"sequent"{'arg; 'hyps; 'concl}}
    <-->
-   hyps
+   'hyps
 >>
 
 interactive_rw reduce_sequent_concl {| reduce |} : <:xrewrite<
-   sequent_concl{"sequent"{arg; hyps; concl}}
+   sequent_concl{"sequent"{'arg; 'hyps; 'concl}}
    <-->
-   concl
+   'concl
 >>
 
 interactive_rw reduce_dest_sequent {| reduce |} : <:xrewrite<
-   dest_sequent{"sequent"{arg; hyps; concl}; a, h, c. e[a; h; c]}
+   dest_sequent{"sequent"{'arg; 'hyps; 'concl}; a, h, c. e['a; 'h; 'c]}
    <-->
-   e[arg; hyps; concl]
+   e['arg; 'hyps; 'concl]
 >>
 
 interactive_rw reduce_is_sequent {| reduce |} : <:xrewrite<
-   is_sequent{"sequent"{arg; hyps; concl}}
+   is_sequent{"sequent"{'arg; 'hyps; 'concl}}
    <-->
-   bdepth{arg} = 0 in "nat"
-   && hyp_depths{0; hyps}
-   && bdepth{concl} = length{hyps} +@ 0 in "nat"
+   bdepth{'arg} = 0 in "nat"
+   && hyp_depths{0; 'hyps}
+   && bdepth{'concl} = length{'hyps} +@ 0 in "nat"
 >>
 
 interactive_rw reduce_is_sequent2 {| reduce |} : <:xrewrite<
-   is_sequent{d;"sequent"{arg; hyps; concl}}
+   is_sequent{'d;"sequent"{'arg; 'hyps; 'concl}}
    <-->
-   bdepth{arg} = d in "nat"
-   && hyp_depths{d; hyps}
-   && bdepth{concl} = length{hyps} +@ d in "nat"
+   bdepth{'arg} = 'd in "nat"
+   && hyp_depths{'d; 'hyps}
+   && bdepth{'concl} = length{'hyps} +@ 'd in "nat"
 >>
 
 interactive sequent_arg_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d = 0 in "nat" -->
-   "wf" : <H> >- s IN "Sequent" -->
-   <H> >- sequent_arg{s} IN BTerm{d}
+   "wf" : <H> >- 'd = 0 in "nat" -->
+   "wf" : <H> >- 's IN "Sequent" -->
+   <H> >- sequent_arg{'s} IN BTerm{'d}
 >>
 
 interactive sequent_hyps_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d = 0 in "nat" -->
-   "wf" : <H> >- s IN "Sequent" -->
-   <H> >- sequent_hyps{s} IN CVar{d}
+   "wf" : <H> >- 'd = 0 in "nat" -->
+   "wf" : <H> >- 's IN "Sequent" -->
+   <H> >- sequent_hyps{'s} IN CVar{'d}
 >>
 
 interactive sequent_concl_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d = length{sequent_hyps{s}} in "nat" -->
-   "wf" : <H> >- s IN "Sequent" -->
-   <H> >- sequent_concl{s} IN BTerm{d}
+   "wf" : <H> >- 'd = length{sequent_hyps{'s}} in "nat" -->
+   "wf" : <H> >- 's IN "Sequent" -->
+   <H> >- sequent_concl{'s} IN BTerm{'d}
 >>
 
 (************************************************************************
@@ -358,42 +355,42 @@ doc <:doc<
    Define alpha-equality on sequents.
 >>
 define unfold_beq_sequent : beq_sequent{'seq1; 'seq2} <--> <:xterm<
-   let arg1, hyps1, goal1 = seq1 in
-   let arg2, hyps2, goal2 = seq2 in
-      beq_bterm{arg1; arg2} &&b beq_bterm_list{hyps1; hyps2} &&b beq_bterm{goal1; goal2}
+   let arg1, hyps1, goal1 = 'seq1 in
+   let arg2, hyps2, goal2 = 'seq2 in
+      beq_bterm{'arg1; 'arg2} &&b beq_bterm_list{'hyps1; 'hyps2} &&b beq_bterm{'goal1; 'goal2}
 >>
 
 doc docoff
 
 interactive_rw reduce_beq_sequent_cons {| reduce |} : <:xrewrite<
-   beq_sequent{"sequent"{arg1; hyps1; goal1}; "sequent"{arg2; hyps2; goal2}}
+   beq_sequent{"sequent"{'arg1; 'hyps1; 'goal1}; "sequent"{'arg2; 'hyps2; 'goal2}}
    <-->
-   beq_bterm{arg1; arg2} &&b beq_bterm_list{hyps1; hyps2} &&b beq_bterm{goal1; goal2}
+   beq_bterm{'arg1; 'arg2} &&b beq_bterm_list{'hyps1; 'hyps2} &&b beq_bterm{'goal1; 'goal2}
 >>
 
 interactive beq_sequent_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- s1 IN "Sequent" -->
-   "wf" : <H> >- s2 IN "Sequent" -->
-   <H> >- beq_sequent{s1; s2} IN "bool"
+   "wf" : <H> >- 's1 IN "Sequent" -->
+   "wf" : <H> >- 's2 IN "Sequent" -->
+   <H> >- beq_sequent{'s1; 's2} IN "bool"
 >>
 
 interactive beq_sequent_intro {| intro [] |} : <:xrule<
-   <H> >- s1 = s2 in "Sequent" -->
-   <H> >- "assert"{beq_sequent{s1; s2}}
+   <H> >- 's1 = 's2 in "Sequent" -->
+   <H> >- "assert"{beq_sequent{'s1; 's2}}
 >>
 
 interactive beq_sequent_elim {| elim [] |} 'H : <:xrule<
-   "wf" : <H>; u: "assert"{beq_sequent{s1; s2}}; <J[u]> >- s1 IN "Sequent" -->
-   "wf" : <H>; u: "assert"{beq_sequent{s1; s2}}; <J[u]> >- s2 IN "Sequent" -->
-   <H>; u: s1 = s2 in "Sequent"; <J[u]> >- C[u] -->
-   <H>; u: "assert"{beq_sequent{s1; s2}}; <J[u]> >- C[u]
+   "wf" : <H>; u: "assert"{beq_sequent{'s1; 's2}}; <J['u]> >- 's1 IN "Sequent" -->
+   "wf" : <H>; u: "assert"{beq_sequent{'s1; 's2}}; <J['u]> >- 's2 IN "Sequent" -->
+   <H>; u: 's1 = 's2 in "Sequent"; <J['u]> >- C['u] -->
+   <H>; u: "assert"{beq_sequent{'s1; 's2}}; <J['u]> >- C['u]
 >>
 
 interactive beq_sequent_forward {| forward |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- s1 in Sequent -->
-   "wf" : <H>; <J[it]> >- s2 in Sequent -->
-   <H>; <J[it]>; s1 = s2 in Sequent >- C[it] -->
-   <H>; x: "assert"{beq_sequent{s1; s2}}; <J[x]> >- C[x]
+   "wf" : <H>; <J[it]> >- 's1 in Sequent -->
+   "wf" : <H>; <J[it]> >- 's2 in Sequent -->
+   <H>; <J[it]>; 's1 = 's2 in Sequent >- C[it] -->
+   <H>; x: "assert"{beq_sequent{'s1; 's2}}; <J['x]> >- C['x]
 >>
 
 (*
@@ -443,8 +440,8 @@ interactive beq_sequent_list_elim {| elim [] |} 'H :
  * Sequents with depths.
  *)
 interactive sequent_depth_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   <H> >- Sequent{d} Type
+   "wf" : <H> >- 'd IN "nat" -->
+   <H> >- Sequent{'d} Type
 >>
 
 interactive sequent_depth_elim :
@@ -452,11 +449,11 @@ interactive sequent_depth_elim :
    sequent { <H> >- 'e in Sequent }
 
 interactive sequent_depth_mem {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- arg IN BTerm{d} -->
-   "wf" : <H> >- hyps IN CVar{d} -->
-   "wf" : <H> >- concl IN BTerm{length{hyps} +@ d} -->
-   <H> >- "sequent"{arg; hyps; concl} IN Sequent{d}
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'arg IN BTerm{'d} -->
+   "wf" : <H> >- 'hyps IN CVar{'d} -->
+   "wf" : <H> >- 'concl IN BTerm{length{'hyps} +@ 'd} -->
+   <H> >- "sequent"{'arg; 'hyps; 'concl} IN Sequent{'d}
 >>
 
 (************************************************************************
@@ -466,61 +463,61 @@ doc <:doc<
    Additional well-formedness theorems for the various types.
 >>
 interactive cvar_nil_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   <H> >- [] IN CVar{d}
+   "wf" : <H> >- 'd IN "nat" -->
+   <H> >- [] IN CVar{'d}
 >>
 
 interactive cvar_cons_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- u IN BTerm{d} -->
-   "wf" : <H> >- v IN CVar{d +@ 1} -->
-   <H> >- u::v IN CVar{d}
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'u IN BTerm{'d} -->
+   "wf" : <H> >- 'v IN CVar{'d +@ 1} -->
+   <H> >- 'u::'v IN CVar{'d}
 >>
 
 interactive cvar_cons_eq {| intro [] |} : <:xrule<
-   "wf" : <H> >- d in nat -->
-   "wf" : <H> >- u1 = u2 in BTerm{d} -->
-   "wf" : <H> >- v1 = v2 in CVar{d +@ 1} -->
-   <H> >- (u1::v1) = (u2::v2) in CVar{d}
+   "wf" : <H> >- 'd in nat -->
+   "wf" : <H> >- 'u1 = 'u2 in BTerm{'d} -->
+   "wf" : <H> >- 'v1 = 'v2 in CVar{'d +@ 1} -->
+   <H> >- ('u1::'v1) = ('u2::'v2) in CVar{'d}
 >>
 
 interactive cvar_append_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- d IN "nat" -->
-   "wf" : <H> >- l1 IN CVar{d} -->
-   "wf" : <H> >- l2 IN CVar{d +@ length{l1}} -->
-   <H> >- append{l1; l2} IN CVar{d}
+   "wf" : <H> >- 'd IN "nat" -->
+   "wf" : <H> >- 'l1 IN CVar{'d} -->
+   "wf" : <H> >- 'l2 IN CVar{'d +@ length{'l1}} -->
+   <H> >- append{'l1; 'l2} IN CVar{'d}
 >>
 
 interactive cvar_append_eq {| intro [] |} : <:xrule<
-   "wf" : <H> >- d in nat -->
-   "wf" : <H> >- l1 = l3 in CVar{d} -->
-   "wf" : <H> >- l2 = l4 in CVar{d +@ length{l1}} -->
-   <H> >- append{l1; l2} = append{l3; l4} in CVar{d}
+   "wf" : <H> >- 'd in nat -->
+   "wf" : <H> >- 'l1 = 'l3 in CVar{'d} -->
+   "wf" : <H> >- 'l2 = 'l4 in CVar{'d +@ length{'l1}} -->
+   <H> >- append{'l1; 'l2} = append{'l3; 'l4} in CVar{'d}
 >>
 
 interactive vflatten_cvar_wf 'J1 'J2 : <:xrule<
-   "wf" : <H> >- d in nat -->
+   "wf" : <H> >- 'd in nat -->
    "wf" : <H> >- vlist{| <J1> |} in list{list} -->
    "wf" : <H> >- vlist{| <J2> |} in list{list} -->
-   "wf" : <H> >- vflatten{| <J1> |} = vflatten{| <J2> |} in CVar{d} -->
-   "wf" : <H> >- vflatten{| <K1> |} = vflatten{| <K2> |} in CVar{d +@ length{vflatten{| <J1> |}}} -->
-   <H> >- vflatten{| <J1>; <K1<|H|> > |} = vflatten{| <J2>; <K2<|H|> > |} in CVar{d}
+   "wf" : <H> >- vflatten{| <J1> |} = vflatten{| <J2> |} in CVar{'d} -->
+   "wf" : <H> >- vflatten{| <K1> |} = vflatten{| <K2> |} in CVar{'d +@ length{vflatten{| <J1> |}}} -->
+   <H> >- vflatten{| <J1>; <K1<|H|> > |} = vflatten{| <J2>; <K2<|H|> > |} in CVar{'d}
 >>
 
 interactive cvar_is_list {| intro [intro_typeinf << 'l >>] |} CVar{'n} : <:xrule<
-   "wf" : <H> >- n IN "nat" -->
-   "wf" : <H> >- l IN CVar{n} -->
-   <H> >- l IN "list"
+   "wf" : <H> >- 'n IN "nat" -->
+   "wf" : <H> >- 'l IN CVar{'n} -->
+   <H> >- 'l IN "list"
 >>
 
 interactive cvar_is_bterm_list {| nth_hyp |} 'H : <:xrule<
-   <H>; l: CVar{n}; <J[l]> >- l IN list{BTerm}
+   <H>; l: CVar{'n}; <J['l]> >- 'l IN list{BTerm}
 >>
 
 interactive bterm2_is_bterm {| intro [intro_typeinf << 'e >>] |} BTerm{'n} : <:xrule<
-   "wf" : <H> >- n in nat -->
-   "wf" : <H> >- e in BTerm{n} -->
-   <H> >- e in BTerm
+   "wf" : <H> >- 'n in nat -->
+   "wf" : <H> >- 'e in BTerm{'n} -->
+   <H> >- 'e in BTerm
 >>
 
 (************************************************************************
@@ -530,42 +527,42 @@ doc <:doc<
    Forward-chaining.
 >>
 interactive cvar_forward {| forward [ForwardPrec forward_trivial_prec] |} 'H : <:xrule<
-   "wf" : <H>; x: l in CVar{n}; <J[x]> >- n in nat -->
-   <H>; x: l in CVar{n}; <J[x]>; l in list{BTerm}; hyp_depths{n; l}; length{l} in nat >- C[x] -->
-   <H>; x: l in CVar{n}; <J[x]> >- 'C[x]
+   "wf" : <H>; x: 'l in CVar{'n}; <J['x]> >- 'n in nat -->
+   <H>; x: 'l in CVar{'n}; <J['x]>; 'l in list{BTerm}; hyp_depths{'n; 'l}; length{'l} in nat >- C['x] -->
+   <H>; x: 'l in CVar{'n}; <J['x]> >- C['x]
 >>
 
 interactive cvar_forward2 {| forward [ForwardPrec forward_trivial_prec] |} 'H : <:xrule<
-   "wf" : <H>; l: CVar{n}; <J[l]> >- n in nat -->
-   <H>; l: CVar{n}; <J[l]>; l in list{BTerm}; hyp_depths{n; l}; length{l} in nat >- 'C[l] -->
-   <H>; l: CVar{n}; <J[l]> >- C[l]
+   "wf" : <H>; l: CVar{'n}; <J['l]> >- 'n in nat -->
+   <H>; l: CVar{'n}; <J['l]>; 'l in list{BTerm}; hyp_depths{'n; 'l}; length{'l} in nat >- C['l] -->
+   <H>; l: CVar{'n}; <J['l]> >- C['l]
 >>
 
 interactive append_cvar_elim {| forward [fwd_reduce_type (-1)] |} 'H : <:xrule<
-   "wf" : <H>; <J[it]> >- d in nat -->
-   "wf" : <H>; <J[it]> >- l1 in list{BTerm} -->
-   "wf" : <H>; <J[it]> >- l2 in list{BTerm} -->
-   <H>; <J[it]>; l1 in CVar{d}; l2 in CVar{d +@ length{l1}} >- C[it] -->
-   <H>; x: append{l1; l2} in CVar{d}; <J[x]> >- C[x]
+   "wf" : <H>; <J[it]> >- 'd in nat -->
+   "wf" : <H>; <J[it]> >- 'l1 in list{BTerm} -->
+   "wf" : <H>; <J[it]> >- 'l2 in list{BTerm} -->
+   <H>; <J[it]>; 'l1 in CVar{'d}; 'l2 in CVar{'d +@ length{'l1}} >- C[it] -->
+   <H>; x: append{'l1; 'l2} in CVar{'d}; <J['x]> >- C['x]
 >>
 
 interactive vflatten_cvar_forward1 {| forward [] |} 'H : <:xrule<
-   "wf" : <H>; <K[it]> >- A in list -->
-   <H>; <K[it]>; A in CVar{n} >- C[it] -->
-   <H>; x: vflatten{| A |} in CVar{n}; <K[x]> >- C[x]
+   "wf" : <H>; <K[it]> >- 'A in list -->
+   <H>; <K[it]>; 'A in CVar{'n} >- C[it] -->
+   <H>; x: vflatten{| 'A |} in CVar{'n}; <K['x]> >- C['x]
 >>
 
 interactive vflatten_cvar_forward {| forward [fwd_reduce_type (-1)] |} 'H : <:xrule<
-   "wf" : <H>; <K[it]> >- n in nat -->
-   "wf" : <H>; <K[it]> >- A in list{BTerm} -->
+   "wf" : <H>; <K[it]> >- 'n in nat -->
+   "wf" : <H>; <K[it]> >- 'A in list{BTerm} -->
    "wf" : <H>; <K[it]> >- vflatten{| <J> |} in list{BTerm} -->
-   <H>; <K[it]>; A in CVar{n}; vflatten{| <J> |} in CVar{n +@ length{A}} >- C[it] -->
-   <H>; x: vflatten{| A; <J> |} in CVar{n}; <K[x]> >- C[x]
+   <H>; <K[it]>; 'A in CVar{'n}; vflatten{| <J> |} in CVar{'n +@ length{'A}} >- C[it] -->
+   <H>; x: vflatten{| 'A; <J> |} in CVar{'n}; <K['x]> >- C['x]
 >>
 
 interactive cvar_positive_length {| ge_elim |} 'H : <:xrule<
-   <H>; l: CVar{n}; <J[l]>; length{l} >= 0 >- C[l] -->
-   <H>; l: CVar{n}; <J[l]> >- C[l]
+   <H>; l: CVar{'n}; <J['l]>; length{'l} >= 0 >- C['l] -->
+   <H>; l: CVar{'n}; <J['l]> >- C['l]
 >>
 
 (************************************************************************
@@ -588,6 +585,7 @@ dform beq_sequent_df : parens :: "prec"[prec_equal] :: beq_sequent{'s1; 's2} =
 (*
  * Convert the term back to a sequent for display.
  *)
+(*
 let no_var = Lm_symbol.add "_"
 let sequent_opname = opname_of_term << "sequent"{'arg; 'hyps; 'concl} >>
 
@@ -623,7 +621,6 @@ let format_sequent format_term buf t =
    let t = mk_sequent_term info in
       format_term buf NOParens t
 
-(*
 ml_dform sequent_df : "sequent"{'arg; 'hyps; 'concl} format_term buf =
    format_sequent format_term buf
  *)
@@ -668,13 +665,13 @@ let resource intro +=
  * Depth reductions.
  *)
 interactive_rw reduce_bdepth_context_nth 'n : <:xrewrite<
-   n in nat -->
-   i in nat -->
-   l in CVar{n} -->
-   i < length{l} -->
-   bdepth{nth{l; i}}
+   'n in nat -->
+   'i in nat -->
+   'l in CVar{'n} -->
+   'i < length{'l} -->
+   bdepth{nth{'l; 'i}}
    <-->
-   n +@ i
+   'n +@ 'i
 >>
 
 let reduce_bdepth_context_nthC = funC (fun e ->
@@ -695,7 +692,7 @@ let reduce_bdepth_context_nthC = funC (fun e ->
             raise (RefineError ("reduce_bdepth_context_nthC", StringTermError ("not a bdepth term", t))))
 
 let resource reduce +=
-   [<:xterm< bdepth{nth{l; i}} >>, wrap_reduce reduce_bdepth_context_nthC]
+   [<:xterm< bdepth{nth{'l; 'i}} >>, wrap_reduce reduce_bdepth_context_nthC]
 
 
 let elim_reduce = wrap_elim_auto_ok (fun i -> rw (addrC [Subterm 1] reduceC) i)

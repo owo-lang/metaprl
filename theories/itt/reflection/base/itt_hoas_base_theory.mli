@@ -35,7 +35,7 @@ declare default_extract
  * Define the axiom rule for meta-typing.
  *)
 rule meta_axiom 'H : <:xrule<
-   meta_type{| <H>; x: T; <J[x]> >- meta_member{x; T} |}
+   meta_type{| <H>; x: 'T; <J['x]> >- meta_member{'x; 'T} |}
 >>
 
 (*

@@ -30,7 +30,7 @@ extends Itt_hoas_theory
  * Define the axiom rule for meta-typing.
  *)
 prim meta_axiom 'H : <:xrule<
-   meta_type{| <H>; x: T; <J[x]> >- meta_member{x; T} |}
+   meta_type{| <H>; x: 'T; <J['x]> >- meta_member{'x; 'T} |}
 >>
 
 (*

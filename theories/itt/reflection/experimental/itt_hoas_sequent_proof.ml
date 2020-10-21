@@ -41,28 +41,20 @@ doc docoff
 
 open Lm_num
 open Lm_debug
-open Lm_printf
 open Lm_int_set
 open Basic_tactics
-open Simple_print
 open Itt_list
 open Itt_bool
-open Itt_dfun
-open Itt_dprod
 open Itt_logic
 open Itt_struct
 open Itt_int_base
-open Itt_hoas_base
-open Itt_hoas_vbind
-open Itt_hoas_vector
 open Itt_hoas_proof
-open Itt_hoas_sequent
 open Itt_hoas_sequent_term
 open Itt_hoas_sequent_proof_step
 open Itt_hoas_normalize
 open Itt_hoas_bterm_wf
 
-let debug_sequent_proof =
+let _debug_sequent_proof =
    create_debug (**)
       { debug_name = "sequent_proof1";
         debug_description = "debug Itt_hoas_sequent_proof tactics";
@@ -73,15 +65,15 @@ doc <:doc<
    Provability in a sequent logic.
 >>
 define unfold_Provable_sequent : ProvableSequent{'logic; 'seq} <--> <:xterm<
-   (seq in BSequent) && Provable{logic; seq}
+   ('seq in BSequent) && Provable{'logic; 'seq}
 >>
 
 define unfold_IsJudgment : IsJudgment{'logic; 'seq} <--> <:xterm<
-   ProvableSequent{logic; $`meta_type{| >- meta_member{seq; Judgment{}} |}}
+   ProvableSequent{'logic; $`meta_type{| >- meta_member{'seq; Judgment{}} |}}
 >>
 
 define unfold_ProvableJudgment : ProvableJudgment{'logic; 'seq} <--> <:xterm<
-   ProvableSequent{logic; seq} && IsJudgment{logic; seq}
+   ProvableSequent{'logic; 'seq} && IsJudgment{'logic; 'seq}
 >>
 
 (************************************************************************
@@ -91,28 +83,28 @@ doc <:doc<
    Well-formedness.
 >>
 interactive provable_sequent_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- seq in BSequent -->
-   <H> >- ProvableSequent{logic; seq} Type
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'seq in BSequent -->
+   <H> >- ProvableSequent{'logic; 'seq} Type
 >>
 
 interactive provable_sequent_all_list {| intro [] |} : <:xrule<
    "wf" : <H> >- 'l in list -->
    "wf" : <H> >- all_list{'l; x. ('x in BSequent)} -->
-   <H> >- all_list{'l; x. Provable{logic; 'x}} -->
-   <H> >- all_list{'l; x. ProvableSequent{logic; 'x}}
+   <H> >- all_list{'l; x. Provable{'logic; 'x}} -->
+   <H> >- all_list{'l; x. ProvableSequent{'logic; 'x}}
 >>
 
 interactive is_judgment_wf {| intro |} : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- seq in BSequent -->
-   <H> >- IsJudgment{logic; seq} Type
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'seq in BSequent -->
+   <H> >- IsJudgment{'logic; 'seq} Type
 >>
 
 interactive provable_judgment_wf {| intro [] |} : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- seq in BSequent -->
-   <H> >- ProvableJudgment{logic; seq} Type
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'seq in BSequent -->
+   <H> >- ProvableJudgment{'logic; 'seq} Type
 >>
 
 (************************************************************************
@@ -124,54 +116,54 @@ doc <:doc<
    eagerly.  However, it should be easy to do so.
 >>
 interactive provable_sequent_intro0 {| intro [] |} : <:xrule<
-   "wf" : <H> >- seq in BSequent -->
-   <H> >- Provable{logic; seq} -->
-   <H> >- ProvableSequent{logic; seq}
+   "wf" : <H> >- 'seq in BSequent -->
+   <H> >- Provable{'logic; 'seq} -->
+   <H> >- ProvableSequent{'logic; 'seq}
 >>
 
 interactive provable_sequent_intro 'premises : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- premises in list{BSequent} -->
-   "wf" : <H> >- goal in BSequent -->
-   "aux" : <H> >- all_list{premises; premise. ProvableSequent{logic; premise}} -->
-   <H> >- exists witness: ProofStepWitness. SimpleStep{premises; goal; witness; logic} -->
-   <H> >- ProvableSequent{logic; goal}
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'premises in list{BSequent} -->
+   "wf" : <H> >- 'goal in BSequent -->
+   "aux" : <H> >- all_list{'premises; premise. ProvableSequent{'logic; 'premise}} -->
+   <H> >- exists witness: ProofStepWitness. SimpleStep{'premises; 'goal; 'witness; 'logic} -->
+   <H> >- ProvableSequent{'logic; 'goal}
 >>
 
 doc <:doc<
    Use an explicit rule to decompose the << SimpleStep{'premises; 'goal; 'witness; 'logic} >>.
 >>
 interactive simple_step_intro 'step : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- premises in list{BSequent} -->
-   "wf" : <H> >- goal in BSequent -->
-   "wf" : <H> >- step in ProofRule -->
-   "wf" : <H> >- MemLogic{step; logic} -->
-   <H> >- exists witness: ProofStepWitness. "assert"{step (proof_step{premises; goal}, witness)} -->
-   <H> >- exists witness: ProofStepWitness. SimpleStep{premises; goal; witness; logic}
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'premises in list{BSequent} -->
+   "wf" : <H> >- 'goal in BSequent -->
+   "wf" : <H> >- 'step in ProofRule -->
+   "wf" : <H> >- MemLogic{'step; 'logic} -->
+   <H> >- exists witness: ProofStepWitness. "assert"{'step (proof_step{'premises; 'goal}, 'witness)} -->
+   <H> >- exists witness: ProofStepWitness. SimpleStep{'premises; 'goal; 'witness; 'logic}
 >>
 
 doc <:doc<
    Use a sublogic to prove << SimpleStep{'premises; 'goal; 'witness; 'logic} >>.
 >>
 interactive simple_step_intro0 'step : <:xrule<
-   "wf" : <H> >- logic in Logic -->
-   "wf" : <H> >- premises in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   "wf" : <H> >- step in ProofRule -->
-   "wf" : <H> >- MemLogic{step; logic} -->
-   <H> >- exists witness: ProofStepWitness. "assert"{step (proof_step{premises; goal}, witness)} -->
-   <H> >- exists witness: ProofStepWitness. SimpleStep{premises; goal; witness; logic}
+   "wf" : <H> >- 'logic in Logic -->
+   "wf" : <H> >- 'premises in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   "wf" : <H> >- 'step in ProofRule -->
+   "wf" : <H> >- MemLogic{'step; 'logic} -->
+   <H> >- exists witness: ProofStepWitness. "assert"{'step (proof_step{'premises; 'goal}, 'witness)} -->
+   <H> >- exists witness: ProofStepWitness. SimpleStep{'premises; 'goal; 'witness; 'logic}
 >>
 
 interactive simple_step_sublogic 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   "wf" : <H> >- premises in list{BTerm} -->
-   "wf" : <H> >- goal in BTerm -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- exists witness: ProofStepWitness. SimpleStep{premises; goal; witness; logic1} -->
-   <H> >- exists witness: ProofStepWitness. SimpleStep{premises; goal; witness; logic2}
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   "wf" : <H> >- 'premises in list{BTerm} -->
+   "wf" : <H> >- 'goal in BTerm -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- exists witness: ProofStepWitness. SimpleStep{'premises; 'goal; 'witness; 'logic1} -->
+   <H> >- exists witness: ProofStepWitness. SimpleStep{'premises; 'goal; 'witness; 'logic2}
 >>
 
 (************************************************************************
@@ -181,8 +173,8 @@ doc <:doc<
    Forward-chaining rules, mainly for well-formedness reasoning.
 >>
 interactive provable_forward 'H : <:xrule<
-   <H>; ProvableSequent{logic; seq}; <J>; seq in BSequent >- C -->
-   <H>; ProvableSequent{logic; seq}; <J> >- C
+   <H>; ProvableSequent{'logic; 'seq}; <J>; 'seq in BSequent >- 'C -->
+   <H>; ProvableSequent{'logic; 'seq}; <J> >- 'C
 >>
 doc docoff
 
@@ -194,13 +186,13 @@ let provable_forwardT i =
 doc docon
 
 interactive provable_forward0 'H : <:xrule<
-   <H>; Provable{logic; seq}; <J>; seq in BTerm >- C -->
-   <H>; Provable{logic; seq}; <J> >- C
+   <H>; Provable{'logic; 'seq}; <J>; 'seq in BTerm >- 'C -->
+   <H>; Provable{'logic; 'seq}; <J> >- 'C
 >>
 
 interactive provable_judgment_forward {| forward |} 'H : <:xrule<
-   <H>; ProvableJudgment{logic; seq}; <J>; ProvableSequent{logic; seq}; IsJudgment{logic; seq} >- C -->
-   <H>; ProvableJudgment{logic; seq}; <J> >- C
+   <H>; ProvableJudgment{'logic; 'seq}; <J>; ProvableSequent{'logic; 'seq}; IsJudgment{'logic; 'seq} >- 'C -->
+   <H>; ProvableJudgment{'logic; 'seq}; <J> >- 'C
 >>
 
 (************************************************************************
@@ -277,7 +269,8 @@ and socvars_context_info info t =
 
 and socvars_sequent_info info t =
    let { sequent_hyps = hyps;
-         sequent_concl = concl
+         sequent_concl = concl;
+         _
        } = explode_sequent t
    in
    let info =
@@ -513,27 +506,27 @@ let provableRuleT t unfold =
  * Some properties of SubLogic.
  *)
 interactive provable_sequent_sub 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- ProvableSequent{logic1; seq} -->
-   <H> >- ProvableSequent{logic2; seq}
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- ProvableSequent{'logic1; 'seq} -->
+   <H> >- ProvableSequent{'logic2; 'seq}
 >>
 
 interactive is_judgment_sub 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- IsJudgment{logic1; seq} -->
-   <H> >- IsJudgment{logic2; seq}
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- IsJudgment{'logic1; 'seq} -->
+   <H> >- IsJudgment{'logic2; 'seq}
 >>
 
 interactive provable_judgment_sub 'logic1 : <:xrule<
-   "wf" : <H> >- logic1 in Logic -->
-   "wf" : <H> >- logic2 in Logic -->
-   <H> >- SubLogic{logic1; logic2} -->
-   <H> >- ProvableJudgment{logic1; seq} -->
-   <H> >- ProvableJudgment{logic2; seq}
+   "wf" : <H> >- 'logic1 in Logic -->
+   "wf" : <H> >- 'logic2 in Logic -->
+   <H> >- SubLogic{'logic1; 'logic2} -->
+   <H> >- ProvableJudgment{'logic1; 'seq} -->
+   <H> >- ProvableJudgment{'logic2; 'seq}
 >>
 
 (************************************************************************
