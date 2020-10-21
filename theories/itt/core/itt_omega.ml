@@ -907,8 +907,7 @@ struct
          Lm_array_util.for_all2 Ring.equal a1 a2
 
       (*
-       * XXX: BUG: This isn't quite right, because Lm_num has multiple
-       * representations for the same number.
+       * Since Lm.num has adopted hash safe Zarith, this should work fine.
        *)
 		let hash = Hashtbl.hash
 	end
