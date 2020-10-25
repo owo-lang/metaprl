@@ -1001,7 +1001,7 @@ B	b7609	t7609
 P	p1564	Number 1360
 P	p1722	Number 1446
 P	p1791	Number 1508
-P	p2530	String Pervasives
+P	p2530	String Stdlib
 O	o2531	uid p2530
 T	t2540	o2531
 B	b2540	t2540

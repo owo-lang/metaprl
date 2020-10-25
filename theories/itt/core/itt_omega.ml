@@ -115,7 +115,7 @@ end
 module VarType =
 struct
    type t=int
-   let compare (a: int) b = Pervasives.compare a b
+   let compare (a: int) b = Stdlib.compare a b
 
    let print out v =
       if v>0 then fprintf out "v%i" v

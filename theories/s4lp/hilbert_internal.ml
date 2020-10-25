@@ -22,36 +22,36 @@ struct
       iter (fun i -> Lm_printf.fprintf out "%a " O.print i) set;
       Lm_printf.fprintf out "}"
 
-	exception Found of O.t
+  exception Found of O.t
 
-	let find set i =
-		try 
-			iter
-				(fun i0 -> if O.compare i i0 = 0 then raise (Found i0))
-				set;
-			raise Not_found
-		with Found i1 -> i1
+  let find set i =
+    try
+      iter
+        (fun i0 -> if O.compare i i0 = 0 then raise (Found i0))
+        set;
+      raise Not_found
+    with Found i1 -> i1
 
-	exception Success
+  exception Success
 
-	let query f set =
-		let result = ref None in
+  let query f set =
+    let result = ref None in
       try
          iter
-            (fun i -> 
-					match f i with
-						Some x ->
-							result := Some x;
-							raise Success
-					 | None ->
-					 		()
-				)
+            (fun i ->
+          match f i with
+            Some x ->
+              result := Some x;
+              raise Success
+           | None ->
+              ()
+        )
             set;
          raise Not_found
       with Success ->
-			match !result with
-				Some r -> r
-			 | None -> raise Not_found
+      match !result with
+        Some r -> r
+       | None -> raise Not_found
 
 end
 
@@ -122,8 +122,8 @@ struct
    let merge s i1 i2 =
       let rec phase2 i1part = function
          [] ->
-				Lm_printf.printf "families: %a\nreps: %a %a\n" print s O.print i1 O.print i2;
-				raise Not_found
+        Lm_printf.printf "families: %a\nreps: %a %a\n" print s O.print i1 O.print i2;
+        raise Not_found
        | h::t ->
             if Set.mem h i2 then
                let new_part = Set.union i1part h in
@@ -176,8 +176,8 @@ struct
 
    let exact_compare p1 p2 =
       match p1, p2 with
-         Principal i1, Principal i2 -> Pervasives.compare i1 i2
-       | NonPrincipal i1, NonPrincipal i2 -> Pervasives.compare i1 i2
+         Principal i1, Principal i2 -> Stdlib.compare i1 i2
+       | NonPrincipal i1, NonPrincipal i2 -> Stdlib.compare i1 i2
        | Principal i1, NonPrincipal i2 when i1 = i2 -> raise (Collision i1)
        | NonPrincipal i1, Principal i2 when i1 = i2 -> raise (Collision i1)
        | Principal i1, NonPrincipal i2 -> 1
@@ -235,36 +235,36 @@ end
 
 module LP =
 struct
-	type proof_term =
-		Var of symbol
-	 | Const of int
-	 | App of proof_term * proof_term
-	 | Plus of proof_term * proof_term
-	 | Check of proof_term
-	 | Provisional of int
-	 | PropTaut of formula
+  type proof_term =
+    Var of symbol
+   | Const of int
+   | App of proof_term * proof_term
+   | Plus of proof_term * proof_term
+   | Check of proof_term
+   | Provisional of int
+   | PropTaut of formula
 
-	and agent = Modal of int | Evidence of int
+  and agent = Modal of int | Evidence of int
 
-	and formula =
-		Falsum
-	 |	Atom of symbol
-	 | And of formula * formula
-	 | Or of formula * formula
-	 | Neg of formula
-	 | Implies of formula * formula
-	 | Box of agent * formula
-	 | Pr of proof_term * formula
+  and formula =
+    Falsum
+   |	Atom of symbol
+   | And of formula * formula
+   | Or of formula * formula
+   | Neg of formula
+   | Implies of formula * formula
+   | Box of agent * formula
+   | Pr of proof_term * formula
 
-	type 'formula hilbert =
-		Axiom of int
-	 | MP of 'formula * 'formula hilbert * 'formula hilbert
-	 | Choice of 'formula hilbert * 'formula hilbert
-	 | Hyp of int
-	 | ConstSpec
-	 | Nec of int * 'formula hilbert
+  type 'formula hilbert =
+    Axiom of int
+   | MP of 'formula * 'formula hilbert * 'formula hilbert
+   | Choice of 'formula hilbert * 'formula hilbert
+   | Hyp of int
+   | ConstSpec
+   | Nec of int * 'formula hilbert
 
-	let weaker_or_equal a b =
+  let weaker_or_equal a b =
    match a with
       Box(Modal af, _) ->
          begin match b with
@@ -313,7 +313,7 @@ struct
    and subst_provisionals_in_formula subst (f: formula) =
       match f with
          Falsum | Atom _ -> f
-       | And(a,b) -> 
+       | And(a,b) ->
             And(
                subst_provisionals_in_formula subst a,
                subst_provisionals_in_formula subst b
@@ -353,8 +353,8 @@ struct
             subst_provisionals_in_hilbert subst pr2
          )
     | Hyp _ | ConstSpec -> pr
-	 | Nec(i,pr) ->
-	 		Nec(i, subst_provisionals_in_hilbert subst pr)
+   | Nec(i,pr) ->
+      Nec(i, subst_provisionals_in_hilbert subst pr)
 
    let rec print_formula out = function
       Falsum -> fprintf out "Falsum"
@@ -385,7 +385,7 @@ struct
     | Choice(p1,p2) -> fprintf out "(%a|%a)" print_hproof p1 print_hproof p2
     | Hyp i -> fprintf out "H%i" i
     | ConstSpec -> fprintf out "CS"
-	 | Nec(i,p) -> fprintf out "Nec(%i,%a)" i print_hproof p
+   | Nec(i,p) -> fprintf out "Nec(%i,%a)" i print_hproof p
 end
 
 exception Not_implemented
@@ -400,7 +400,7 @@ type t = formula
 let fam_cmp f1 f2 =
    match f1, f2 with
       Evidence _, Evidence _ ->
-         0 (* why 0, not Pervasives.compare ? 
+         0 (* why 0, not Stdlib.compare ?
             * because these are two provisionals for the same formula
             *)
     | Evidence _, Modal _ ->
@@ -408,14 +408,14 @@ let fam_cmp f1 f2 =
     | Modal _, Evidence _ ->
          1
     | Modal i1, Modal i2 ->
-         Pervasives.compare i1 i2
+         Stdlib.compare i1 i2
 
 let rec compare_pterm t1 t2 =
    match t1, t2 with
       Var v1, Var v2 -> Lm_symbol.compare v1 v2
     | Var _, (Const _ | App _ | Plus _ | Check _ | Provisional _ | PropTaut _) -> -1
     | Const _, Var _ -> 1
-    | Const c1, Const c2 -> Pervasives.compare c1 c2
+    | Const c1, Const c2 -> Stdlib.compare c1 c2
     | Const _, (App _ | Plus _ | Check _ | Provisional _ | PropTaut _) -> -1
     | App _, (Var _ | Const _) -> 1
     | App(t11, t12), App(t21, t22) ->
@@ -435,22 +435,22 @@ let rec compare_pterm t1 t2 =
     | Plus _, (Check _ | Provisional _ | PropTaut _) -> -1
     | Check _, (Var _ | Const _ | App _ | Plus _) -> 1
     | Check t1, Check t2 -> compare_pterm t1 t2
-	 | Check _, (Provisional _ | PropTaut _) -> -1
-	 | Provisional _, (Var _ | Const _ | App _ | Plus _ | Check _) ->
-	 		raise (Invalid_argument
-			"Equal formulas were prefixed with provisional term and something else")
-	 | Provisional i, Provisional j ->
-	 		let c = Pervasives.compare i j in
-			if c = 0 then
-				0
-			else
-		 		raise (Invalid_argument
-				"compare_pterm: Equal formulas were prefixed with different provisional terms")
-	 | Provisional _, PropTaut _ ->
+   | Check _, (Provisional _ | PropTaut _) -> -1
+   | Provisional _, (Var _ | Const _ | App _ | Plus _ | Check _) ->
+      raise (Invalid_argument
+      "Equal formulas were prefixed with provisional term and something else")
+   | Provisional i, Provisional j ->
+      let c = Stdlib.compare i j in
+      if c = 0 then
+        0
+      else
+        raise (Invalid_argument
+        "compare_pterm: Equal formulas were prefixed with different provisional terms")
+   | Provisional _, PropTaut _ ->
          raise (Invalid_argument
          "Equal formulas were prefixed with provisional term and something else")
-	 | PropTaut _, (Var _ | Const _ | App _ | Plus _ | Check _ | Provisional _) -> 1
-	 | PropTaut _, PropTaut _ -> 0
+   | PropTaut _, (Var _ | Const _ | App _ | Plus _ | Check _ | Provisional _) -> 1
+   | PropTaut _, PropTaut _ -> 0
 
 let rec compare f1 f2 =
    match f1, f2 with
@@ -523,7 +523,7 @@ struct
             end
       )
 
-   let print printer out map = 
+   let print printer out map =
       iter
          (fun k d ->
             Lm_printf.fprintf out "%a : %a\n" print_formula k printer d
@@ -533,14 +533,14 @@ end
 
 (*
 let rec pt2term = function
-	Var s -> mk_var_term s
+  Var s -> mk_var_term s
  | Const i -> mk_const_term i
  | App(s,t) -> mk_app_term (pt2term s) (pt2term t)
  | Plus(s,t) -> mk_union_term (pt2term s) (pt2term t)
  | Check t -> mk_check_term (pt2term t)
 
 let rec fml2term = function
-	Atom s -> mk_var_term s
+  Atom s -> mk_var_term s
  | And(s,t) -> mk_and_term(fml2term s) (fml2term t)
  | Or(s,t) -> mk_or_term(fml2term s) (fml2term t)
  | Implies(s,t) -> mk_implies_term(fml2term s) (fml2term t)
@@ -551,22 +551,22 @@ let rec fml2term = function
 exception Not_axiom
 
 let prop_axiom_index = function
-	Implies(a1,Implies(b,a2)) when a1=a2 -> 1
+  Implies(a1,Implies(b,a2)) when a1=a2 -> 1
  | Implies(Implies(a1,Implies(b1,c1)),Implies(Implies(a2,b2),Implies(a3,c2)))
- 	when a1=a2 & a1=a3 & b1=b2 & c1=c2 -> 2
+  when a1=a2 & a1=a3 & b1=b2 & c1=c2 -> 2
  | Implies(And(a1,b),a2) when a1=a2 -> 3
  | Implies(And(a,b1),b2) when b1=b2 -> 4
  | Implies(a1,Implies(b1,And(a2,b2))) when a1=a2 & b1=b2 -> 5
  | Implies(a1,Or(a2,b)) when a1=a2 -> 6
  | Implies(b1,Or(a,b2)) when b1=b2 -> 7
  | Implies(Implies(a1,c1),Implies(Implies(b1,c2),Implies(Or(a2,b2),c3)))
- 	when a1=a2 & b1=b2 & c1=c2 & c1=c3 -> 8
+  when a1=a2 & b1=b2 & c1=c2 & c1=c3 -> 8
  | Implies(Implies(a1,b1),Implies(Implies(a2,Neg(b2)),Neg(a3)))
- 	when a1=a2 & a1=a3 & b1=b2 -> 9
+  when a1=a2 & a1=a3 & b1=b2 -> 9
  | Implies(a1,Implies(Neg(a2),b)) when a1=a2 -> 10
  | Or(a1,Neg(a2)) when a1=a2 -> 11
  | Implies(Pr(s1,Implies(a1,b1)),Implies(Pr(t1,a2),Pr(App(s2,t2),b2)))
- 	when a1=a2 & b1=b2 & s1=s2 & t1=t2 -> 12
+  when a1=a2 & b1=b2 & s1=s2 & t1=t2 -> 12
  | Implies(Pr(t,a1),a2) when a1=a2 -> 13
  | Implies(Pr(t1,a1),Pr(Check(t2),Pr(t3,a2))) when a1=a2 & t1=t2 & t1=t3 -> 14
  | Implies(Pr(t1,a1),Pr(Plus(s,t2),a2)) when t1=t2 & a1=a2 -> 15
@@ -581,59 +581,59 @@ let prop_axiom_count = 20
 
 let axiom_index = function
  | Pr(Const(i),a) ->
- 		if i > 0 then
-	 		let ai = prop_axiom_index a in
-			if i = ai then
-				prop_axiom_count + i
-			else
-				0
-		else
-			0
+    if i > 0 then
+      let ai = prop_axiom_index a in
+      if i = ai then
+        prop_axiom_count + i
+      else
+        0
+    else
+      0
  | f -> prop_axiom_index f
 
 let axiom f = Axiom(axiom_index f)
 
 let rec check_proof_hidden hyps d f hidden =
-	match d with
-	 | Axiom(i) ->
-			(i > 0) && (axiom_index f = i), hidden
-	 | MP(a,d1,d2) ->
-	 		let check1, hidden1 = check_proof_hidden hyps d1 a hidden in
+  match d with
+   | Axiom(i) ->
+      (i > 0) && (axiom_index f = i), hidden
+   | MP(a,d1,d2) ->
+      let check1, hidden1 = check_proof_hidden hyps d1 a hidden in
          if check1 then
             check_proof_hidden hyps d2 (Implies(a,f)) hidden1
          else
             false, FSet.empty
-	 | Choice(d1,d2) ->
-	 		let check1, hidden1 = check_proof_hidden hyps d1 f hidden in
+   | Choice(d1,d2) ->
+      let check1, hidden1 = check_proof_hidden hyps d1 f hidden in
          if check1 then
             true, hidden1
          else check_proof_hidden hyps d2 f hidden
-	 | Hyp i ->
-	 		if(i < List.length hyps) then
-		 		List.nth hyps i = f, hidden
-			else
-				false, hidden
-	 | ConstSpec ->
-	 		begin match f with
-				Pr(PropTaut(f1), f2) when compare f1 f2 = 0 ->
+   | Hyp i ->
+      if(i < List.length hyps) then
+        List.nth hyps i = f, hidden
+      else
+        false, hidden
+   | ConstSpec ->
+      begin match f with
+        Pr(PropTaut(f1), f2) when compare f1 f2 = 0 ->
                true, FSet.add hidden f2
-			 | _ ->
-			 		false, FSet.empty
-			end
-	 | Nec(i,d1) ->
-	 		begin match f with
-				Box(Modal i1, f1) when i=i1 & (hyps=[] || prop_axiom_index f1 > 0) ->
-					check_proof_hidden hyps d1 f1 hidden
-			 | _ ->
-			 		false, FSet.empty
-			end
+       | _ ->
+          false, FSet.empty
+      end
+   | Nec(i,d1) ->
+      begin match f with
+        Box(Modal i1, f1) when i=i1 & (hyps=[] || prop_axiom_index f1 > 0) ->
+          check_proof_hidden hyps d1 f1 hidden
+       | _ ->
+          false, FSet.empty
+      end
 
 let check_proof hyps d f =
    let check, _ = check_proof_hidden hyps d f FSet.empty in
    check
 
 exception Unliftable
-exception Not_proof of formula hilbert * formula 
+exception Not_proof of formula hilbert * formula
 
 let pt t = Var(add t)
 let pT = pt "t"
@@ -646,55 +646,55 @@ let atomC = atom "c"
 
 (* from proofs of s:a->b and t:a build a proof of s*t:b *)
 let appProof hyps s b s_ab_proof t a t_a_proof =
-	assert(check_proof hyps s_ab_proof (Pr(s,Implies(a,b))));
-	assert(check_proof hyps t_a_proof (Pr(t,a)));
-	let pr_s_ab = Pr(s,Implies(a,b)) in
-	let st = App(s,t) in
-	let st_b_proof = MP(
-		Pr(t,a),
-		t_a_proof,
-		MP(
-			pr_s_ab,
-			s_ab_proof,
-			axiom (Implies(Pr(pS,Implies(atomA,atomB)),Implies(Pr(pT,atomA),Pr(App(pS,pT),atomB))))
-		)
-	) in
-	assert(check_proof hyps st_b_proof (Pr(st,b)));
-	st_b_proof, st
+  assert(check_proof hyps s_ab_proof (Pr(s,Implies(a,b))));
+  assert(check_proof hyps t_a_proof (Pr(t,a)));
+  let pr_s_ab = Pr(s,Implies(a,b)) in
+  let st = App(s,t) in
+  let st_b_proof = MP(
+    Pr(t,a),
+    t_a_proof,
+    MP(
+      pr_s_ab,
+      s_ab_proof,
+      axiom (Implies(Pr(pS,Implies(atomA,atomB)),Implies(Pr(pT,atomA),Pr(App(pS,pT),atomB))))
+    )
+  ) in
+  assert(check_proof hyps st_b_proof (Pr(st,b)));
+  st_b_proof, st
 
 let rec lift hyps d f =
-	assert(check_proof hyps d f);
-	let checkAxiom = axiom (Implies(Pr(pT,atomS),Pr(Check(pT),Pr(pT,atomS)))) in
-	match d, f with
-	 | Axiom i, Pr(t,a) ->
-	 		if i > 0 && axiom_index f = i then
-		 		MP(f,d,checkAxiom),
-				Check(t)
-			else
-				raise (Not_proof(d, f))
-	 | Axiom i, _ -> (* propositional axiom *)
-	 		if i > 0 && prop_axiom_index f = i then
-				axiom (Pr(Const(i),f)),
-				Const(i)
-			else
-				raise (Not_proof(d,f))
-	 | Hyp i, Pr(t,a) when f = List.nth hyps i ->
-				MP(f,d,checkAxiom),
-				Check(t)
+  assert(check_proof hyps d f);
+  let checkAxiom = axiom (Implies(Pr(pT,atomS),Pr(Check(pT),Pr(pT,atomS)))) in
+  match d, f with
+   | Axiom i, Pr(t,a) ->
+      if i > 0 && axiom_index f = i then
+        MP(f,d,checkAxiom),
+        Check(t)
+      else
+        raise (Not_proof(d, f))
+   | Axiom i, _ -> (* propositional axiom *)
+      if i > 0 && prop_axiom_index f = i then
+        axiom (Pr(Const(i),f)),
+        Const(i)
+      else
+        raise (Not_proof(d,f))
+   | Hyp i, Pr(t,a) when f = List.nth hyps i ->
+        MP(f,d,checkAxiom),
+        Check(t)
 (*	 | Hyp i, Box(Modal i ,a) when f = List.nth hyps i ->
-	 			MP(
-				*)
-	 | Hyp i, _ ->
-	 			Lm_printf.printf "hyps:";
-				List.iter (Lm_printf.printf "%a " print_formula) hyps;
-				Lm_printf.printf "\nHyp %i\n" i;
-				Lm_printf.printf "f:%a\n" print_formula f;
-				raise Unliftable
-	 | ConstSpec, Pr(PropTaut(f1) as t, f2) when compare f1 f2 = 0 ->
-			MP(f,d,checkAxiom),
-			Check(t)
-	 | ConstSpec, _ ->
-	 		raise (Invalid_argument "lift: PropTaut used to prove a wrong formula")
+        MP(
+        *)
+   | Hyp i, _ ->
+        Lm_printf.printf "hyps:";
+        List.iter (Lm_printf.printf "%a " print_formula) hyps;
+        Lm_printf.printf "\nHyp %i\n" i;
+        Lm_printf.printf "f:%a\n" print_formula f;
+        raise Unliftable
+   | ConstSpec, Pr(PropTaut(f1) as t, f2) when compare f1 f2 = 0 ->
+      MP(f,d,checkAxiom),
+      Check(t)
+   | ConstSpec, _ ->
+      raise (Invalid_argument "lift: PropTaut used to prove a wrong formula")
     | _, Pr(t, a) ->
          let proof0 = checkAxiom in (* t:a->!t:t:a *)
          MP(f,d,proof0),
@@ -708,97 +708,97 @@ let rec lift hyps d f =
     | MP(a,d1,d2), _ ->
          let ld1, a_pt = lift hyps d1 a in
          let ld2, af_pt = lift hyps d2 (Implies(a,f)) in
-			appProof hyps af_pt f ld2 a_pt a ld1
-	 | Nec(i,d1), Box(Modal i1, f1) when i=i1 ->
-	 		let ld1, f1_pt = lift hyps d1 f1 in
-			let pr_f1 = Pr(f1_pt, f1) in
-			let lld1, check_f1_pt = lift hyps ld1 pr_f1 in
-			let concl = f in (*Box(Modal i, f1)*)
-			let connection = Implies(pr_f1,concl) in
-			let ai = axiom_index connection in
-			let pr_conn_proof = Axiom ai in
-			let lconn, conn_pt = lift hyps pr_conn_proof connection in
-			appProof hyps (Const ai) concl lconn check_f1_pt pr_f1 lld1
-	 | Nec(_,_), _ ->
-	 		raise (Invalid_argument "lift: Nec used to prove a wrong formula")
+      appProof hyps af_pt f ld2 a_pt a ld1
+   | Nec(i,d1), Box(Modal i1, f1) when i=i1 ->
+      let ld1, f1_pt = lift hyps d1 f1 in
+      let pr_f1 = Pr(f1_pt, f1) in
+      let lld1, check_f1_pt = lift hyps ld1 pr_f1 in
+      let concl = f in (*Box(Modal i, f1)*)
+      let connection = Implies(pr_f1,concl) in
+      let ai = axiom_index connection in
+      let pr_conn_proof = Axiom ai in
+      let lconn, conn_pt = lift hyps pr_conn_proof connection in
+      appProof hyps (Const ai) concl lconn check_f1_pt pr_f1 lld1
+   | Nec(_,_), _ ->
+      raise (Invalid_argument "lift: Nec used to prove a wrong formula")
 
 
 let rec deduction h hyps d f =
    (*Lm_printf.printf "deduction: h=%a hyps=%a f=%a\n" print_formula h (fun out l -> List.iter (Lm_printf.fprintf out "%a " print_formula) l) hyps print_formula f;*)
    assert (check_proof (h::hyps) d f);
-	let proof =
-	match d with
-		Choice(d1,d2) ->
-			begin try
-				deduction h hyps d1 f
-			with Not_proof _ ->
-				deduction h hyps d2 f
-			end
-	 | Axiom i when i > 0 && axiom_index f = i ->
-	 		MP(f,Axiom(i),axiom (Implies(atomA,Implies(atomB,atomA))))
-	 | Axiom _ ->
-	 		raise (Not_proof(d,f))
-	 | Hyp 0 when compare h f = 0 ->
-	 		MP(
-				Implies(f,Implies(f,f)),
-				axiom (Implies(atomA,Implies(atomB,atomA))),
-				MP(
-					Implies(f,Implies(Implies(f,f),f)),
-					axiom (Implies(atomA,Implies(atomB,atomA))),
-					axiom (Implies(Implies(atomA,Implies(atomB,atomC)),Implies(Implies(atomA,atomB),Implies(atomA,atomC))))
-				)
-			)
-	 | Hyp 0 ->
-				raise (Not_proof(d,f))
-	 | Hyp i ->
-	 		let i' = pred i in
-	 		if List.nth hyps i' = f then
-		 		MP(f,Hyp(i'),axiom (Implies(atomA,Implies(atomB,atomA))))
-			else
-				raise (Not_proof(d,f))
-	 | MP(a,d1,d2) ->
-			let dd1 = deduction h hyps d1 a in
-			let dd2 = deduction h hyps d2 (Implies(a,f)) in
-			MP(
-				Implies(h,a),
-				dd1,
-				MP(
-					Implies(h,Implies(a,f)),
-					dd2,
-					axiom (Implies(Implies(atomA,Implies(atomB,atomC)),Implies(Implies(atomA,atomB),Implies(atomA,atomC))))
-				)
-			)
-	 | ConstSpec ->
-	 		begin match f with
-				Pr(PropTaut(f1), f2) when compare f1 f2 = 0 ->
-					MP(f,ConstSpec,axiom (Implies(atomA,Implies(atomB,atomA))))
-			 | _ ->
-			 		raise (Not_proof(d,f))
-			end
-	 | Nec(i,d1) ->
-	 		begin match f with
-				Box(Modal i1, f1) when i=i1 && prop_axiom_index f1 > 0 ->
-					MP(
-						f,
-						d,
-						axiom (Implies(f,Implies(h,f)))
-					)
-			 | _ ->
-			 		raise (Not_proof(d,f))
-			end
-	in
-	if(check_proof hyps proof (Implies(h,f))) then
-		proof
-	else begin
-		Lm_printf.printf "deduction error:\nh=%a\nhyps=%a\nf=%a\nproof:\n%a\n" print_formula h (fun out l -> List.iter (Lm_printf.fprintf out "%a " print_formula) l) hyps print_formula f print_hproof d;
-		Lm_printf.printf "new proof:\n%a\n" print_hproof proof;
-		assert(check_proof hyps proof (Implies(h,f)));
-		proof
-	end
+  let proof =
+  match d with
+    Choice(d1,d2) ->
+      begin try
+        deduction h hyps d1 f
+      with Not_proof _ ->
+        deduction h hyps d2 f
+      end
+   | Axiom i when i > 0 && axiom_index f = i ->
+      MP(f,Axiom(i),axiom (Implies(atomA,Implies(atomB,atomA))))
+   | Axiom _ ->
+      raise (Not_proof(d,f))
+   | Hyp 0 when compare h f = 0 ->
+      MP(
+        Implies(f,Implies(f,f)),
+        axiom (Implies(atomA,Implies(atomB,atomA))),
+        MP(
+          Implies(f,Implies(Implies(f,f),f)),
+          axiom (Implies(atomA,Implies(atomB,atomA))),
+          axiom (Implies(Implies(atomA,Implies(atomB,atomC)),Implies(Implies(atomA,atomB),Implies(atomA,atomC))))
+        )
+      )
+   | Hyp 0 ->
+        raise (Not_proof(d,f))
+   | Hyp i ->
+      let i' = pred i in
+      if List.nth hyps i' = f then
+        MP(f,Hyp(i'),axiom (Implies(atomA,Implies(atomB,atomA))))
+      else
+        raise (Not_proof(d,f))
+   | MP(a,d1,d2) ->
+      let dd1 = deduction h hyps d1 a in
+      let dd2 = deduction h hyps d2 (Implies(a,f)) in
+      MP(
+        Implies(h,a),
+        dd1,
+        MP(
+          Implies(h,Implies(a,f)),
+          dd2,
+          axiom (Implies(Implies(atomA,Implies(atomB,atomC)),Implies(Implies(atomA,atomB),Implies(atomA,atomC))))
+        )
+      )
+   | ConstSpec ->
+      begin match f with
+        Pr(PropTaut(f1), f2) when compare f1 f2 = 0 ->
+          MP(f,ConstSpec,axiom (Implies(atomA,Implies(atomB,atomA))))
+       | _ ->
+          raise (Not_proof(d,f))
+      end
+   | Nec(i,d1) ->
+      begin match f with
+        Box(Modal i1, f1) when i=i1 && prop_axiom_index f1 > 0 ->
+          MP(
+            f,
+            d,
+            axiom (Implies(f,Implies(h,f)))
+          )
+       | _ ->
+          raise (Not_proof(d,f))
+      end
+  in
+  if(check_proof hyps proof (Implies(h,f))) then
+    proof
+  else begin
+    Lm_printf.printf "deduction error:\nh=%a\nhyps=%a\nf=%a\nproof:\n%a\n" print_formula h (fun out l -> List.iter (Lm_printf.fprintf out "%a " print_formula) l) hyps print_formula f print_hproof d;
+    Lm_printf.printf "new proof:\n%a\n" print_hproof proof;
+    assert(check_proof hyps proof (Implies(h,f)));
+    proof
+  end
 
 let syllogism a b c proofAB proofBC =
-	assert(check_proof [] proofAB (Implies(a,b)));
-	assert(check_proof [] proofBC (Implies(b,c)));
+  assert(check_proof [] proofAB (Implies(a,b)));
+  assert(check_proof [] proofBC (Implies(b,c)));
    let ab = Implies(a,b) in
    let bc = Implies(b,c) in
    let ac = Implies(a,c) in
@@ -820,18 +820,18 @@ let syllogism a b c proofAB proofBC =
 module S4G =
 struct
    type fset = FSet.t
-   
+
    type rule_node =
       Axiom of LP.formula
     | AxiomFalsum
     | NegLeft of LP.formula * gentzen
-	 | NegRight of LP.formula * gentzen
+   | NegRight of LP.formula * gentzen
     | ImplLeft of LP.formula * LP.formula * gentzen * gentzen
     | ImplRight of LP.formula * LP.formula * gentzen
-	 | AndLeft of LP.formula * LP.formula * gentzen
-	 | AndRight of LP.formula * LP.formula * gentzen * gentzen
-	 | OrLeft of LP.formula * LP.formula * gentzen * gentzen
-	 | OrRight of LP.formula * LP.formula * gentzen
+   | AndLeft of LP.formula * LP.formula * gentzen
+   | AndRight of LP.formula * LP.formula * gentzen * gentzen
+   | OrLeft of LP.formula * LP.formula * gentzen * gentzen
+   | OrRight of LP.formula * LP.formula * gentzen
     | BoxRight of int * LP.formula * gentzen
     | BoxLeft of LP.formula * gentzen
 
@@ -848,9 +848,9 @@ struct
                subst_provisionals_in_formula subst a,
                subst_provisionals_in_gentzen subst subderivation
             )
-		 | NegRight(a,subderivation) ->
-		 		NegRight(
-				   subst_provisionals_in_formula subst a,
+     | NegRight(a,subderivation) ->
+        NegRight(
+           subst_provisionals_in_formula subst a,
                subst_provisionals_in_gentzen subst subderivation
             )
        | ImplLeft(a,b,left,right) ->
@@ -866,27 +866,27 @@ struct
                subst_provisionals_in_formula subst b,
                subst_provisionals_in_gentzen subst subderivation
             )
-		 | AndLeft(a,b,subderivation) ->
+     | AndLeft(a,b,subderivation) ->
             AndLeft(
                subst_provisionals_in_formula subst a,
                subst_provisionals_in_formula subst b,
                subst_provisionals_in_gentzen subst subderivation
             )
-		 | AndRight(a,b,left,right) ->
-		 		AndRight(
+     | AndRight(a,b,left,right) ->
+        AndRight(
                subst_provisionals_in_formula subst a,
                subst_provisionals_in_formula subst b,
                subst_provisionals_in_gentzen subst left,
                subst_provisionals_in_gentzen subst right
             )
-		 | OrLeft(a,b,left,right) ->
+     | OrLeft(a,b,left,right) ->
             OrLeft(
                subst_provisionals_in_formula subst a,
                subst_provisionals_in_formula subst b,
                subst_provisionals_in_gentzen subst left,
                subst_provisionals_in_gentzen subst right
             )
-		 | OrRight(a,b,subder) ->
+     | OrRight(a,b,subder) ->
             OrRight(
                subst_provisionals_in_formula subst a,
                subst_provisionals_in_formula subst b,
@@ -910,7 +910,7 @@ end
 open S4G
 
 let sequent_formula hyps concls =
-   let fh = 
+   let fh =
       if FSet.is_empty hyps then
          Neg Falsum
       else
@@ -985,7 +985,7 @@ let rec assign_fresh counter = function
       counter', Pr(t, a')
 
 let assign_fresh_multiple map counter set =
-   FSet.fold 
+   FSet.fold
       (fun (map, counter, set) a ->
          let counter', a' = assign_fresh counter a in
          FMap.add map a a',
@@ -1050,7 +1050,7 @@ let merge start_set map0 map1 families0 families1 =
  * less efficient.
  * So, I've chosen a different approach - the first element of
  * the 'assign's result tuple is a map from original formulas
- * to their new forms 
+ * to their new forms
  * (not global but limited to just processed sequent)
  *)
 let rec assign families counter deriv =
@@ -1078,7 +1078,7 @@ let result = match deriv with
          FSet.remove concls0 a'
       )
  | NegRight(a, subder), hyps, concls ->
-		let families0, map0, counter0, subder0 = assign families counter subder in
+    let families0, map0, counter0, subder0 = assign families counter subder in
       let _, hyps0, concls0 = subder0 in
       let a' = FMap.find map0 a in
       let nega' = Neg a' in
@@ -1121,7 +1121,7 @@ let result = match deriv with
          FSet.add (FSet.remove concls0 b') ab'
       )
  | AndLeft(a,b,subder), hyps, concls ->
-		let families0, map0, counter0, subder0 = assign families counter subder in
+    let families0, map0, counter0, subder0 = assign families counter subder in
       let _, hyps0, concls0 = subder0 in
       let a' = FMap.find map0 a in
       let b' = FMap.find map0 b in
@@ -1140,7 +1140,7 @@ let result = match deriv with
       let _, hyps0, concls0 = left' in
       let a' = FMap.find map0 a in
       let b' = FMap.find map1 b in
-		let ab = And(a, b) in
+    let ab = And(a, b) in
       let ab' = And(a', b') in
       let start_set = FSet.union hyps (FSet.remove concls ab) in
       merge start_set map0 map1 families0 families1,
@@ -1169,7 +1169,7 @@ let result = match deriv with
          concls0
       )
  | OrRight(a,b,subder), hyps, concls ->
-		let families0, map0, counter0, subder0 = assign families counter subder in
+    let families0, map0, counter0, subder0 = assign families counter subder in
       let _, hyps0, concls0 = subder0 in
       let a' = FMap.find map0 a in
       let b' = FMap.find map0 b in
@@ -1179,7 +1179,7 @@ let result = match deriv with
       counter0,
       (
          OrRight(a', b', subder0),
-			hyps0,
+      hyps0,
          FSet.add (FSet.remove (FSet.remove concls0 a') b') ab'
       )
  | BoxRight(agent,b,subder), hyps, concls ->
@@ -1193,19 +1193,19 @@ let result = match deriv with
       let delta = FSet.remove concls boxb in
       let map1, counter1, gamma' = assign_fresh_multiple map0' counter0 gamma in
       let map2, counter2, delta' = assign_fresh_multiple map1 counter1 delta in
-		let boxb', families1, counter3 =
-			if agent = 0 then
-	      	Pr(Provisional counter2, b'),
-   	   	FamilyPart.add_new families0 (Provisional.Principal counter2),
-	      	succ counter2
-			else
-				Box(Modal agent, b'),
-				families0,
-         	counter2
-		in
-			families1,
-			FMap.add map2 boxb boxb',
-			counter3,
+    let boxb', families1, counter3 =
+      if agent = 0 then
+          Pr(Provisional counter2, b'),
+        FamilyPart.add_new families0 (Provisional.Principal counter2),
+          succ counter2
+      else
+        Box(Modal agent, b'),
+        families0,
+          counter2
+    in
+      families1,
+      FMap.add map2 boxb boxb',
+      counter3,
          (
             BoxRight(agent, b', subder0),
             FSet.union hyps0 gamma',
@@ -1216,24 +1216,24 @@ let result = match deriv with
       let _, hyps0, concls0 = subder0 in
       let a' = FMap.find map0 a in
       let _, assum_hyps, _ = subder in
-		let fm =
-			FSet.query
-				(function Box(Modal _, a1) as f when compare a a1 = 0 -> Some f | _ -> None)
-				assum_hyps
-		in
+    let fm =
+      FSet.query
+        (function Box(Modal _, a1) as f when compare a a1 = 0 -> Some f | _ -> None)
+        assum_hyps
+    in
       let a'from_box =
-        	match fm, FMap.find map0 fm with
-   	      Box(Modal 0, _), Pr(_, fm') -> fm'
-      	 | Box(Modal 0, _), _ -> raise (Invalid_argument "A Pr-formula expected")
-			 | _, Box(Modal _, fm') -> fm'
-			 | _, _ -> raise (Invalid_argument "A Box-formula expected")
+          match fm, FMap.find map0 fm with
+          Box(Modal 0, _), Pr(_, fm') -> fm'
+         | Box(Modal 0, _), _ -> raise (Invalid_argument "A Pr-formula expected")
+       | _, Box(Modal _, fm') -> fm'
+       | _, _ -> raise (Invalid_argument "A Box-formula expected")
       in
       let families1 = merge_pair families0 a' a'from_box in
       families1,
       FMap.remove map0 a,
       counter0,
       (
-         BoxLeft(a', subder0), 
+         BoxLeft(a', subder0),
          FSet.remove hyps0 a',
          concls0
       )
@@ -1251,7 +1251,7 @@ let make_provisionals_sum set =
       set
 
 let rec make_provisionals_subst families =
-   FamilyPart.fold 
+   FamilyPart.fold
       (fun subst set ->
          let family_set = FamilyPart.strip_principality set in
          let essential =
@@ -1280,15 +1280,15 @@ let realize_chain_rule subst tC c proofTC hyps concls =
    let tail4 = MP(Pr(tR, cc'), tail2, tail3) in (* a proof of tC:c->tR*tC:c' *)
    let tail5 = MP(Pr(tC,c), proofTC, tail4) in (* a proof of tR*tC:c' *)
    let resultT, resultF, resultProof = App(tR,tC), c', tail5 in
-	assert(check_proof [] resultProof (Pr(resultT, resultF)));
-	subst, resultT, resultF, resultProof
+  assert(check_proof [] resultProof (Pr(resultT, resultF)));
+  subst, resultT, resultF, resultProof
 
 let realize_branch_rule subst tC1 c1 proofTC1 tC2 c2 proofTC2 hyps concls =
    let c' = sequent_formula hyps concls in
    let d = Implies(c2, c') in
    let taut = Implies(c1, d) in
    let tR = PropTaut(taut) in
-	let appAxiom = axiom (Implies(Pr(pS,Implies(atomA,atomB)),Implies(Pr(pT,atomA),Pr(App(pS,pT),atomB)))) in
+  let appAxiom = axiom (Implies(Pr(pS,Implies(atomA,atomB)),Implies(Pr(pT,atomA),Pr(App(pS,pT),atomB)))) in
    let proof1 = ConstSpec in (*for tR:taut *)
    let proof2 =  appAxiom in (*for tR:taut->(tC1:c1->tR*tC1:d *)
    let proof3 = MP(Pr(tR, taut), proof1, proof2) in (*for tC1:c1->tR*tC1:d *)
@@ -1297,13 +1297,13 @@ let realize_branch_rule subst tC1 c1 proofTC1 tC2 c2 proofTC2 hyps concls =
    let proof6 = MP(Pr(App(tR, tC1), d), proof4, proof5) in (*for tC2:c2->tR*tC1*tC2:c' *)
    let proof7 = MP(Pr(tC2, c2), proofTC2, proof6) in (*for tR*tC1*tC2:c' *)
    let resultT, resultF, resultProof = App(App(tR, tC1), tC2), c', proof7 in
-	assert(check_proof [] resultProof (Pr(resultT, resultF)));
+  assert(check_proof [] resultProof (Pr(resultT, resultF)));
    subst, resultT, resultF, resultProof
 
 let realize_axiom subst hyps concls =
    let f' = sequent_formula hyps concls in
    let resultT, resultF, resultProof = PropTaut f', f', ConstSpec in
-	assert(check_proof [] resultProof (Pr(resultT, resultF)));
+  assert(check_proof [] resultProof (Pr(resultT, resultF)));
    subst, resultT, resultF, resultProof
 
 let add_family families fam t f =
@@ -1327,7 +1327,7 @@ let add_family families fam t f =
    proof2, prF
 
 let provePropTaut taut =
-	let taut' = Pr(PropTaut(taut), taut) in
+  let taut' = Pr(PropTaut(taut), taut) in
    let proof7 = ConstSpec in (* taut' *)
    assert(check_proof [] proof7 taut');
    let proof8 = axiom (Implies(Pr(pT,atomA),atomA)) in (* taut'->taut *)
@@ -1335,33 +1335,33 @@ let provePropTaut taut =
    MP(taut', proof7, proof8) (* taut *)
 
 let prove_conj hyps a proofa b proofb =
-	let ab = And(a,b) in
-	let proof =
-		MP(
-			b,
-			proofb,
-			MP(
-				a,
-				proofa,
-				axiom (Implies(a,Implies(b,ab)))
-			)
-		)
-	in
-	assert (check_proof hyps proof ab);
-	proof
+  let ab = And(a,b) in
+  let proof =
+    MP(
+      b,
+      proofb,
+      MP(
+        a,
+        proofa,
+        axiom (Implies(a,Implies(b,ab)))
+      )
+    )
+  in
+  assert (check_proof hyps proof ab);
+  proof
 
 (* from a->b->c to b&a->c *)
 let collapse_2impls a b c proof =
-	let ba = And(b,a) in
-	let abc = Implies(a,Implies(b,c)) in
-	let hyps = [ba;abc] in
-	let proofA =
-		MP(
-			ba,
-			Hyp 0,
-			axiom (Implies(ba,a))
-		)
-	in
+  let ba = And(b,a) in
+  let abc = Implies(a,Implies(b,c)) in
+  let hyps = [ba;abc] in
+  let proofA =
+    MP(
+      ba,
+      Hyp 0,
+      axiom (Implies(ba,a))
+    )
+  in
    let proofB =
       MP(
          ba,
@@ -1369,174 +1369,174 @@ let collapse_2impls a b c proof =
          axiom (Implies(ba,b))
       )
    in
-	let proofC =
-		MP(
-			b,
-			proofB,
-			MP(
-				a,
-				proofA,
-				Hyp 1
-			)
-		)
-	in
-	assert (check_proof hyps proofC c);
-	let proof1 = deduction ba [abc] proofC c in
-	let proof2 = deduction abc [] proof1 (Implies(ba,c)) in
-	assert (check_proof [] proof2 (Implies(abc,Implies(ba,c))));
-	MP(
-		abc,
-		proof,
-		proof2
-	)
+  let proofC =
+    MP(
+      b,
+      proofB,
+      MP(
+        a,
+        proofA,
+        Hyp 1
+      )
+    )
+  in
+  assert (check_proof hyps proofC c);
+  let proof1 = deduction ba [abc] proofC c in
+  let proof2 = deduction abc [] proof1 (Implies(ba,c)) in
+  assert (check_proof [] proof2 (Implies(abc,Implies(ba,c))));
+  MP(
+    abc,
+    proof,
+    proof2
+  )
 
 (* from a1->...->an->b to an&...&a1->b *)
 let rec collapse_impls f proof =
-	(*Lm_printf.printf"collapse_impls %a\n" print_formula f;*)
-	match f with
-		Implies(a,Implies(b,c)) ->
-			let proof0 = collapse_2impls a b c proof in
-			collapse_impls (Implies(And(b,a),c)) proof0
-	 | _ ->
-	 		proof
+  (*Lm_printf.printf"collapse_impls %a\n" print_formula f;*)
+  match f with
+    Implies(a,Implies(b,c)) ->
+      let proof0 = collapse_2impls a b c proof in
+      collapse_impls (Implies(And(b,a),c)) proof0
+   | _ ->
+      proof
 
 let lemma3 aiset =
-	let ailist = FSet.to_list aiset in
-	let _, conj, proof0 = FSet.symbolic_left_sum
-		(fun a0 ->
-			(1, a0, Hyp 0))
-		(fun acc ai ->
-			let i, f, proof0 = acc in
-			succ i, And(f,ai), prove_conj ailist f proof0 ai (Hyp i)
-		)
-		aiset
-	in
-	let proof1, s = lift ailist proof0 conj in
-	let prconj = Pr(s,conj) in
-	assert (check_proof ailist proof1 prconj);
-	let rec aux = fun proof f l ->
-		match l with
-			ai::tl ->
-				aux (deduction ai tl proof f) (Implies(ai,f)) tl
-		 |	[] ->
-				proof, f
-	in
-	let proof2, f = aux proof1 prconj ailist in (* a0->a1->...->prconj *)
-	let proof3 = collapse_impls f proof2 in
-	assert (check_proof [] proof3 (Implies(conj,prconj)));
-	proof3, s, conj
+  let ailist = FSet.to_list aiset in
+  let _, conj, proof0 = FSet.symbolic_left_sum
+    (fun a0 ->
+      (1, a0, Hyp 0))
+    (fun acc ai ->
+      let i, f, proof0 = acc in
+      succ i, And(f,ai), prove_conj ailist f proof0 ai (Hyp i)
+    )
+    aiset
+  in
+  let proof1, s = lift ailist proof0 conj in
+  let prconj = Pr(s,conj) in
+  assert (check_proof ailist proof1 prconj);
+  let rec aux = fun proof f l ->
+    match l with
+      ai::tl ->
+        aux (deduction ai tl proof f) (Implies(ai,f)) tl
+     |	[] ->
+        proof, f
+  in
+  let proof2, f = aux proof1 prconj ailist in (* a0->a1->...->prconj *)
+  let proof3 = collapse_impls f proof2 in
+  assert (check_proof [] proof3 (Implies(conj,prconj)));
+  proof3, s, conj
 
 (* [](a->b) to []a->[]b *)
 let spread_box f proof =
-	match f with
-		Box(agent, Implies(a, b)) ->
-			MP(
-				f,
-				proof,
-				axiom(Implies(f,Implies(Box(agent, a),Box(agent, b))))
-			)
-	 | _ ->
-	 		proof
+  match f with
+    Box(agent, Implies(a, b)) ->
+      MP(
+        f,
+        proof,
+        axiom(Implies(f,Implies(Box(agent, a),Box(agent, b))))
+      )
+   | _ ->
+      proof
 
 (* []a & []b -> [](a&b) *)
 let conj2box_impl_box_conj2 agent a b =
-	Lm_printf.printf "a=%a\nb=%a\n" print_formula a print_formula b;
-	let ax = Implies(a,Implies(b,And(a,b))) in
-	let p0 = spread_box (Box(Modal agent, ax)) (Nec(agent, axiom ax)) in
-	let p1 = MP(Box(Modal agent, a), Hyp 0, p0) in (* []a >- [](b->(a&b)) *)
-	let p2 = spread_box (Box(Modal agent, Implies(b, And(a,b)))) p1 in (* []a >- []b->[](a&b) *)
-	let boxBimplBoxAB = Implies(Box(Modal agent, b), Box(Modal agent, And(a,b))) in
-	assert (check_proof [Box(Modal agent, a)] p2 boxBimplBoxAB);
-	let p3 = deduction (Box(Modal agent, a)) [] p2 boxBimplBoxAB in (* []a->[]b->[](a&b) *)
-	let boxABoxBimplBoxAB = Implies(Box(Modal agent, a), boxBimplBoxAB) in
-	assert (check_proof [] p3 boxABoxBimplBoxAB);
-	let goal = Implies(And(Box(Modal agent, a), Box(Modal agent, b)),Box(Modal agent, And(a,b))) in
-	let taut = Implies(boxABoxBimplBoxAB, goal) in
-	let p4 = provePropTaut taut in
-	let p5 = MP(boxABoxBimplBoxAB, p3, p4) in
-	assert(check_proof [] p5 goal);
-	Lm_printf.printf "goal=%a\n" print_formula goal;
-	p5, goal
+  Lm_printf.printf "a=%a\nb=%a\n" print_formula a print_formula b;
+  let ax = Implies(a,Implies(b,And(a,b))) in
+  let p0 = spread_box (Box(Modal agent, ax)) (Nec(agent, axiom ax)) in
+  let p1 = MP(Box(Modal agent, a), Hyp 0, p0) in (* []a >- [](b->(a&b)) *)
+  let p2 = spread_box (Box(Modal agent, Implies(b, And(a,b)))) p1 in (* []a >- []b->[](a&b) *)
+  let boxBimplBoxAB = Implies(Box(Modal agent, b), Box(Modal agent, And(a,b))) in
+  assert (check_proof [Box(Modal agent, a)] p2 boxBimplBoxAB);
+  let p3 = deduction (Box(Modal agent, a)) [] p2 boxBimplBoxAB in (* []a->[]b->[](a&b) *)
+  let boxABoxBimplBoxAB = Implies(Box(Modal agent, a), boxBimplBoxAB) in
+  assert (check_proof [] p3 boxABoxBimplBoxAB);
+  let goal = Implies(And(Box(Modal agent, a), Box(Modal agent, b)),Box(Modal agent, And(a,b))) in
+  let taut = Implies(boxABoxBimplBoxAB, goal) in
+  let p4 = provePropTaut taut in
+  let p5 = MP(boxABoxBimplBoxAB, p3, p4) in
+  assert(check_proof [] p5 goal);
+  Lm_printf.printf "goal=%a\n" print_formula goal;
+  p5, goal
 
 (* []a1&[]a2&..&[]an -> [](a1&a2&..&an) *)
 let rec conj_box_impl_box_conj agent set =
-	match FSet.cardinal set with
-		0 ->
-			let a = Box(Modal agent, Neg Falsum) in
-			let taut = Implies(a,a) in
-			provePropTaut taut, a
-	 | 1 ->
-			let a = FSet.min_elt set in
-			let boxA = Box(Modal agent, a) in
-			let taut = Implies(boxA, boxA) in
-			provePropTaut taut, boxA
-	 | 2 ->
-	 		let a = FSet.min_elt set in
-			let set' = FSet.remove set a in
-			let b = FSet.min_elt set' in
-			let p, f' = conj2box_impl_box_conj2 agent a b in
-			let f = And(Box(Modal agent, a), Box(Modal agent, b)) in
-			let f'' = Implies(f, Box(Modal agent, And(a,b))) in
-			Lm_printf.printf "f=%a\n" print_formula f'';
-			assert (f''=f');
-			p, f
-	 | _ ->
-	 		Lm_printf.printf "set:%i %a\n" (FSet.cardinal set) FSet.print set;
-	 		let an = FSet.max_elt set in
-			Lm_printf.printf "An:%a\n" print_formula an;
-			let boxAn = Box(Modal agent, an) in
-			let set' = FSet.remove set an in
-			let conjA2n = FSet.symbolic_left_sum
-				(fun x -> x)
-				(fun acc e -> And(acc,e))
-				set'
-			in
-			let conjAi = And(conjA2n, an) in
-			let boxConjAi = Box(Modal agent, conjAi) in
-			let p0, conjBoxA2n = conj_box_impl_box_conj agent set' in (* &&([]a1..[]an-1) -> [](&&a1..an-1) *)
-			let p0goal = Implies(conjBoxA2n,Box(Modal agent, conjA2n)) in
-			Lm_printf.printf "p0goal=%a\n" print_formula p0goal;
-			assert(check_proof [] p0 p0goal);
-			let conjBoxAi = And(conjBoxA2n, boxAn) in
-			let taut = Implies(Implies(conjBoxA2n,Box(Modal agent, conjA2n)),Implies(conjBoxAi,And(Box(Modal agent, conjA2n),boxAn))) in
-			let p1 = provePropTaut taut in
-			let p2 = MP(
-				Implies(conjBoxA2n,Box(Modal agent, conjA2n)),
-				p0,
-				p1
-			) in (* &&[]ai -> [](&&a1..an-1)&[]an *)
-			let p3,_ = conj2box_impl_box_conj2 agent conjA2n an in (* [](&&(a1..an-1))&[]an -> [](&&(a1..an)) *)
-			let p4 = syllogism conjBoxAi (And(Box(Modal agent, conjA2n),boxAn)) boxConjAi p2 p3 in (* &&[]ai -> []&&ai *)
-			p4, conjBoxAi
+  match FSet.cardinal set with
+    0 ->
+      let a = Box(Modal agent, Neg Falsum) in
+      let taut = Implies(a,a) in
+      provePropTaut taut, a
+   | 1 ->
+      let a = FSet.min_elt set in
+      let boxA = Box(Modal agent, a) in
+      let taut = Implies(boxA, boxA) in
+      provePropTaut taut, boxA
+   | 2 ->
+      let a = FSet.min_elt set in
+      let set' = FSet.remove set a in
+      let b = FSet.min_elt set' in
+      let p, f' = conj2box_impl_box_conj2 agent a b in
+      let f = And(Box(Modal agent, a), Box(Modal agent, b)) in
+      let f'' = Implies(f, Box(Modal agent, And(a,b))) in
+      Lm_printf.printf "f=%a\n" print_formula f'';
+      assert (f''=f');
+      p, f
+   | _ ->
+      Lm_printf.printf "set:%i %a\n" (FSet.cardinal set) FSet.print set;
+      let an = FSet.max_elt set in
+      Lm_printf.printf "An:%a\n" print_formula an;
+      let boxAn = Box(Modal agent, an) in
+      let set' = FSet.remove set an in
+      let conjA2n = FSet.symbolic_left_sum
+        (fun x -> x)
+        (fun acc e -> And(acc,e))
+        set'
+      in
+      let conjAi = And(conjA2n, an) in
+      let boxConjAi = Box(Modal agent, conjAi) in
+      let p0, conjBoxA2n = conj_box_impl_box_conj agent set' in (* &&([]a1..[]an-1) -> [](&&a1..an-1) *)
+      let p0goal = Implies(conjBoxA2n,Box(Modal agent, conjA2n)) in
+      Lm_printf.printf "p0goal=%a\n" print_formula p0goal;
+      assert(check_proof [] p0 p0goal);
+      let conjBoxAi = And(conjBoxA2n, boxAn) in
+      let taut = Implies(Implies(conjBoxA2n,Box(Modal agent, conjA2n)),Implies(conjBoxAi,And(Box(Modal agent, conjA2n),boxAn))) in
+      let p1 = provePropTaut taut in
+      let p2 = MP(
+        Implies(conjBoxA2n,Box(Modal agent, conjA2n)),
+        p0,
+        p1
+      ) in (* &&[]ai -> [](&&a1..an-1)&[]an *)
+      let p3,_ = conj2box_impl_box_conj2 agent conjA2n an in (* [](&&(a1..an-1))&[]an -> [](&&(a1..an)) *)
+      let p4 = syllogism conjBoxAi (And(Box(Modal agent, conjA2n),boxAn)) boxConjAi p2 p3 in (* &&[]ai -> []&&ai *)
+      p4, conjBoxAi
 
 (* []i a0 -> [][]i a0 where []i is either [] or xi: *)
 let introspection agent a =
-	match a with
-		Box(Modal agent', a0) when agent = agent' ->
-			axiom (Implies(Box(Modal agent, atomA), Box(Modal agent, Box(Modal agent, atomA)))), (* [] a->[][] a *)
-			Implies(a, Box(Modal agent, a))
-	 | Pr(t, a0) ->
-	 		let p0 = axiom (Implies(Pr(t, atomA), Pr(Check(t), Pr(t, atomA)))) in
-			let p1 = axiom (Implies(Pr(t, atomA), Box(Modal agent, atomA))) in
-			syllogism a (Pr(Check(t), a)) (Box(Modal agent, a)) p0 p1,
-			Implies(a, Box(Modal agent, a))
-	 | _ ->
-	 		raise (Invalid_argument "introspection: unexpected kind of formula")
+  match a with
+    Box(Modal agent', a0) when agent = agent' ->
+      axiom (Implies(Box(Modal agent, atomA), Box(Modal agent, Box(Modal agent, atomA)))), (* [] a->[][] a *)
+      Implies(a, Box(Modal agent, a))
+   | Pr(t, a0) ->
+      let p0 = axiom (Implies(Pr(t, atomA), Pr(Check(t), Pr(t, atomA)))) in
+      let p1 = axiom (Implies(Pr(t, atomA), Box(Modal agent, atomA))) in
+      syllogism a (Pr(Check(t), a)) (Box(Modal agent, a)) p0 p1,
+      Implies(a, Box(Modal agent, a))
+   | _ ->
+      raise (Invalid_argument "introspection: unexpected kind of formula")
 
 (* &&([]i ai -> [][]i ai) *)
 let rec introspections agent set =
-	match FSet.cardinal set with
-		0 ->
-			let taut = Neg Falsum in
-			provePropTaut taut, taut
-	 | 1 ->
-	 		introspection agent (FSet.min_elt set)
-	 | _ ->
-	 		let a = FSet.min_elt set in
-			let set' = FSet.remove set a in
-			let p0, i0 = introspection agent a in
-			let p1, i1 = introspections agent set' in
-			prove_conj [] i0 p0 i1 p1, And(i0,i1)
+  match FSet.cardinal set with
+    0 ->
+      let taut = Neg Falsum in
+      provePropTaut taut, taut
+   | 1 ->
+      introspection agent (FSet.min_elt set)
+   | _ ->
+      let a = FSet.min_elt set in
+      let set' = FSet.remove set a in
+      let p0, i0 = introspection agent a in
+      let p1, i1 = introspections agent set' in
+      prove_conj [] i0 p0 i1 p1, And(i0,i1)
 
 (* Gentzen to Hilbert transformation (phase 3) *)
 let rec g2h families subst = function
@@ -1549,9 +1549,9 @@ let rec g2h families subst = function
          realize_axiom subst hyps concls
     | NegLeft(f, subderivation), hyps, concls ->
          assert (FSet.mem hyps (Neg f));
-			let subst', tC, c, proofTC = g2h families subst subderivation in
+      let subst', tC, c, proofTC = g2h families subst subderivation in
          realize_chain_rule subst' tC c proofTC hyps concls
-	 | NegRight(f, subderivation), hyps, concls ->
+   | NegRight(f, subderivation), hyps, concls ->
          assert (FSet.mem concls (Neg f));
          let subst', tC, c, proofTC = g2h families subst subderivation in
          realize_chain_rule subst' tC c proofTC hyps concls
@@ -1568,17 +1568,17 @@ let rec g2h families subst = function
          assert (FSet.mem hyps (And(a, b)));
          let subst', tC, c, proofTC = g2h families subst subderivation in
          realize_chain_rule subst' tC c proofTC hyps concls
-	 | AndRight(a, b, left, right), hyps, concls ->
+   | AndRight(a, b, left, right), hyps, concls ->
          assert (FSet.mem concls (And(a, b)));
          let subst1, tC1, c1, proofTC1 = g2h families subst left in
          let subst2, tC2, c2, proofTC2 = g2h families subst1 right in
          realize_branch_rule subst2 tC1 c1 proofTC1 tC2 c2 proofTC2 hyps concls
-	 | OrLeft(a, b, left, right), hyps, concls ->
+   | OrLeft(a, b, left, right), hyps, concls ->
          assert (FSet.mem hyps (Or(a, b)));
          let subst1, tC1, c1, proofTC1 = g2h families subst left in
          let subst2, tC2, c2, proofTC2 = g2h families subst1 right in
          realize_branch_rule subst2 tC1 c1 proofTC1 tC2 c2 proofTC2 hyps concls
-	 | OrRight(a, b, subderivation), hyps, concls ->
+   | OrRight(a, b, subderivation), hyps, concls ->
          assert (FSet.mem concls (Or(a, b)));
          let subst', tC, c, proofTC = g2h families subst subderivation in
          realize_chain_rule subst' tC c proofTC hyps concls
@@ -1595,16 +1595,16 @@ let rec g2h families subst = function
          assert (FSet.for_all test assum_hyps);
          let subst1, tC, c, proofTC = g2h families subst subderivation in
          let fam = FSet.query
-				(function
-					Pr(Provisional i, f') when compare f f' = 0 -> Some i
-				 | _ -> None
-				)
-				concls
-			in
+        (function
+          Pr(Provisional i, f') when compare f f' = 0 -> Some i
+         | _ -> None
+        )
+        concls
+      in
          begin match c with
             Implies(ais, b) ->
-					let proof1, s, ais' = lemma3 assum_hyps in (* ais->s:ais *)
-					assert (check_proof [] proof1 (Implies(ais,Pr(s,ais))));
+          let proof1, s, ais' = lemma3 assum_hyps in (* ais->s:ais *)
+          assert (check_proof [] proof1 (Implies(ais,Pr(s,ais))));
                let proof2 = axiom (Implies(Pr(pS,Implies(atomA,atomB)),Implies(Pr(pT,atomA),Pr(App(pS,pT),atomB)))) in (* tC:c->(s:ais->tC*s:b) *)
                let proof3 = MP(Pr(tC, c), proofTC, proof2) in (* s:ais->tC*s:b) *)
                let tCs = App(tC, s) in
@@ -1631,7 +1631,7 @@ let rec g2h families subst = function
                let proof10 = MP(Implies(ais, prB'), proof6, proof9) in (* c' *)
                assert (check_proof [] proof10 c');
                let proof11, tC' = lift [] proof10 c' in
-					assert(check_proof [] proof11 (Pr(tC', c')));
+          assert(check_proof [] proof11 (Pr(tC', c')));
                subst2, tC', c', proof11
           | _ ->
                raise Not_implemented
@@ -1646,64 +1646,64 @@ let rec g2h families subst = function
          let subst1, tC, c, proofTC = g2h families subst subderivation in
          begin match c with
             Implies(ais, b) ->
-					(*
-						tC: ais -> b here c = (ais -> b)
-						[](ais -> b)
-						[]ais -> []b
-						&&([] []i ai) -> []ais
-						&&([] []i ai) -> []b here []i is [] or xi:
-						[]ai -> [] []ai
-						xi:ai -> [] xi:ai
-						&&([]i ai) -> []b
-						add Gamma, Delta
-						lift
-					*)
-					let prC = Pr(tC,c) in
-					let boxC = Box(Modal agent, c) in
-					let proof0 = MP(prC, proofTC, axiom(Implies(prC,boxC))) in (* tC:c -> []c *)
-					let boxAis = Box(Modal agent, ais) in
-					let boxb = Box(Modal agent, b) in
-					let proof1 = MP(boxC, proof0, axiom(Implies(boxC,Implies(boxAis, boxb)))) in (* []ais -> []b *)
-					assert(check_proof [] proof1 (Implies(boxAis, boxb)));
-					let proof2, conjBoxBoxAi = conj_box_impl_box_conj agent assum_hyps in (* &&([] []i ai) -> []ais *)
-					assert(check_proof [] proof2 (Implies(conjBoxBoxAi, boxAis)));
-					let proof3 = syllogism conjBoxBoxAi boxAis boxb proof2 proof1 in (* &&([] []i ai) -> []b *)
-					let proof4, introsp = introspections agent assum_hyps in (* &&([]i ai -> [][]i ai) *)
-					let conjBoxAi =
-						if FSet.cardinal assum_hyps > 0 then
-							FSet.symbolic_left_sum
-								(fun x -> x)
-								(fun acc e -> And(acc, e))
-								assum_hyps
-						else
-							Neg Falsum
-					in (* &&([]i ai) *)
-					let taut0 = Implies(introsp, Implies(Implies(conjBoxBoxAi,boxb),Implies(conjBoxAi,boxb))) in
-					let proof5 = provePropTaut taut0 in
-					let proof6 =
-						MP(
-							Implies(conjBoxBoxAi,boxb),
-							proof3,
-							MP(
-								introsp,
-								proof4,
-								proof5
-							)
-						)
-					in (* &&([]i Ai) -> []b *)
-					let c' = sequent_formula hyps concls in
-					let taut1 = Implies(Implies(conjBoxAi, boxb), c') in
-					let proof7 = provePropTaut taut1 in
-					let proof8 =
-						MP(
-							Implies(conjBoxAi, boxb),
-							proof6,
-							proof7
-						)
-					in
-					assert(check_proof [] proof8 c');
-					let proof9, tC' = lift [] proof8 c' in
-					assert(check_proof [] proof9 (Pr(tC', c')));
+          (*
+            tC: ais -> b here c = (ais -> b)
+            [](ais -> b)
+            []ais -> []b
+            &&([] []i ai) -> []ais
+            &&([] []i ai) -> []b here []i is [] or xi:
+            []ai -> [] []ai
+            xi:ai -> [] xi:ai
+            &&([]i ai) -> []b
+            add Gamma, Delta
+            lift
+          *)
+          let prC = Pr(tC,c) in
+          let boxC = Box(Modal agent, c) in
+          let proof0 = MP(prC, proofTC, axiom(Implies(prC,boxC))) in (* tC:c -> []c *)
+          let boxAis = Box(Modal agent, ais) in
+          let boxb = Box(Modal agent, b) in
+          let proof1 = MP(boxC, proof0, axiom(Implies(boxC,Implies(boxAis, boxb)))) in (* []ais -> []b *)
+          assert(check_proof [] proof1 (Implies(boxAis, boxb)));
+          let proof2, conjBoxBoxAi = conj_box_impl_box_conj agent assum_hyps in (* &&([] []i ai) -> []ais *)
+          assert(check_proof [] proof2 (Implies(conjBoxBoxAi, boxAis)));
+          let proof3 = syllogism conjBoxBoxAi boxAis boxb proof2 proof1 in (* &&([] []i ai) -> []b *)
+          let proof4, introsp = introspections agent assum_hyps in (* &&([]i ai -> [][]i ai) *)
+          let conjBoxAi =
+            if FSet.cardinal assum_hyps > 0 then
+              FSet.symbolic_left_sum
+                (fun x -> x)
+                (fun acc e -> And(acc, e))
+                assum_hyps
+            else
+              Neg Falsum
+          in (* &&([]i ai) *)
+          let taut0 = Implies(introsp, Implies(Implies(conjBoxBoxAi,boxb),Implies(conjBoxAi,boxb))) in
+          let proof5 = provePropTaut taut0 in
+          let proof6 =
+            MP(
+              Implies(conjBoxBoxAi,boxb),
+              proof3,
+              MP(
+                introsp,
+                proof4,
+                proof5
+              )
+            )
+          in (* &&([]i Ai) -> []b *)
+          let c' = sequent_formula hyps concls in
+          let taut1 = Implies(Implies(conjBoxAi, boxb), c') in
+          let proof7 = provePropTaut taut1 in
+          let proof8 =
+            MP(
+              Implies(conjBoxAi, boxb),
+              proof6,
+              proof7
+            )
+          in
+          assert(check_proof [] proof8 c');
+          let proof9, tC' = lift [] proof8 c' in
+          assert(check_proof [] proof9 (Pr(tC', c')));
                subst1, tC', c', proof9
           | _ ->
                raise Not_implemented
@@ -1815,7 +1815,7 @@ let rec lp_free subst f =
     | Pr(Plus(_,_),_) ->
          subst, f
     | Pr(_,_) ->
-         try 
+         try
             let v = FMap.find subst f in
             subst, Atom v
          with Not_found ->
@@ -1824,7 +1824,7 @@ let rec lp_free subst f =
             subst', Atom v
 
 let full proof1 =
-	let tC, c, proof = realize proof1 in
+  let tC, c, proof = realize proof1 in
    Lm_printf.printf "result: %a\nproof: %a\n" print_formula (Pr(tC, c)) print_hproof proof;
    let check, hidden = check_proof_hidden [] proof (Pr(tC, c)) FSet.empty in
    assert check;
