@@ -66,8 +66,8 @@ doc <:doc<
    Red-black tree is a tree that satisfy the following conditions:
    @begin[enumerate]
 
-    @item{Each node has a color: red or black;}
-    @item{ Any child of a red color is black;}
+    @item{ Each node has a color: red or black}
+    @item{ Any child of a red color is black}
     @item{ All paths from the root to any leaf have the same number of black nodes.}
    @end[enumerate]
 >>

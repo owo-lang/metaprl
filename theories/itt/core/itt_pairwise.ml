@@ -1,5 +1,5 @@
 doc <:doc<
-   @module[Itt_pointwise]
+   @module[Itt_pairwise]
 
    @parents
    @docoff
