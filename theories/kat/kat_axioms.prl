@@ -1,0 +1,47 @@
+Rule/Rewrite prod_assotiative: Prim
+Rule/Rewrite rev_prod_assotiative: No proof
+Rule/Rewrite prod_1_r: Prim
+Rule/Rewrite prod_1_l: Prim
+Rule/Rewrite prod_0_r: Prim
+Rule/Rewrite prod_0_l: Prim
+Rule/Rewrite plus_assotiative: Prim
+Rule/Rewrite rev_plus_assotiative: No proof
+Rule/Rewrite plus_commutative: Prim
+Rule/Rewrite plus_0_r: Prim
+Rule/Rewrite plus_0_l: Prim
+Rule/Rewrite neg_wf: Prim
+Rule/Rewrite and_wf: Prim
+Rule/Rewrite or_wf: Prim
+Rule/Rewrite and_commutative: Prim
+Rule/Rewrite neg_l: Prim
+Rule/Rewrite neg_0: Prim
+Rule/Rewrite double_neg: Prim
+Rule/Rewrite transitivity:
+   Proof:
+      0 by byDefT le
+        0.1 by rwhAll (revAssumC 2)
+          0.1.1 by rwhAll (addrC [2; 1] (revAssumC 1))
+            0.1.1.1 by reduceT ttca
+              No Subgoals
+            Close 0.1.1.1
+          Close 0.1.1
+        Close 0.1
+      Close 0
+Rule/Rewrite asymmetry:
+   Proof:
+      0 by byDefT le
+        0.1 by rwhAll (firstC [revAssumC 1; revAssumC 2])
+          0.1.1 by rwh (someSubC symC) 0 ttca
+            No Subgoals
+          Close 0.1.1
+        Close 0.1
+      Close 0
+Rule/Rewrite reduce_ifthenelse_true:
+   Proof: 0 by byDefT ifthenelse
+            No Subgoals
+          Close 0
+Rule/Rewrite reduce_ifthenelse_false:
+   Proof: 0 by byDefT ifthenelse
+            No Subgoals
+          Close 0
+Rule/Rewrite one_times_one: No proof

@@ -1,0 +1,8 @@
+Rule/Rewrite nuprl_recognizer1__compatible:
+   Proof:
+      0 by byDefT unfold_recognizer1 thenT byDefT unfold_ma__single__effect1
+        No Subgoals
+      Close 0
+Rule/Rewrite nuprl_recognizer1_wf: No proof
+Rule/Rewrite nuprl_recognizer1__feasible: No proof
+Rule/Rewrite nuprl_recognizer1__realizes: No proof

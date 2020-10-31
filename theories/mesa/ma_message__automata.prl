@@ -1,0 +1,22 @@
+Rule/Rewrite empty_is_pw_compat: No proof
+Rule/Rewrite all_list_if: No proof
+Rule/Rewrite msga_wf: Prim
+Rule/Rewrite join_wf: Prim
+Rule/Rewrite compat_wf: Prim
+Rule/Rewrite comp_left_join: Prim
+Rule/Rewrite comp_right_join: Prim
+Rule/Rewrite comp_join_join: No proof
+Rule/Rewrite comp_left_if: No proof
+Rule/Rewrite comp_right_if: No proof
+Rule/Rewrite nuprl_ma_empty_compat_left: No proof
+Rule/Rewrite nuprl_ma_empty_compat_right: No proof
+Rule/Rewrite nuprl_ma_empty_compatible_left: No proof
+Rule/Rewrite nuprl_ma_empty_compatible_right: No proof
+Rule/Rewrite state_single_elim:
+   Proof:
+      0 by assertAtT 3 <<'s 'x in 'T>> ttca
+        0.1 by
+        byDefT unfold_ma__state thenT withT <<'x>> (dT 2) thenT reduceT ttca
+          No Subgoals
+        Close 0.1
+      Close 0

@@ -1,0 +1,124 @@
+Rule/Rewrite ax: Proof: 0 by jproverT ta
+                          No Subgoals
+                        Close 0
+Rule/Rewrite notnot: Proof: 0 by jproverT ta
+                              No Subgoals
+                            Close 0
+Rule/Rewrite notnot2: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite implies: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite mult2: Proof: 0 by jproverT ta
+                             No Subgoals
+                           Close 0
+Rule/Rewrite mult3: Proof: 0 by jproverT ta
+                             No Subgoals
+                           Close 0
+Rule/Rewrite mult4: Proof: 0 by jproverT ta
+                             No Subgoals
+                           Close 0
+Rule/Rewrite jens_prop: Proof: 0 by jproverT ta
+                                 No Subgoals
+                               Close 0
+Rule/Rewrite prop_n1: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite prop_n2: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite prop_n3: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite prop_n4: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite ax_all: Proof: 0 by jproverT ta
+                              No Subgoals
+                            Close 0
+Rule/Rewrite all_exst:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite jens_fo: Proof: 0 by jproverT ta
+                               No Subgoals
+                             Close 0
+Rule/Rewrite subst:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite barber:
+   Proof:
+      0 by jproverT ttca
+        0.1 by backThruAssumT 3 ttca
+          No Subgoals
+        Close 0.1
+      Close 0
+Rule/Rewrite fv1: No proof
+Rule/Rewrite fv2: Proof: 0 by jproverT ta
+                           No Subgoals
+                         Close 0
+Rule/Rewrite fv3: No proof
+Rule/Rewrite jens_fo_fv:
+   Proof:
+      0 by
+      assertT <<"type"{'P['a]} and "type"{'R['a]} and "type"{'T['a]}>> thenMT jproverT thenT logicAutoT
+        No Subgoals
+      Close 0
+Rule/Rewrite fun1: Proof: 0 by jproverT thenT logicAutoT
+                            No Subgoals
+                          Close 0
+Rule/Rewrite fun2: Proof: 0 by jproverT thenT logicAutoT
+                            No Subgoals
+                          Close 0
+Rule/Rewrite fo_n1: Proof: 0 by jproverT ta
+                             No Subgoals
+                           Close 0
+Rule/Rewrite fo_n2: Proof: 0 by jproverT ta
+                             No Subgoals
+                           Close 0
+Rule/Rewrite fo_n3: Proof: 0 by jproverT ta
+                             No Subgoals
+                           Close 0
+Rule/Rewrite fo_n4:
+   Proof:
+      0 by
+      tryT (failWithT "takes really long, too longs to try automatically")
+        << Goal >>
+      Close 0
+Rule/Rewrite deadlock1:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite deadlock2:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite deadlock3:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite deadlock4:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite mult_no_rename:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite mult_no_rename2:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite mult_eigen_del:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite mult_rename:
+   Proof: 0 by withT <<'item>> jproverT ta
+            No Subgoals
+          Close 0
+Rule/Rewrite agatha: Proof: 0 by jproverT ttca
+                              No Subgoals
+                            Close 0

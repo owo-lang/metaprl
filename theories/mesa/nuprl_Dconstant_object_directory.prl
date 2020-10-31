@@ -1,0 +1,35 @@
+Rule/Rewrite nuprl_Dconstant__compatible:
+   Proof: 0 by byDefT unfold_Dconstant
+            No Subgoals
+          Close 0
+Rule/Rewrite nuprl_Dconstant_wf: No proof
+Rule/Rewrite nuprl_Dconstant__feasible: No proof
+Rule/Rewrite nuprl_Dconstant__realizes:
+   Proof:
+      0 by byDefT unfold_d__realizes  ttca
+        << Goal >>
+        << Goal >>
+        << Goal >>
+        0.4 by
+        letT << 'es = "w-es"[level:l]{'w;'p} in "event_system"[level:l] >>
+          << Goal >>
+          0.4.2 by
+          assertT <<  ("alle-at"[]{'es;'i;e.not{"assert"{"es-first"{'es;'e}}} => 'e} ) >>
+            0.4.2.1 by alle_at_pred <<event_system[level:l]>> <<bind{x.'e}>>
+              << Goal >>
+              << Goal >>
+              << Goal >>
+              << Goal >>
+            Close 0.4.2.1
+            << Goal >>
+          0.4.2 Has Xtra: 0.4.2.3 by nameHypT 2 "ess1" thenT es_invariantT
+                            << Goal >>
+                            << Goal >>
+                            << Goal >>
+                            << Goal >>
+                            << Goal >>
+                            << Goal >>
+                            << Goal >>
+                          Close 0.4.2.3
+        Close 0.4
+      Close 0
