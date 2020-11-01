@@ -100,7 +100,7 @@ sig
    val equal : ring -> ring -> bool
    val isNegative : ring -> bool
    val gcd : ring -> ring -> ring
-   val list_gcd : ring list -> ring
+   (* val list_gcd : ring list -> ring *)
 
    val term_of : ring -> term
    val mul_term : term -> term -> term
@@ -788,8 +788,8 @@ module IntRing =
 struct
    type ring = num
 
-   let num0=num_of_int 0
-   let num1=num_of_int 1
+   let num0 = zero_num
+   let num1 = one_num
    let ringUnit = num1
    let ringZero = num0
 
@@ -800,35 +800,15 @@ struct
 
 	let isPositive = lt_num num0
 
-	let abs = abs_num
+   let abs = abs_num
+   let mul = mult_num
+   let add = add_num
+   let sub = sub_num
+   let neg = neg_num
 
-   let mul a b = mult_num a b
-
-   let add a b = add_num a b
-
-   let sub a b = sub_num a b
-
-   let neg a = sub num0 a
-
-	let rem a b =
-		let abs_b = abs_num b in
-		let almost_mod = mod_num (abs_num a) abs_b in
-		if ge_num a num0 then
-			almost_mod
-		else
-			if is_zero almost_mod then
-				almost_mod
-			else
-				sub_num abs_b almost_mod
-
-	let div a b =
-		let a_rem_b = rem a b in
-		let a' = sub a a_rem_b in
-		let abs_div = div_num (abs_num a') (abs_num b) in
-		if ((compare_num a num0) * (compare_num b num0)) >= 0 then
-			abs_div
-		else
-			neg abs_div
+   (* Euclidean division and remainder. *)
+   let rem = erem_num
+   let div = ediv_num
 
 (* unused
 	let sign_num a = num_of_int (compare_num a num0)
@@ -837,28 +817,9 @@ struct
    let compare = compare_num
    let equal = eq_num
 
-	let rec gcd_aux a b =
-		if is_zero b then
-			a
-		else
-			if eq_num b num1 then
-				num1
-			else
-				let r = rem a b in
-				gcd_aux b r
+	let gcd = gcd_num
 
-	let gcd a b =
-		let a' = abs_num a in
-		let b' = abs_num b in
-		let c = compare_num a' b' in
-		if c > 0 then
-			gcd_aux a' b'
-		else
-			if c < 0 then
-				gcd_aux b' a'
-			else
-				a'
-
+   (* unused
 	let rec list_gcd_aux c = function
 		hd::tl ->
 			list_gcd_aux (gcd c hd) tl
@@ -868,6 +829,7 @@ struct
 		[i] -> abs_num i
 	 | hd::tl -> list_gcd_aux hd tl
 	 | [] -> raise (Invalid_argument "list_gcd was applied to empty list")
+   *)
 
    let term_of a = mk_number_term a
 
@@ -1474,9 +1436,9 @@ let rec eval_hyp_pos_aux hyp_length hyp_pos count = function
  | [] -> ()
 
 let eval_hyp_pos n hyp_length used_hyps =
-	let hyp_pos = Array.create (Array.length hyp_length) 0 in
-	eval_hyp_pos_aux hyp_length hyp_pos n used_hyps;
-	hyp_pos
+   let hyp_pos = Array.make (Array.length hyp_length) 0 in
+   eval_hyp_pos_aux hyp_length hyp_pos n used_hyps;
+   hyp_pos
 
 let omegaCoreT info hyp_num hyp_length used_hyps tree f = funT (fun p ->
 	let hyp_pos = eval_hyp_pos hyp_num hyp_length used_hyps in
@@ -1699,7 +1661,7 @@ let rec prune_tree used_hyps = function
 *)
 
 let isEmptyOrMainLabel l =
-   (l="") or (List.mem l main_labels)
+   (l="") || (List.mem l main_labels)
 
 let count_main_goals goall =
 	let count = ref 0 in
