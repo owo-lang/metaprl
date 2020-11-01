@@ -13,4 +13,4 @@ MPFILES[] =
    itt_int_bench2
    itt_test
    test
-   prop-pigeon
+   prop_pigeon

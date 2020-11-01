@@ -34,7 +34,6 @@ extends Itt_theory
 
 open Lm_debug
 open Lm_printf
-open Lm_symbol
 
 open Basic_tactics
 
@@ -149,7 +148,7 @@ let proveT = funT (fun p ->
  * in itt_prop_decide.  We apply autoT to well-formedness subgoals
  * to knock them off as soon as possible.
  *)
-let debug_prop_decide =
+let _debug_prop_decide =
   create_debug (**)
      { debug_name = "prop_decide";
        debug_description = "show propDecide operations";
@@ -171,20 +170,20 @@ let revOnSomeHypT tac =
 (* Operate on all non-wf subgoals *)
 let ifNotWT = ifLabT "wf" autoT
 
-(* Select a clause in the disjunction *)
+(* Select a clause in the disjunction
 let rec dorT i =
    if i = 1 then
       idT
    else
-      selT 2 (dT 0) thenMT dorT (pred i)
+      selT 2 (dT 0) thenMT dorT (pred i) *)
 
-(* Decompose a nested disjunction *)
+(* Decompose a nested disjunction
 let rec dest_nested_or t =
    if is_or_term t then
       let h, t = dest_or t in
          h :: dest_nested_or t
    else
-      [t]
+      [t] *)
 
 let is_hyp_term p t =
    let rec search i length =
@@ -260,7 +259,7 @@ let rec decompPropDecideHyp1T max_depth count i = funT (fun p ->
    let term = Sequent.nth_hyp p i in
       if is_false_term term then
          dT i
-      else if is_and_term term or is_or_term term then
+      else if is_and_term term || is_or_term term then
          dT i thenT ifNotWT (internalPropDecideT max_depth count)
       else if is_imp_and_term term then
          (* {C & D => B} => {C => D => B} *)
@@ -297,7 +296,7 @@ and decompPropDecideConclT max_depth count = funT (fun p ->
       if is_or_term goal then
          (selT 1 (dT 0) thenT ifNotWT (internalPropDecideT max_depth count))
          orelseT (selT 2 (dT 0) thenT ifNotWT (internalPropDecideT max_depth count))
-      else if is_and_term goal or is_implies_term goal then
+      else if is_and_term goal || is_implies_term goal then
          dT 0 thenT ifNotWT (internalPropDecideT max_depth count)
       else
          trivialT)

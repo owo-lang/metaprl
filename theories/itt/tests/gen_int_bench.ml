@@ -75,7 +75,7 @@ let gen_bench ~name ~seed ~nrules ~nineq ~nvars ~intrange ~maxdepth =
 	Random.init seed;
 	let co = open_out name in
 	fprintf co "extends Itt_int_test\n\n";
-	fprintf co "open Itt_int_test\n\n";
+	(* fprintf co "open Itt_int_test\n\n"; *)
 	for i=0 to nrules - 1 do
 		gen_rule co i nineq nvars intrange maxdepth
 	done;

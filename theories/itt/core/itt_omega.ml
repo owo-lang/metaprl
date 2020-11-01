@@ -89,18 +89,18 @@ sig
 
    val ringUnit : ring
    val ringZero : ring
-	val abs : ring -> ring
+   val abs : ring -> ring
    val mul : ring -> ring -> ring
-	val div : ring -> ring -> ring
-	val rem : ring -> ring -> ring
+   val div : ring -> ring -> ring
+   val rem : ring -> ring -> ring
    val add : ring -> ring -> ring
    val neg : ring -> ring
    val sub : ring -> ring -> ring
    val compare : ring -> ring -> int
    val equal : ring -> ring -> bool
-	val isNegative : ring -> bool
-	val gcd : ring -> ring -> ring
-	val list_gcd : ring list -> ring
+   val isNegative : ring -> bool
+   val gcd : ring -> ring -> ring
+   val list_gcd : ring list -> ring
 
    val term_of : ring -> term
    val mul_term : term -> term -> term
@@ -125,9 +125,9 @@ end
 
 module Var =
 struct
-	type t = term
-	let equal = alpha_equal
-	let hash = Term_hash_code.hash_term
+   type t = term
+   let equal = alpha_equal
+   let hash = Term_hash_code.hash_term
 end
 
 module Var2Index(Ring : RingSig) =
@@ -138,7 +138,7 @@ struct
 
    let create n = (ref 0, Table.create n)
 
-	let length (r,_) = !r
+   let length (r,_) = !r
 
    let lookup (info:t) v =
       let count, table = info in
@@ -203,27 +203,27 @@ sig
 
    val constvar : vars
 
-	val dim : af -> int
+   val dim : af -> int
    val mk_number: int -> ring -> af
    val mk_var: int -> vars -> af
-	val grow: int -> af -> af
+   val grow: int -> af -> af
    val scale: ring -> af -> af
-	val div: af -> ring -> af
+   val div: af -> ring -> af
    val add: af -> af -> af
-	val sub: af -> af -> af
+   val sub: af -> af -> af
    val add_scaled: af -> ring -> af -> af
-	val sub_scaled: af -> ring -> af -> af
-	val sub_number : af -> ring -> af
+   val sub_scaled: af -> ring -> af -> af
+   val sub_number : af -> ring -> af
 
    val coef: af -> vars -> ring
    val get: af -> vars -> ring
    val remove: af -> vars -> af
    val split: af -> (ring * vars * af)
-	val any_var : af -> vars
+   val any_var : af -> vars
    val isNumber: af -> bool
-	val gcd: af -> ring
+   val gcd: af -> ring
 
-	val value_of : af -> ring
+   val value_of : af -> ring
    val term_of : (term array) -> af -> term
 
    val print : out_channel -> af -> unit
@@ -232,8 +232,8 @@ end
 
 module MakeAF(Ring : RingSig)
    : AF_Sig with
-	type ring=Ring.ring and
-	type vars=VarType.t =
+   type ring=Ring.ring and
+   type vars=VarType.t =
 struct
    module Monom=MakeMonom(Ring)
    module Table=Lm_splay_table.MakeTable(Monom)
@@ -244,7 +244,7 @@ struct
 
    type af=Table.t
 
-	let constvar = 0
+   let constvar = 0
 
    let print_var = VarType.print
 
@@ -255,13 +255,13 @@ struct
       fprintf out "("; Table.iter aux f; fprintf out ")%t" flush
 
    let mk_number _ k =
-		Table.add Table.empty constvar k
+      Table.add Table.empty constvar k
 
    let mk_var _ v = Table.add Table.empty v Ring.ringUnit
 
-	let grow _ f = f
+   let grow _ f = f
 
-	let dim f = pred (Table.length f)
+   let dim f = pred (Table.length f)
 
    let scale_aux k v d =
       Ring.mul k d
@@ -275,79 +275,79 @@ struct
       try Table.find f v
       with Not_found -> Ring.ringZero
 
-	let get f v = coef f v
+   let get f v = coef f v
 
-	let add_aux v k f =
-		let k' = coef f v in
-		Table.replace f v [Ring.add k' k]
+   let add_aux v k f =
+      let k' = coef f v in
+      Table.replace f v [Ring.add k' k]
 
-	let add f1 f2 =
-		Table.fold_map add_aux f1 f2
+   let add f1 f2 =
+      Table.fold_map add_aux f1 f2
 
-	let sub_aux v k f =
-		let k' = coef f v in
-		Table.replace f v [Ring.sub k' k]
+   let sub_aux v k f =
+      let k' = coef f v in
+      Table.replace f v [Ring.sub k' k]
 
-	let sub f1 f2 =
-		Table.fold_map sub_aux f1 f2
+   let sub f1 f2 =
+      Table.fold_map sub_aux f1 f2
 (*
-		let neg_f2 = scale (Ring.neg Ring.ringUnit) f2 in
-		add f1 neg_f2
+      let neg_f2 = scale (Ring.neg Ring.ringUnit) f2 in
+      add f1 neg_f2
 *)
 
-	let add_scaled_aux c v k f =
-		let k' = coef f v in
-		Table.replace f v [Ring.add k' (Ring.mul c k)]
+   let add_scaled_aux c v k f =
+      let k' = coef f v in
+      Table.replace f v [Ring.add k' (Ring.mul c k)]
 
-	let add_scaled f1 c f2 =
-		Table.fold_map (add_scaled_aux c) f1 f2
+   let add_scaled f1 c f2 =
+      Table.fold_map (add_scaled_aux c) f1 f2
 
-	let sub_scaled_aux c v k f =
-		let k' = coef f v in
-		Table.replace f v [Ring.sub k' (Ring.mul c k)]
+   let sub_scaled_aux c v k f =
+      let k' = coef f v in
+      Table.replace f v [Ring.sub k' (Ring.mul c k)]
 
-	let sub_scaled f1 c f2 =
-		Table.fold_map (sub_scaled_aux c) f1 f2
+   let sub_scaled f1 c f2 =
+      Table.fold_map (sub_scaled_aux c) f1 f2
 
-	let sub_number f k =
-		let k' = Table.find f constvar in
-		Table.replace f constvar [Ring.sub k' k]
-(*		let k' = Table.find f constvar in
-		let f' = Table.remove f constvar in
-		Table.add f' constvar (Ring.sub k' k)
+   let sub_number f k =
+      let k' = Table.find f constvar in
+      Table.replace f constvar [Ring.sub k' k]
+(*    let k' = Table.find f constvar in
+      let f' = Table.remove f constvar in
+      Table.add f' constvar (Ring.sub k' k)
 *)
 
-	let gcd f =
-		let r = ref Ring.ringZero in
-		let aux v k =
-			if v=constvar then
-				()
-			else
-				r:=Ring.gcd !r k
-		in
-		Table.iter aux f;
-		!r
+   let gcd f =
+      let r = ref Ring.ringZero in
+      let aux v k =
+         if v=constvar then
+            ()
+         else
+            r:=Ring.gcd !r k
+      in
+      Table.iter aux f;
+      !r
 
-	let div f k = Table.map (fun v c -> Ring.div c k) f
+   let div f k = Table.map (fun v c -> Ring.div c k) f
 
    let remove f vs = Table.remove f vs
 
    let rec split f =
-		if Table.is_empty f then
-			(Ring.ringZero, constvar, mk_number 0 Ring.ringZero)
-		else
-			let v, coefs, rest = Table.deletemax f in
-			match coefs with
-				[c] ->
-					if v!=constvar && (Ring.equal c Ring.ringZero) then
-						split rest
-					else
-						(c,v,rest)
-			 | _ -> raise (Invalid_argument "More than one coefficient associated with a variable")
+      if Table.is_empty f then
+         (Ring.ringZero, constvar, mk_number 0 Ring.ringZero)
+      else
+         let v, coefs, rest = Table.deletemax f in
+         match coefs with
+            [c] ->
+               if v!=constvar && (Ring.equal c Ring.ringZero) then
+                  split rest
+               else
+                  (c,v,rest)
+          | _ -> raise (Invalid_argument "More than one coefficient associated with a variable")
 
-	let any_var f =
-		let c,v,_ = split f in
-		v
+   let any_var f =
+      let c,v,_ = split f in
+      v
 
    let isNumber f =
       let test=ref true in
@@ -358,14 +358,14 @@ struct
       Table.iter aux f;
       !test
 
-	let value_of f =
-		if isNumber f then
-			coef f constvar
-		else
-			begin
-				eprintf "AF.value_of: applied to a non-constant form %a" print f;
-				raise (Invalid_argument "AF.value_of: applied to a non-constant form")
-			end
+   let value_of f =
+      if isNumber f then
+         coef f constvar
+      else
+         begin
+            eprintf "AF.value_of: applied to a non-constant form %a" print f;
+            raise (Invalid_argument "AF.value_of: applied to a non-constant form")
+         end
 
    let term_of_monom info k v =
       if v=constvar then
@@ -393,8 +393,8 @@ end
 (* unused
 module MakeArrayAF(Ring : RingSig)
    : AF_Sig with
-	type ring=Ring.ring and
-	type vars=VarType.t =
+   type ring=Ring.ring and
+   type vars=VarType.t =
 struct
    module Monom=MakeMonom(Ring)
    module VI=Var2Index(Ring)
@@ -404,7 +404,7 @@ struct
 
    type af=ring array
 
-	let constvar = 0
+   let constvar = 0
 
    let print_var = VarType.print
 
@@ -414,98 +414,98 @@ struct
       in
       fprintf out "("; Array.iteri aux f; fprintf out ")%t" flush
 
-	let dim f = pred (Array.length f)
+   let dim f = pred (Array.length f)
 
    let mk_number n k =
-		Array.init (succ n) (fun i -> if i=constvar then k else Ring.ringZero)
+      Array.init (succ n) (fun i -> if i=constvar then k else Ring.ringZero)
 
    let mk_var n v =
-		Array.init (succ n) (fun i -> if i=v then Ring.ringUnit else Ring.ringZero)
+      Array.init (succ n) (fun i -> if i=v then Ring.ringUnit else Ring.ringZero)
 
-	let grow n f =
-		let old = Array.length f in
-		if n > old then
-			Array.init n (fun i -> if i<old then f.(i) else Ring.ringZero)
-		else
-			f
+   let grow n f =
+      let old = Array.length f in
+      if n > old then
+         Array.init n (fun i -> if i<old then f.(i) else Ring.ringZero)
+      else
+         f
 
    let scale_aux k d =
       Ring.mul k d
 
    let scale k f =
-		Array.map (scale_aux k) f
+      Array.map (scale_aux k) f
 
-	let div f k =
-		Array.map (fun x -> Ring.div x k) f
+   let div f k =
+      Array.map (fun x -> Ring.div x k) f
 
    let coef f v =
-		f.(v)
+      f.(v)
 
-	let get f i =
-		if i>= Array.length f then
-			Ring.ringZero
-		else
-			f.(i)
+   let get f i =
+      if i>= Array.length f then
+         Ring.ringZero
+      else
+         f.(i)
 
    let add f1 f2 =
-		if Array.length f1 > Array.length f2 then
-			Array.mapi (fun i k1 -> Ring.add k1 (get f2 i)) f1
-		else
-			Array.mapi (fun i k2 -> Ring.add k2 (get f1 i)) f2
+      if Array.length f1 > Array.length f2 then
+         Array.mapi (fun i k1 -> Ring.add k1 (get f2 i)) f1
+      else
+         Array.mapi (fun i k2 -> Ring.add k2 (get f1 i)) f2
 
    let add_scaled f1 c f2 =
-		if Array.length f1 > Array.length f2 then
-			Array.mapi (fun i k1 -> Ring.add k1 (Ring.mul c (get f2 i))) f1
-		else
-			Array.mapi (fun i k2 -> Ring.add (Ring.mul c k2) (get f1 i)) f2
+      if Array.length f1 > Array.length f2 then
+         Array.mapi (fun i k1 -> Ring.add k1 (Ring.mul c (get f2 i))) f1
+      else
+         Array.mapi (fun i k2 -> Ring.add (Ring.mul c k2) (get f1 i)) f2
 
-	let sub f1 f2 =
-		if Array.length f1 > Array.length f2 then
-			Array.mapi (fun i k1 -> Ring.sub k1 (get f2 i)) f1
-		else
-			Array.mapi (fun i k2 -> Ring.sub (get f1 i) k2) f2
+   let sub f1 f2 =
+      if Array.length f1 > Array.length f2 then
+         Array.mapi (fun i k1 -> Ring.sub k1 (get f2 i)) f1
+      else
+         Array.mapi (fun i k2 -> Ring.sub (get f1 i) k2) f2
 
-	let sub_scaled f1 c f2 =
-		if Array.length f1 > Array.length f2 then
-			Array.mapi (fun i k1 -> Ring.sub k1 (Ring.mul c (get f2 i))) f1
-		else
-			Array.mapi (fun i k2 -> Ring.sub (get f1 i) (Ring.mul c k2)) f2
+   let sub_scaled f1 c f2 =
+      if Array.length f1 > Array.length f2 then
+         Array.mapi (fun i k1 -> Ring.sub k1 (Ring.mul c (get f2 i))) f1
+      else
+         Array.mapi (fun i k2 -> Ring.sub (get f1 i) (Ring.mul c k2)) f2
 
-	let sub_number f k =
-		f.(constvar) <- Ring.sub f.(constvar) k;
-		f
+   let sub_number f k =
+      f.(constvar) <- Ring.sub f.(constvar) k;
+      f
 
    let remove f v =
-		f.(v) <- Ring.ringZero;
-		f
+      f.(v) <- Ring.ringZero;
+      f
 
-	let rec gcd_aux f acc i =
-		if i < Array.length f then
-			gcd_aux f (Ring.gcd acc f.(i)) (succ i)
-		else
-			acc
+   let rec gcd_aux f acc i =
+      if i < Array.length f then
+         gcd_aux f (Ring.gcd acc f.(i)) (succ i)
+      else
+         acc
 
-	(*let gcd f = Array.fold_left Ring.gcd Ring.ringZero f*)
-	let gcd f = gcd_aux f Ring.ringZero (succ constvar)
+   (*let gcd f = Array.fold_left Ring.gcd Ring.ringZero f*)
+   let gcd f = gcd_aux f Ring.ringZero (succ constvar)
 
-	exception Found of int
+   exception Found of int
 
-	let split f =
-		let n = Array.length f in
-		try
-			for i=(pred n) downto 1 do
-				if Ring.compare f.(i) Ring.ringZero <> 0 then
-					raise (Found i)
-			done;
-			(f.(constvar), constvar, Array.make n Ring.ringZero)
-		with
-			Found i ->
-				let f' = Array.init n (fun j -> if i=j then Ring.ringZero else f.(j)) in
-				(f.(i), i, f')
+   let split f =
+      let n = Array.length f in
+      try
+         for i=(pred n) downto 1 do
+            if Ring.compare f.(i) Ring.ringZero <> 0 then
+               raise (Found i)
+         done;
+         (f.(constvar), constvar, Array.make n Ring.ringZero)
+      with
+         Found i ->
+            let f' = Array.init n (fun j -> if i=j then Ring.ringZero else f.(j)) in
+            (f.(i), i, f')
 
-	let any_var f =
-		let n = Array.length f in
-		try
+   let any_var f =
+      let n = Array.length f in
+      try
 			for i=(pred n) downto 1 do
 				if Ring.compare f.(i) Ring.ringZero <> 0 then
 					raise (Found i)
