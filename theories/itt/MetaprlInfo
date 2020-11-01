@@ -22,6 +22,7 @@ PRINT_THEORIES[] =
     core/itt_theory
     core/itt_equal
     core/itt_struct
+    core/itt_image
     core/itt_squash
     core/itt_squiggle
     core/itt_subtype

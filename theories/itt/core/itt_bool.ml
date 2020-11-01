@@ -194,6 +194,7 @@ dform assert_df : parens :: "prec"[prec_assert] :: except_mode[src] :: "assert"{
 
 doc <:doc<
    @rules
+
    @modsubsection{Typehood, well-formedness, and membership}
 
    The $@bool$ type is a member of every universe, and it
@@ -325,8 +326,8 @@ doc <:doc<
    @tt{assert} term is well-formed if its argument is
    a Boolean value.
 
-   The <<"assert"{"true"}>> goal is always provable;
-   the <<"assert"{"false"}>> assumption is contradictory.
+   The <<"assert"{btrue}>> goal is always provable;
+   the <<"assert"{bfalse}>> assumption is contradictory.
 >>
 interactive assert_type {| intro []; nth_hyp |} :
    [wf] sequent { <H> >- 't in bool } -->

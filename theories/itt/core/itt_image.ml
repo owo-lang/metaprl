@@ -49,9 +49,11 @@ extends Itt_equal
 extends Itt_struct
 extends Itt_pairwise
 doc docoff
+
 extends Itt_comment
 
 open Basic_tactics
+
 open Itt_equal
 open Itt_struct
 
@@ -61,6 +63,9 @@ declare Img{'A; x.'f['x]}
 
 doc <:doc<
    @rules
+
+   @modsubsection{Equality and typehood}
+
    <<Img{'A; x.'f['x]}>> is a type when $A$ is a type and $f$ is closed,
 >>
 
@@ -77,6 +82,8 @@ interactive img_univ_eq {| intro [] |}:
    sequent { <H> >- Img{'A; x.'f<||>['x]} = Img{'B; x.'f<||>['x]} in univ[i:l] }
 
 doc <:doc<
+   @modsubsection{Membership}
+
    The elements of <<Img{'A; x.'f['x]}>> are $f[a]$ for <<'a in 'A>>.
 >>
 prim img_mem 'a :
@@ -104,12 +111,17 @@ let img_introT = funT (fun p ->
 
 let resource intro += (<< 'a = 'b in Img{'A; x.'f<||>['x]} >>, wrap_intro img_introT)
 
-doc docon
+doc <:doc<
+   @modsubsection{Introduction}
+>>
 
 interactive img_intro {| intro[] |} :
    sequent { <H> >- 'A } -->
    sequent { <H> >- Img{'A; x.'f<||>['x]} }
 
+doc <:doc<
+   @modsubsection{Elimination}
+>>
 prim img_elim :
    sequent { <H>; a: 'A >- 't in 'T['f['a]] } -->
    sequent { <H>; y: Img{'A; a.'f<||>['a]} >- 't in 'T['y] } = it
