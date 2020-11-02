@@ -55,8 +55,8 @@ open Itt_dfun
 
 doc <:doc<
    @modsection{Non-strict Partial Order}
-   @modsubsection{Rewrites}
 
+   @modsubsection{Rewrites}
 >>
 
 define unfold_isRelation : isRelation{'car; 'rel} <-->

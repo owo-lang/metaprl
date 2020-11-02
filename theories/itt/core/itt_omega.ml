@@ -100,7 +100,6 @@ sig
    val equal : ring -> ring -> bool
    val isNegative : ring -> bool
    val gcd : ring -> ring -> ring
-   (* val list_gcd : ring list -> ring *)
 
    val term_of : ring -> term
    val mul_term : term -> term -> term
@@ -796,9 +795,9 @@ struct
    let print out a =
       fprintf out "(%s)" (string_of_num a)
 
-	let isNegative = gt_num num0
+   let isNegative = gt_num num0
 
-	let isPositive = lt_num num0
+   let isPositive = lt_num num0
 
    let abs = abs_num
    let mul = mult_num
@@ -817,7 +816,7 @@ struct
    let compare = compare_num
    let equal = eq_num
 
-	let gcd = gcd_num
+   let gcd = gcd_num
 
    (* unused
 	let rec list_gcd_aux c = function
@@ -1150,7 +1149,7 @@ let norm constr =
 	else
 		let c = rem (AF.coef f AF.constvar) gcd in
 		let f' = AF.div f gcd in
-		if eq_num c num0 then
+		if is_zero c then
 			(Mul (tree, gcd), f')
 		else
 			(MulAndWeaken (tree, gcd, c), f')
@@ -1258,7 +1257,7 @@ let rec collect_unbound_vars pool acc i =
 let rec no_unbound_vars f = function
 	hd::tl ->
 		let c = AF.coef f hd in
-		if not (eq_num c num0) then
+		if not (is_zero c) then
 			begin
 				if !debug_omega then
 					eprintf "Unbound v%i in %a@." hd AF.print f;
