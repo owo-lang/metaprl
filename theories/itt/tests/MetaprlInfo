@@ -11,6 +11,7 @@ MPFILES[] =
    itt_int_test
    itt_int_bench
    itt_int_bench2
+   itt_int_bench3
    itt_test
    test
    prop_pigeon
