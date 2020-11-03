@@ -1,5 +1,5 @@
 doc <:doc<
-   @module[Dtactic]
+   @module[Meta_dtactic]
 
    The @tactic[meta_dT] tactic is the analog of @tactic[dT], but
    for the meta-logic.

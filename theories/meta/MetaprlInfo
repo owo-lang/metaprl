@@ -24,11 +24,12 @@ PRINT_THEORIES[] =
     $(SUPPORT)/tactics/dtactic
     base/base_trivial
     base/base_rewrite
+    base/base_reflection
     $(SUPPORT)/display/summary
     $(SUPPORT)/display/comment
     $(SUPPORT)/shell/mptop
     extensions/meta_dtactic
     extensions/meta_struct
-    extensions/meta_implies
     extensions/meta_context_terms
+    extensions/meta_context_terms2
     extensions/meta_context_ind1
