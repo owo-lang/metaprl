@@ -17,9 +17,10 @@ BENCH_FILES[] =
 
 BENCH_MLI_FILES = $(addsuffix .mli, $(BENCH_FILES))
 BENCH_ML_FILES  = $(addsuffix .ml, $(BENCH_FILES))
+BENCH_SMT_FILES = $(addsuffix .smt, $(BENCH_FILES))
 BENCH_SRC_FILES = $(BENCH_MLI_FILES) $(BENCH_ML_FILES)
 
-$(BENCH_ML_FILES): $(GEN)
+$(BENCH_ML_FILES): $(GEN) :effects: $(BENCH_SMT_FILES)
    ./$(GEN)
 
 $(BENCH_MLI_FILES):
@@ -28,7 +29,7 @@ $(BENCH_MLI_FILES):
 LocalOCamlGeneratedFiles($(BENCH_SRC_FILES))
 
 clean:
-    $(CLEAN) $(GEN) $(BENCH_SRC_FILES)
+    $(CLEAN) $(GEN) $(BENCH_SRC_FILES) $(BENCH_SMT_FILES)
 
 Theory($(MPFILES))
 
