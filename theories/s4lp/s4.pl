@@ -185,7 +185,7 @@ assignFamily(proof(negLeft(A), Gamma, Delta, chain(Derivation)),
 	Derivation2 = fProof(Rule, Gamma1, Delta2A2, Branches),
 	member([A, A2], Map1),
 	Gamma2 = [neg(A2) | Gamma1],
-	takeout(A2, Delta2A2, Delta2), 
+	takeout(A2, Delta2A2, Delta2),
 	Map = [[neg(A), neg(A2)] | Map1].
 
 axiom(impl(A,impl(B,A))).
@@ -200,12 +200,14 @@ lift([],[]).
 lift([[axiom,H]|T], Lifted) :-
 	lift(T,LiftedT),
 	Lifted = [[axiom,pr(axiom(H),H)]|LiftedT].
-	
+
 lift([[mp,H]|T], Lifted) :-
 	lift(T, LiftedT),
 	member([_,pr(f, impl(A,H))], LiftedT),
 	member([_,pr(a, A)], LiftedT),
-	Lifted = [[mp,pr(prod(f,a), H)],[mp,impl(pr(a,A),pr(prod(f,a),H))],[axiom,impl(pr(f,impl(A,H),impl(pr(a,H),pr(prod(f,a),H)))]|LiftedT].
+	Lifted = [[mp,pr(prod(f,a), H)],
+            [mp,impl(pr(a,A),pr(prod(f,a),H))],
+            [axiom,impl(pr(f,impl(A,H),impl(pr(a,H),pr(prod(f,a),H))))] | LiftedT].
 
 realize(proof(axiom(S), Gamma, Delta, leaf), fProof(axiom(SF), GammaF, DeltaF, leaf), Map,
 	Tail, [[axiom,pr(axiomC(Start), impl(andL(GammaF), orL(DeltaF)))] | Tail], Start, End) :-
@@ -216,8 +218,8 @@ realize(proof(axiomFalse, Gamma, Delta, leaf), fProof(axiomFalse, GammaF, DeltaF
 	End is Start+1.
 
 realize(proof(boxLeft(A), Gamma, Delta, chain(Pr)), fProof(boxLeft(AF), GammaF, DeltaF, chain(PrF), Map,
-		Tail, NewProof, Start, End) :- 
-	realize(Pr, PrF, Map, Tail, NewProof0, Start, Tmp) :-
+		Tail, NewProof, Start, End)) :-
+	realize(Pr, PrF, Map, Tail, NewProof0, Start, Tmp),
 	NewProof0 = [[_,pr(T, F)]|_],
 	NewF = impl(andL(GammaF), orL(DeltaF)),
 	Lemma = pr(boxLeft(Tmp), impl(F, NewF)),
@@ -225,19 +227,19 @@ realize(proof(boxLeft(A), Gamma, Delta, chain(Pr)), fProof(boxLeft(AF), GammaF, 
 	End is Tmp+1.
 
 realize(proof(boxRight(A), Gamma, Delta, chain(Pr)), fProof(boxRight(AF), GammaF, DeltaF, chain(PrF), Map,
-		Tail, NewProof, Start, end) :-
+		Tail, NewProof, Start, end)) :-
 	realize(Pr, PrF, Map, Tail, NewProof0, Start, Tmp),
 	NewProof0 = [[_,pr(T, F)]|_],
 	F = impl(As,B),
 	s = l3(As),
 	L3 = impl(As, pr(s, As)),
-	Lemma0 = impl(pr(s,As), pr(prod(T,s), B),
-	Lemma1 = impl(As, pr(prod(T,s), B),
+	Lemma0 = impl(pr(s,As), pr(prod(T,s), B)),
+	Lemma1 = impl(As, pr(prod(T,s), B)),
 	Lemma2 = impl(As, AF),
 	Lemma3 = pr(XXX, impl(Lemma2, NewF)),
 	NewF = impl(andL(GammaF), orL(DeltaF)),
 	Lemma = pr(boxRight(Tmp), impl(F, NewF)),
-	NewProof = [pr(prod(boxRight(Tmp), T), NewF)|NewProof0]
+	NewProof = [pr(prod(boxRight(Tmp), T), NewF)|NewProof0],
 	End is Tmp+1.
 
 realize(proof(implLeft(A,B), Gamma, Delta, branches(BrA, BrB)), fProof(implLeft(AF,BF), GammaF, DeltaF, branches(BrAF, BrBF)), Map,
@@ -248,7 +250,7 @@ realize(proof(implLeft(A,B), Gamma, Delta, branches(BrA, BrB)), fProof(implLeft(
 	NewProof1 = [[_,pr(T1, F1)]|_],
 	NewF = impl(andL(GammaF), orL(DeltaF)),
 	Lemma = pr(implLeft(Tmp1), impl(F0, impl(F1, NewF))),
-	NewProof = [[mp,pr(prod(prod(implLeft(Tmp1), T0), T1), newF)]|NewProof1),
+	NewProof = [[mp,pr(prod(prod(implLeft(Tmp1), T0), T1), newF)]|NewProof1],
 	End is Tmp1+1.
 
 realize(proof(implRight(A,B), Gamma, Delta, chain(Pr)), fProof(implRight(AF, BF), GammaF, DeltaF, chain(PrF)), Map,
@@ -261,7 +263,7 @@ realize(proof(implRight(A,B), Gamma, Delta, chain(Pr)), fProof(implRight(AF, BF)
 	End is Tmp+1.
 
 realize(proof(negLeft(A), Gamma, Delta, chain(Pr), fProof(negLeft(AF), GammaF, DeltaF, chain(PrF)), Map,
-		Tail, NewProof, Start, End) :-
+		Tail, NewProof, Start, End)) :-
 	realize(Pr, PrF, Map, Tail, NewProof0, Start, Tmp),
 	NewProof0 = [[_,pr(T, F)]|_],
 	NewF = impl(andL(GammaF), orL(DeltaF)),
