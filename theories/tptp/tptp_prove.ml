@@ -48,6 +48,8 @@ open Itt_logic
 open Tptp
 open Tptp_cache
 
+open Refiner.Refiner
+
 let debug_tptp =
    create_debug (**)
       { debug_name = "tptp";
@@ -154,7 +156,7 @@ type t =
  * Tabbing for printing.
  *)
 let tab out i =
-   for j = 0 to i do
+   for _j = 0 to i do
       output_char out ' '
    done
 
@@ -272,7 +274,7 @@ let dest_hyps bound hyps =
         tptp_positive = StringSet.empty
       }
    in
-   let hyps' = Array.create len null_hyp in
+   let hyps' = Array.make len null_hyp in
    let _ =
       for i = j to len - 1 do
          match SeqHyp.get hyps i with
@@ -376,11 +378,13 @@ let unify_term_lists constants terms1 terms2 =
 (*
  * Check that the goal and the hyp have some hope at unification.
  *)
+(*
 let check_unify
-    { tptp_positive = pos1; tptp_negative = neg1 }
-    { tptp_positive = pos2; tptp_negative = neg2 } =
+    { tptp_positive = pos1; tptp_negative = neg1 ; _}
+    { tptp_positive = pos2; tptp_negative = neg2 ; _} =
    if not (StringSet.intersectp pos1 pos2 || StringSet.intersectp neg1 neg2) then
       raise (RefineError ("unify", StringError "terms do not unify"))
+*)
 
 (************************************************************************
  * TACTICS                                                              *
@@ -479,7 +483,7 @@ let new_goal constants subst terms1 terms2 =
          in
             subst @ subst', info
 
-let mk_goal { tptp_vars = vars; tptp_body = body } =
+let mk_goal { tptp_vars = vars; tptp_body = body; _ } =
    if body = [] then
       << "true" >>
    else
@@ -660,7 +664,7 @@ let assert_new_goal level constants subst hyp_index goal tac = funT (fun p ->
  *)
 let resolveT = argfunT (fun i p ->
    let hyp = Sequent.nth_hyp p i in
-   let { sequent_hyps = hyps; sequent_concl = concl } = Sequent.explode_sequent_arg p in
+   let { sequent_hyps = hyps; sequent_concl = concl; _ } = Sequent.explode_sequent_arg p in
    let j, constants = first_clause hyps in
    let hyp_info = dest_hyp hyp in
    let goal_info = dest_goal concl in
@@ -757,7 +761,8 @@ let rec prove_auxT
 let proveT = argfunT (fun bound p ->
    eprintf "Tptp_prove.proveT: %d%t" bound eflush;
    let { sequent_concl = concl;
-         sequent_hyps = hyps
+         sequent_hyps = hyps;
+         _
        } = Sequent.explode_sequent_arg p
    in
    let info = dest_hyps bound hyps in

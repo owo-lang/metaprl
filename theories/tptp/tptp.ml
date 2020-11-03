@@ -9,7 +9,6 @@ open Basic_tactics
 
 open Itt_equal
 open Itt_dfun
-open Itt_logic
 open Tptp_derive
 
 (************************************************************************
@@ -58,7 +57,7 @@ define unfold_t : "t" <--> token["default-token":t]
 let fold_atomic = makeFoldC << atomic{'x} >> unfold_atomic
 let fold_all    = makeFoldC << "all"{v. 'b['v]} >> unfold_all
 let fold_exists = makeFoldC << "exists"{v. 'b['v]} >> unfold_exists
-let fold_t      = makeFoldC << "t" >> unfold_t
+(* let fold_t      = makeFoldC << "t" >> unfold_t *)
 
 let fold_atom0  = makeFoldC << atom0 >> unfold_atom0
 let fold_atom1  = makeFoldC << atom1 >> unfold_atom1
@@ -249,7 +248,7 @@ let is_t_term = is_no_subterms_term t_opname
 let apply_term = << 'f 'x >>
 let apply_opname = opname_of_term apply_term
 
-let rec mk_apply_term = function
+let mk_apply_term = function
    [] ->
       raise (Failure "mk_apply_term")
  | [f] ->

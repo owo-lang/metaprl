@@ -34,7 +34,6 @@ extends Itt_struct
 extends Itt_logic
 
 open Term_sig
-open Refiner.Refiner.TermType
 open Refiner.Refiner.Term
 open Refiner.Refiner.TermSubst
 open Refiner.Refiner.RefineError

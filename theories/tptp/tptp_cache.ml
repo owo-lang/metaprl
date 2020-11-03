@@ -145,6 +145,7 @@ and compare_bterm_lists constantp subst terms1 terms2 =
     | _, [] ->
          GreaterThan
 
+(* unused
 and compare_term_lists constantp subst terms1 terms2 =
    match terms1, terms2 with
       term1 :: terms1, term2 :: terms2 ->
@@ -161,6 +162,7 @@ and compare_term_lists constantp subst terms1 terms2 =
          LessThan
     | _, [] ->
          GreaterThan
+*)
 
 and compare_vars subst v1 v2 =
    try
@@ -221,13 +223,11 @@ let rec compare_term_sub_list constantp subst terms1 terms2 =
 let sort_term_list terms =
    let compare term1 term2 =
       match compare_terms (fun v -> true) [] term1 term2 with
-         LessThan ->
-            true
-       | GreaterThan
-       | Equal _ ->
-            false
+         LessThan -> -1
+       | GreaterThan -> 1
+       | Equal _ -> 0
    in
-      Sort.list compare terms
+      List.sort compare terms
 
 (*
  * Merge two term lists, and remove duplicates.

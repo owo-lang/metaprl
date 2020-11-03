@@ -3,7 +3,7 @@
  *)
 {
 open Lm_printf
-open Lm_debug
+(* open Lm_debug *)
 
 open Tptp_parse
 }
@@ -34,9 +34,9 @@ rule main = parse
     { RightBrack }
   | '\''  [^ '\''] * '\''
     { let s = Lexing.lexeme lexbuf in
-	let s' = String.create (String.length s - 2) in
-	   String.blit s 1 s' 0 (String.length s');
-	   String s'
+	let s' = Bytes.create (String.length s - 2) in
+	   Bytes.blit_string s 1 s' 0 (Bytes.length s');
+	   String (Bytes.to_string s')
     }
   | "--"
     { Negative }
