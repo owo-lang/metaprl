@@ -36,6 +36,7 @@ PRINT_THEORIES[] =
     core/itt_prod
     core/itt_logic
     core/itt_decidable
+    core/itt_sqsimple
     core/itt_bool
     core/itt_int_base
     core/itt_int_ext

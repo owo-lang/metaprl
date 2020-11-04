@@ -235,6 +235,8 @@ prec prec_unary < prec_add
 dform number_df : number[n:n] =
    slot[n:n]
 
+dform int_prl_df : except_mode [src] :: int = mathbbZ
+
 dform beq_int_df1 : parens :: "prec"[prec_compare] :: beq_int{'a; 'b} =
    slot["lt"]{'a} `" =" Mpsymbols!subb `" " slot["le"]{'b}
 

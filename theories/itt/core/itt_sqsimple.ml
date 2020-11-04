@@ -39,9 +39,9 @@ doc <:doc<
 doc <:doc<
    @parents
 >>
-
 extends Itt_logic
 extends Itt_squiggle
+doc docoff
 
 open Basic_tactics
 open Term_match_table
