@@ -1000,7 +1000,7 @@ interactive_rw rem_neg_rw :
    ('b <> 0) -->
    ('a in int) -->
    ('b in int) -->
-   ('a %@ 'b) <--> ('a %@ (-'b))
+   ('a %@ 'b) <--> ((-'a) %@ (-'b))
 
 let rem_negC = rem_neg_rw
 
