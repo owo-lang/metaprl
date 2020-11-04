@@ -15,7 +15,7 @@ open Tptp_type
 %token RightParen
 %token LeftBrack
 %token RightBrack
-%token Negative
+%token Negate
 %token Positive
 %token Comma
 %token Dot

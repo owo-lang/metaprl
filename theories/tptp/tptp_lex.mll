@@ -8,8 +8,10 @@ open Lm_printf
 open Tptp_parse
 }
 
+let alpha_numeric = ['A'-'Z' 'a'-'z' '0'-'9' '_' ]
+
 rule main = parse
-    [' ' '\010' '\013' '\009' '\012'] +
+    [' ' '\n' '\r' '\t' '\012'] +
     { main lexbuf }
   | ['A'-'Z' '\192'-'\214' '\216'-'\222' ]
     (['A'-'Z' 'a'-'z' '_' '\192'-'\214' '\216'-'\246' '\248'-'\255'
@@ -21,7 +23,7 @@ rule main = parse
       '\'' '0'-'9' ]) *
       { match Lexing.lexeme lexbuf with
            "include" -> Include
-         | "input_clause" -> Input_clause
+         | "cnf" -> Cnf
          | name -> Lid name
       }
   | '('
@@ -38,10 +40,10 @@ rule main = parse
 	   Bytes.blit_string s 1 s' 0 (Bytes.length s');
 	   String (Bytes.to_string s')
     }
-  | "--"
-    { Negative }
-  | "++"
-    { Positive }
+  | "~"
+    { Negate }
+  | "|"
+    { Vline }
   | ','
     { Comma }
   | '.'
