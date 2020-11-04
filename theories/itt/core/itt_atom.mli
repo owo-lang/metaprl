@@ -61,7 +61,7 @@ rule atomType : sequent { <H> >- "type"{atom} }
  * H >- Atom ext "t"
  * by tokenFormation "t"
  *)
-rule tokenFormation : sequent { <H> >- atom }
+rule tokenFormation token[t:t] : sequent { <H> >- atom }
 
 (*
  * H >- "t" = "t" in Atom

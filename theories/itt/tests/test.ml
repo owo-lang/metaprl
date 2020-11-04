@@ -35,6 +35,15 @@ extends Itt_theory
 interactive qq :
    sequent { <H>; x: int; y: int >- decidable{equal{int;'x;'y}} }
 
+interactive tokenExtract :
+   sequent { <H> >- atom }
+
+interactive numWf :
+   sequent { <H> >- 12 in int }
+
+interactive numEx :
+   sequent { <H> >- int }
+
 (*
  * -*-
  * Local Variables:

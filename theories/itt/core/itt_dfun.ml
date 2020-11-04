@@ -58,6 +58,10 @@ declare "fun"{'A; x. 'B['x]}
 declare lambda{x. 'b['x]}
 declare apply{'f; 'a}
 
+doc <:doc<
+   @terms
+
+>>
 define unfold_ycomb: ycomb <--> lambda{h. lambda{x. 'h ('x 'x)} lambda{x. 'h ('x 'x)}}
 
 define unfold_fix: fix{f. 'b['f]} <--> ycomb (lambda{f. 'b['f]})

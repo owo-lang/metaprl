@@ -128,10 +128,10 @@ prim tokenEquality {| intro [] |} :
 doc <:doc<
    @modsubsection{Introduction}
 
-   The $@atom$ type is always provable; the token ``t'' is
-   a witness.
+   The $@atom$ type is always provable; the provided token ``t'' is
+   used as the witness.
 >>
-interactive tokenFormation {| intro [] |} :
+interactive tokenFormation {| intro [] |} token[t:t] :
    sequent { <H> >- atom }
 
 doc <:doc<
