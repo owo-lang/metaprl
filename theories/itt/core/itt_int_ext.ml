@@ -994,13 +994,13 @@ interactive rem_neg :
    sequent { <H> >- 'b <> 0 } -->
    [wf] sequent { <H> >- 'a in int } -->
    [wf] sequent { <H> >- 'b in int } -->
-   sequent { <H> >- ('a %@ 'b) ~ ((-'a) %@ (-'b)) }
+   sequent { <H> >- ('a %@ 'b) ~ ('a %@ (-'b)) }
 
 interactive_rw rem_neg_rw :
    ('b <> 0) -->
    ('a in int) -->
    ('b in int) -->
-   ('a %@ 'b) <--> ((-'a) %@ (-'b))
+   ('a %@ 'b) <--> ('a %@ (-'b))
 
 let rem_negC = rem_neg_rw
 
