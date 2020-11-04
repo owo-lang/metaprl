@@ -263,7 +263,7 @@ dform lt_bool_df1 : parens :: "prec"[prec_compare] :: lt_bool{'a; 'b} =
 
 (*
  * XXX: JYH: this display form is rather poorly designed.
- * Why displya using the constant string "n" -- why
+ * Why display using the constant string "n" -- why
  * not use the binding variables that are present
  * in the original term.  Also, this display form substitutes
  * stuff into the expression bodies, which is not really

@@ -74,8 +74,8 @@ let arith op goal =
 
 let check_zero op =
    fun a b ->
-      if Lm_num.is_zero b then raise (RefineError ("Base_meta.arith", StringError "division by zero"))
-      else op a b
+      try op a b with
+         Division_by_zero -> raise (RefineError ("Base_meta.arith", StringError "division by zero"))
 
 (*
  * sum{op1[@i1:n]; op2[@i2:n]} --> op1[@i1 + @i2]
