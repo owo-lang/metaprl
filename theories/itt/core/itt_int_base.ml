@@ -382,7 +382,7 @@ interactive_rw int_sqequal_rw ('a ~ 'b) :
 let int_sqequalC = int_sqequal_rw
 
 doc <:doc<
-   @modsubsection{Typehood and well-formedness of @tt[int] and @tt[number]}
+   @modsubsection{Typehood and well-formedness of @tt[int]}
 
    The $@int$ type inhabits every universe, and it
    is a type.
@@ -412,15 +412,6 @@ interactive int_sqsimple {| intro []; sqsimple |} :
  *)
 interactive intFormation :
    sequent { <H> >- univ[i:l] }
-
-(*
- * H >- Z ext n
- * by numberFormation n
- *)
-prim numberFormation {| intro [] |} number[n:n] :
-   sequent { <H> >- int } = number[n:n]
-
-let resource intro += (<<int>>, wrap_intro (numberFormation <<0>>))
 
 doc <:doc<
    @modsubsection{Well-formedness of operations and relations}
@@ -553,6 +544,15 @@ doc <:doc<
  *)
 prim numberEquality {| intro [] |} :
    sequent { <H> >- number[n:n] in int } = it
+
+(*
+ * H >- Z ext n
+ * by numberFormation n
+ *)
+interactive numberFormation {| intro [] |} number[n:n] :
+   sequent { <H> >- int }
+
+let resource intro += (<<int>>, wrap_intro (numberFormation <<0>>))
 
 doc <:doc<
    @modsubsection{Order relation properties}
