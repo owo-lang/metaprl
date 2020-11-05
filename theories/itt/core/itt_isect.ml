@@ -205,10 +205,10 @@ interactive intersectionMemberFormation2 {| intro [] |} :
 
 doc <:doc<
 
-   Of course $@top$ is inhabited.
+   Of course $@top$ can be inhabited by any term.
 >>
 
-interactive topMemberFormation {| intro [] |} :
+interactive topMemberFormation {| intro [] |} 'a :
    sequent { <H> >-  top }
 
 doc <:doc<

@@ -552,7 +552,9 @@ prim numberEquality {| intro [] |} :
 interactive numberFormation {| intro [] |} number[n:n] :
    sequent { <H> >- int }
 
+(* ldb: should use withT << 0 >> (dT n)
 let resource intro += (<<int>>, wrap_intro (numberFormation <<0>>))
+*)
 
 doc <:doc<
    @modsubsection{Order relation properties}
