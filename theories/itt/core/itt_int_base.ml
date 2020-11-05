@@ -6,7 +6,7 @@ doc <:doc<
    (<<'x +@ 'y>>, <<'x -@ 'y>>, <<- 'x>>)
    with linear order both in propositional (<<'x < 'y>>)
    and boolean (<<lt_bool{'x ; 'y}>>) forms.
-	It was decided that because inequalities on integers are decidable, it would
+   It was decided that because inequalities on integers are decidable, it would
    be better to define boolean inequalities as primitive ones and
    propositional as derived (via <<"assert"{'x}>>) from the correspondent
    boolean inequalities.
@@ -264,20 +264,15 @@ dform lt_bool_df1 : parens :: "prec"[prec_compare] :: lt_bool{'a; 'b} =
    slot["lt"]{'a} `" <" Mpsymbols!subb `" " slot["le"]{'b}
 
 (*
- * XXX: JYH: this display form is rather poorly designed.
- * Why display using the constant string "n" -- why
- * not use the binding variables that are present
- * in the original term.  Also, this display form substitutes
- * stuff into the expression bodies, which is not really
- * a good idea.
+ * LDB: Redesigned display for induction.
  *)
 declare display_n : Dform
 declare display_ind{'x : Dform } : Dform
 declare display_ind_n : Dform
-declare display_ind_eq{'x : Dform; 'y : Dform} : Dform
+declare display_ind_eq{'x : Dform; 'y : Dform; 'a : Dform; 'b : Dform} : Dform
 
 dform display_n_df : display_n =
-   math_it["n":s]
+   alpha
 
 dform display_ind_df1 : display_ind{'x} =
    math_it["Ind":s] `"(" 'x `")"
@@ -285,19 +280,21 @@ dform display_ind_df1 : display_ind{'x} =
 dform display_ind_df2 : display_ind_n =
    display_ind{display_n}
 
-dform ind_eq_df: except_mode[src] :: display_ind_eq{'x;'y} =
-   szone 'x space `"=" space 'y ezone
+dform ind_eq_df: except_mode[src] :: display_ind_eq{'x;'y;'a;'b} =
+   szone 'x `", " 'y `" = " display_n `"," display_ind{'a}
+   hspace
+    `"in " 'b ezone
 
 dform ind_df : parens :: "prec"[prec_bor] :: except_mode[src] ::
    ind{'x; i, j. 'down['i :> Dform; 'j :> Dform]; 'base; k, l. 'up['k :> Dform; 'l :> Dform]} =
    szone pushm[3]
-     szone display_ind{'x} space `"where" space display_ind_n space `"=" ezone
+     szone display_ind{'x} space `"where" space display_ind_n `" =" ezone
    hspace
-     math_implies{math_lt{display_n; 0}; display_ind_eq{display_ind_n; 'down[display_n; display_ind{math_add{display_n;1}}]}}
+     math_implies{math_lt{display_n; 0};display_ind_eq{'i;'j;math_add{display_n;1};'down['i; 'j]}}
    hspace
-     math_implies{display_ind_eq{display_n; 0}; display_ind_eq{display_ind_n; 'base}}
+     math_implies{math_equal{int;display_n; 0};'base}
    hspace
-     math_implies{math_lt{0; display_n}; display_ind_eq{display_ind_n; 'up[display_n; display_ind{math_sub{display_n;1}}]}}
+     math_implies{math_lt{0; display_n};display_ind_eq{'k;'l;math_sub{display_n;1};'up['k; 'l]}}
    popm ezone
 
 doc <:doc<
@@ -583,9 +580,9 @@ interactive_rw lt_irreflex_rw {| reduce |} :
 let lt_IrreflexC = lt_irreflex_rw
 
 interactive irrefl_Elimination 'H 'J :
-	[wf] sequent { <H> >- 'a in int } -->
-	[wf] sequent { <H> >- 'b in int } -->
-	sequent { <H>; x: 'a < 'b; <J['x]>; y: 'b < 'a; <K['x;'y]> >- 'C['x;'y] }
+   [wf] sequent { <H> >- 'a in int } -->
+   [wf] sequent { <H> >- 'b in int } -->
+   sequent { <H>; x: 'a < 'b; <J['x]>; y: 'b < 'a; <K['x;'y]> >- 'C['x;'y] }
 
 let irrefl_EliminationT i j = funT (fun p ->
    let i = get_pos_hyp_num p i in
@@ -593,8 +590,8 @@ let irrefl_EliminationT i j = funT (fun p ->
       irrefl_Elimination i (j-i))
 
 interactive irreflElim {| elim [] |} 'H :
-	[wf] sequent { <H> >- 'a in int } -->
-	sequent { <H>; x: 'a < 'a; <J['x]> >- 'C['x] }
+   [wf] sequent { <H> >- 'a in int } -->
+   sequent { <H>; x: 'a < 'a; <J['x]> >- 'C['x] }
 
 interactive lt_Asym 'a 'b :
    [main] sequent { <H> >- 'a < 'b } -->
@@ -839,7 +836,7 @@ interactive_rw add_Id2_rw {| reduce; arith_unfold |} :
 let add_Id2C = add_Id2_rw
 
 let resource reduce += [
-	<<'a -@ 0>>, wrap_reduce_crw (unfold_sub thenC (addrC [Subterm 2] reduce_minus));
+   <<'a -@ 0>>, wrap_reduce_crw (unfold_sub thenC (addrC [Subterm 2] reduce_minus));
 ]
 
 interactive_rw add_Id3_rw ('a :> Term) :
